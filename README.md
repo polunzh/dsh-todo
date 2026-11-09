@@ -32,6 +32,10 @@ With the sidebar expanded, the countdown sits at the end of the row, right after
 
 ![Countdown after the panel name](./preview/screenshots/sidebar-badge-wide.png)
 
+An unstarted focus stays quiet; a short or long break shows as soon as it becomes the current mode, labelled with the mode name (`Short break 05:00`) and tinted blue to separate it from focus.
+
+![Short break countdown on the sidebar](./preview/screenshots/sidebar-badge-wide-break.png)
+
 ### Pomodoro Timer & 7-Day Stats
 ![Pomodoro View](./preview/screenshots/pomodoro.png)
 
@@ -54,7 +58,7 @@ With the sidebar expanded, the countdown sits at the end of the row, right after
 ### Pomodoro Timer
 - **Work Cycles**: 25-minute focus, 5-minute short break, 15-minute long break every 4 focus sessions (all durations and cycle counts configurable).
 - **Task Binding**: Bind the active timer to any task; completing a focus session increments that task's Pomodoro counter.
-- **Composer dock**: A compact timer row sits under chat composer in every session — idle shows the configured focus length, running shows the countdown with the bound task and pause/skip controls. The sidebar icon shows a pulsing dot while a session runs.
+- **Composer dock**: A compact timer row sits under chat composer in every session — idle shows the configured focus length, running shows the countdown with the bound task and pause/skip controls. The sidebar icon mirrors the countdown as mm:ss, labelled with the mode while on a break.
 - **Persistent Countdown**: Timer state is preserved in browser storage (`localStorage`) with absolute timestamps, surviving page refreshes without drifting.
 - **Audio & Visual Alerts**: A browser notification when a session ends, plus a synthetic Web Audio chime that is **off by default** — turn it on in the pomodoro settings, where a Test button plays it immediately.
 - **Statistics**: Today's Pomodoros vs daily goal, focus minutes, cumulative totals, current streak (in days), and a 7-day bar chart.

@@ -352,22 +352,32 @@
       if (mode !== "panel") document.body.setAttribute("data-mode", mode);
       if (params.get("debug") === "1") document.body.setAttribute("data-debug", "1");
 
-      /* 会话截图需要一个正在跑的番茄钟：先写 localStorage，客户端启动时会读它。 */
-      if (params.get("pom") === "running") {
-        const remaining = 18 * 60000 + 42000;
-        try {
-          window.localStorage.setItem(
-            "dsh-todo/pomodoro",
-            JSON.stringify({
-              mode: "focus",
-              endsAt: Date.now() + remaining,
-              remainingMs: remaining,
-              running: true,
-              taskId: "t-01",
-              cycle: 1,
-            }),
-          );
-        } catch {}
+      /* 侧边栏截图需要一个指定状态的番茄钟：先写 localStorage，客户端启动时会读它。
+         ?pom=running（专注运行中）/ short-running（短休运行中）/ short-idle（短休未开始）*/
+      const pomSeed = params.get("pom");
+      if (pomSeed) {
+        const pomStates = {
+          running: { mode: "focus", minutes: 18, seconds: 42, running: true },
+          "short-running": { mode: "short", minutes: 4, seconds: 42, running: true },
+          "short-idle": { mode: "short", minutes: 5, seconds: 0, running: false },
+        };
+        const seed = pomStates[pomSeed];
+        if (seed) {
+          const remaining = (seed.minutes * 60 + seed.seconds) * 1000;
+          try {
+            window.localStorage.setItem(
+              "dsh-todo/pomodoro",
+              JSON.stringify({
+                mode: seed.mode,
+                endsAt: seed.running ? Date.now() + remaining : null,
+                remainingMs: remaining,
+                running: seed.running,
+                taskId: "t-01",
+                cycle: 1,
+              }),
+            );
+          } catch {}
+        }
       }
       if (isDark) {
         document.body.setAttribute("data-ds-dark-theme", "");

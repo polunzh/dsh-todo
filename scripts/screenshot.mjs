@@ -5,13 +5,8 @@
  *   node scripts/screenshot.mjs
  *   node scripts/screenshot.mjs --keep
  *
- * Emits 6 screenshots to preview/screenshots/:
- *   1. panel-light.png      1440×900  today view, light
- *   2. panel-dark.png       1440×900  today view, dark
- *   3. panel-light-en.png   1440×900  today view, English
- *   4. calendar.png         1440×900  calendar view, light
- *   5. pomodoro.png         1440×900  pomodoro view, light
- *   6. mobile.png            390×844  today view, mobile portrait
+ * Writes panel, calendar, pomodoro, dock and sidebar screenshots to
+ * preview/screenshots/ (1440×900 unless noted).
  */
 import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
@@ -87,6 +82,20 @@ const shots = [
     narrative: "展开侧栏时，秒级倒计时落在「待办」名称后面",
   },
   {
+    name: "sidebar-badge-break",
+    width: 1440,
+    height: 900,
+    url: "?mode=rail&pom=short-idle&theme=light&locale=zh",
+    narrative: "收起侧边栏：短休未开始也显示「短休 05:00」，蓝色与专注区分",
+  },
+  {
+    name: "sidebar-badge-wide-break",
+    width: 1440,
+    height: 900,
+    url: "?mode=sidebar&pom=short-idle&theme=light&locale=zh",
+    narrative: "展开侧栏：「短休 05:00」落在「待办」名称后面，蓝色胶囊",
+  },
+  {
     name: "mobile",
     width: 390,
     height: 844,
@@ -101,6 +110,9 @@ async function launchChrome(port) {
     "--headless=new",
     `--remote-debugging-port=${port}`,
     `--user-data-dir=${profileDir}`,
+    // 无 GUI/受限沙箱环境（CI、agent 终端）下也能起浏览器并连上 CDP
+    "--no-sandbox",
+    "--remote-allow-origins=*",
     "--no-first-run",
     "--no-default-browser-check",
     "--disable-background-networking",
