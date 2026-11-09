@@ -18,7 +18,7 @@ function loadClient() {
   const window = {
     __ModuleLoader__: {
       load(registration) {
-        assert.equal(registration.id, "dsh-todo");
+        assert.equal(registration.id, "@polunzh/dsh-todo");
         exported = registration.factory((name) => {
           assert.equal(name, "react", "只能 require react");
           return {};

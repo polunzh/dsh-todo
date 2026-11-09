@@ -3,4 +3,4 @@
 # 浏览器侧注册侧边栏入口与主面板。
 - insert:
     - id: todo
-      name: dsh-todo
+      name: '@polunzh/dsh-todo'

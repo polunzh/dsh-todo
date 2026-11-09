@@ -19,6 +19,7 @@ const CLIENT_PATH = join(root, "lib", "client.js");
 const SOURCE = readFileSync(CLIENT_PATH, "utf8");
 const STORAGE_KEY = "dsh-todo/pomodoro";
 const PANEL_ID = "dsh-todo";
+const PACKAGE_NAME = "@polunzh/dsh-todo";
 
 /* ============================ 运行环境 ============================ */
 
@@ -216,7 +217,7 @@ function withPlugin(options, run) {
 
 test("模块注册 id、inject 与仅 require react", () => {
   withPlugin({}, (env) => {
-    assert.equal(env.registration.id, PANEL_ID);
+    assert.equal(env.registration.id, PACKAGE_NAME);
     assert.deepEqual(env.exports.inject, ["slots", "locale"]);
     assert.deepEqual(env.requireNames, ["react"], "工厂函数只能 require react");
     assert.equal(env.exports.__preview.PANEL_ID, PANEL_ID);

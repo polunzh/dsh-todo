@@ -1,7 +1,7 @@
 {
-  "name": "dsh-todo",
+  "name": "@polunzh/dsh-todo",
   "version": "0.1.0",
-  "description": "待办清单与番茄钟：Todoist 式的今天/即将到来/收件箱/项目视图，TickTick 式的任务番茄钟与统计；侧边栏入口、主面板页面、智能体可读写同一份任务。",
+  "description": "待办清单与番茄钟：Todoist 式的今天/即将到来/收件箱/项目视图，TickTick 式的任务番茄钟与统计；侧边栏入口、主面板页面、智能体可读写同一份任务。 Todo list and pomodoro timer for DeepSeek Harness: Todoist-style Today/Upcoming/Inbox/Project views, TickTick-style task-bound pomodoro with stats, plus an agent tool over the same tasks.",
   "type": "module",
   "main": "./lib/index.js",
   "exports": {
@@ -49,5 +49,16 @@
   "license": "MIT",
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/polunzh/dsh-todo.git"
+  },
+  "homepage": "https://github.com/polunzh/dsh-todo#readme",
+  "bugs": {
+    "url": "https://github.com/polunzh/dsh-todo/issues"
   }
 }
