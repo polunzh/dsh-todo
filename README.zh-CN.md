@@ -23,6 +23,11 @@ DeepSeek Harness 待办清单与番茄钟插件。深度融合 **Todoist** 经�
 
 ![输入框下方的番茄钟](./preview/screenshots/dock-in-chat.png)
 
+### 侧边栏图标上的分钟角标
+侧边栏收起时，运行中的番茄剩余分钟数直接显示在待办图标右上角，任何页面都能看到。
+
+![侧边栏图标分钟角标](./preview/screenshots/sidebar-badge.png)
+
 ### 番茄钟与 7 天统计
 ![番茄钟视图](./preview/screenshots/pomodoro.png)
 

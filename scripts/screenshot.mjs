@@ -73,6 +73,13 @@ const shots = [
     narrative: "会话视图中输入框下方的常驻番茄钟（倒计时 + 绑定任务 + 暂停/跳过）",
   },
   {
+    name: "sidebar-badge",
+    width: 1440,
+    height: 900,
+    url: "?mode=rail&pom=running&theme=light&locale=zh",
+    narrative: "收起侧边栏时，待办图标右上角的番茄分钟角标",
+  },
+  {
     name: "mobile",
     width: 390,
     height: 844,

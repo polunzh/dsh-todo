@@ -23,6 +23,11 @@ The timer lives under the composer, so it stays in view while you chat: countdow
 
 ![Pomodoro under the composer](./preview/screenshots/dock-in-chat.png)
 
+### Minute badge on the sidebar icon
+With the sidebar collapsed, the running session's remaining minutes sit on the to-do icon, so the countdown is visible from any page.
+
+![Minute badge on the sidebar icon](./preview/screenshots/sidebar-badge.png)
+
 ### Pomodoro Timer & 7-Day Stats
 ![Pomodoro View](./preview/screenshots/pomodoro.png)
 
