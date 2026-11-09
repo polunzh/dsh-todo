@@ -113,12 +113,13 @@ test("已知项目名优先匹配，未知的也当项目", () => {
   assert.equal(parse("#新项目 开个头", { projects: ["工作"] }).project, "新项目");
 });
 
-test("优先级 !p1 到 !p4", () => {
-  [1, 2, 3, 4].forEach((priority) => {
+test("优先级 !p0 到 !p4", () => {
+  [0, 1, 2, 3, 4].forEach((priority) => {
     const parsed = parse(`!p${priority} 任务`);
     assert.equal(parsed.priority, priority);
     assert.equal(parsed.title, "任务");
   });
+  assert.equal(parse("!0 线上故障").priority, 0);
   assert.equal(parse("!1 紧急").priority, 1);
   assert.equal(parse("!high 紧急").priority, 1);
   assert.equal(parse("没有优先级的任务").priority, null);

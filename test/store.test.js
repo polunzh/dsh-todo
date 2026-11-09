@@ -108,6 +108,10 @@ test("createTask validation errors", () => {
     () => createTask({ title: "ok", priority: 5 }, { dataDir: testDir }),
     (err) => err instanceof StoreError && err.code === "invalid-priority",
   );
+
+  const top = createTask({ title: "线上故障", priority: 0 }, { dataDir: testDir });
+  assert.equal(top.priority, 0);
+  assert.equal(updateTask({ id: top.id, priority: null }, { dataDir: testDir }).priority, null);
   assert.throws(
     () => createTask({ title: "ok", recurrence: "yearly" }, { dataDir: testDir }),
     (err) => err instanceof StoreError && err.code === "invalid-recurrence",

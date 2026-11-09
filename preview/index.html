@@ -314,8 +314,9 @@
           </div>
           <div class="pv-turn">
             <div class="pv-assistant">
-              <p>今天有 4 项要处理，其中 1 项已经逾期：</p>
+              <p>今天有 5 项要处理，其中 1 项已经逾期：</p>
               <ul>
+                <li>修线上 502（P0，今天 11:00）</li>
                 <li>审阅 Q4 路线图初稿（P1，今天 14:30）</li>
                 <li>周常 1-on-1 准备与记录（P2，今天 16:00）</li>
                 <li>晨读：《现代系统性能》第四章（P3）</li>
@@ -402,6 +403,23 @@
       ];
 
       const seedTasks = [
+        {
+          id: "t-00",
+          title: targetLocale === "en" ? "Fix production 502 on checkout" : "修线上 502（结算页）",
+          note: targetLocale === "en" ? "Customers cannot pay. Loop in payments on-call." : "用户无法付款，先拉支付值班一起看。",
+          due: { date: todayDate, time: "11:00" },
+          priority: 0,
+          projectId: "p-work",
+          labels: [targetLocale === "en" ? "Incident" : "故障"],
+          parentId: null,
+          recurrence: null,
+          done: false,
+          doneAt: null,
+          createdAt: now - 1800000,
+          updatedAt: now - 1800000,
+          order: 20,
+          pomodoros: 0,
+        },
         {
           id: "t-01",
           title: targetLocale === "en" ? "Review Q4 roadmap draft" : "审阅 Q4 路线图初稿",

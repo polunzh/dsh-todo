@@ -62,6 +62,15 @@
 - `git init`、首次提交、创建 `polunzh/dsh-todo` 远程并推送（有 `gh` 且已登录时）。
 - 如有变更涉及用户可见行为，README 与截图同步更新。
 
+## 阶段 7 · P0 优先级
+
+- `lib/store.js`：`PRIORITIES = [0,1,2,3,4]`；`normalizePriority` 只把 `null`/`undefined`/`""` 当清除，`0` 是合法 P0。
+- `lib/index.js`：工具 `priority` 描述改为 `0(P0 最高)..4`，清除用 `null`；`formatTaskLine` 的 `task.priority` 判空改成 `!= null`，排序把 `0` 排在 `1` 前。
+- `lib/client.js`：`priorityOf` 用 `5` 表示无优先级（原来是 `0`，会与 P0 撞车）；解析 `!p0` / `!0`；筛选按钮、详情分段、快速添加 chip、日历色条、列表色条补 `p0`；CSS 加实心红标签与 4px 色条。
+- 测试：`parse.test.js` 加 `!p0`；`store.test.js` 覆盖 `0` 合法、`5` 非法；`tool.test.js` 覆盖新增 P0 与 `null` 清除；`route.test.js` 保持 `9` 非法。
+- 文档：`docs/contract.md` 的 `priority` 字段与工具 schema；两份 README 的优先级说明；重跑截图脚本更新 README 配图。
+- 验收：`npm test` 全绿、`node --check` 通过、预览页能看到 P0 标签与筛选、安装后刷新页面旧任务不受影响。
+
 ## 风险与对策
 
 - **主面板高度/滚动**：宿主给的是整列容器，页面自己 `height:100%` + 内部滚动；用真机截图确认。

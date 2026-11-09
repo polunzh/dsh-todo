@@ -60,7 +60,7 @@ test("the tool definition matches the contract", () => {
     "weekly",
     "monthly",
   ]);
-  assert.equal(tool.parameters.properties.priority.type, "integer");
+  assert.deepEqual(tool.parameters.properties.priority.type, ["integer", "null"]);
   assert.equal(tool.parameters.properties.labels.type, "array");
   assert.equal(tool.parameters.properties.labels.items.type, "string");
 
@@ -176,6 +176,18 @@ test("action=list view=completed shows done tasks", async () => {
   assert.match(completed.summary, /\[x\]/);
 });
 
+test("action=add accepts P0 as the top priority", async () => {
+  const result = await executeTodoAction(
+    { action: "add", title: "线上故障", priority: 0 },
+    opts,
+  );
+  assert.equal(result.task.priority, 0);
+  assert.match(result.summary, /P0/);
+
+  const listed = await executeTodoAction({ action: "list", view: "all" }, opts);
+  assert.match(listed.summary, /\[ \] 线上故障 · P0/);
+});
+
 test("action=update changes fields and clears due/priority", async () => {
   const added = await executeTodoAction(
     { action: "add", title: "旧标题", due: "2026-11-20", priority: 2 },
@@ -187,7 +199,7 @@ test("action=update changes fields and clears due/priority", async () => {
     id: added.task.id,
     title: "新标题",
     due: "",
-    priority: 0,
+    priority: null,
     note: "补充说明",
   });
   assert.equal(updated.ok, true);

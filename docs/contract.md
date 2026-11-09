@@ -27,7 +27,7 @@ Task = {
   "title": "写周报",                   // trim 后 1..500 字符
   "note": "",                          // 0..10000 字符
   "due": null | { "date": "2026-11-09", "time": null | "15:00" },  // 本地日期/时刻
-  "priority": null | 1 | 2 | 3 | 4,   // 1 = P1 最高，4 = P4 最低，null = 无
+  "priority": null | 0 | 1 | 2 | 3 | 4,   // 0 = P0 最紧急，4 = P4 最低，null = 无
   "projectId": null | "uuid",
   "labels": ["工作"],                  // 最多 10 个，每个 1..40 字符，去重
   "parentId": null | "uuid",           // 子任务只允许一层：父任务的 parentId 必须是 null
@@ -136,7 +136,7 @@ Settings = {
     "title": { "type": "string" },
     "note": { "type": "string" },
     "due": { "type": "string", "description": "YYYY-MM-DD 或 YYYY-MM-DD HH:mm；空字符串表示清除" },
-    "priority": { "type": "integer", "description": "1(P1 最高)..4；0 表示清除" },
+    "priority": { "type": ["integer", "null"], "minimum": 0, "maximum": 4, "description": "0 = P0 最紧急，1..4 = P1..P4；null 或省略表示无" },
     "project": { "type": "string", "description": "项目名称或 id" },
     "labels": { "type": "array", "items": { "type": "string" } },
     "recurrence": { "type": "string", "enum": ["none", "daily", "weekday", "weekly", "monthly"] },
@@ -171,7 +171,7 @@ Settings = {
 
 - `today` 用宿主返回的 `today`（本地日期字符串），不要用浏览器时区另算。
 - 视图：`today`（`due.date <= today` 且未完成，分「逾期 / 今天」两组）、`upcoming`（`due.date > today`，按日期分组）、`inbox`（`due == null`）、`completed`（`done`，按 `doneAt` 倒序，最多 200 条）、`project:<id>`、`calendar:<YYYY-MM>`、`pomodoro`。
-- 排序：`priority` 升序（P1 在前，null 最后）→ `order` 升序。
+- 排序：`priority` 升序（P0 在前，null 最后）→ `order` 升序。
 - 子任务缩进显示在父任务下方；父任务显示 `完成 2/3`。
 - 重复任务行显示循环图标，完成时出现提示「下一次：11 月 10 日」。
 

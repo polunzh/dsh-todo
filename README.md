@@ -51,7 +51,7 @@ An unstarted focus stays quiet; a short or long break shows as soon as it become
 - **Natural-Language Quick Add**: Type `Tomorrow 3pm review roadmap #work !p1 ~weekly` to parse due dates, times, projects, priorities, and recurrence rules into structured fields automatically.
 - **Task Hierarchy**: One-level subtasks with progress tracking (`1/2 completed`), cascade completion, and cascade deletion with full undo support.
 - **Recurring Tasks**: Supports `daily`, `weekday` (skipping weekends), `weekly`, and `monthly` frequencies with catch-up logic. Marking a recurring task complete archives the current occurrence and immediately spawns the next scheduled occurrence with fresh subtasks.
-- **Priorities & Labels**: P1 (Urgent, red), P2 (High, orange), P3 (Medium, blue), P4 (Low, gray), plus arbitrary `#project` and `@tag` labels.
+- **Priorities & Labels**: P0 (Critical, filled red), P1 (Urgent, red), P2 (High, orange), P3 (Medium, blue), P4 (Low, gray); quick add accepts `!p0`–`!p4`, plus arbitrary `#project` and `@tag` labels.
 - **Calendar Grid**: Interactive monthly grid displaying task count dots; clicking any date filters tasks for that specific day.
 - **Search & Filter**: Real-time keyword search across titles and notes, combined with multi-select priority filters.
 
