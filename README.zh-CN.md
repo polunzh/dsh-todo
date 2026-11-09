@@ -28,6 +28,10 @@ DeepSeek Harness 待办清单与番茄钟插件。深度融合 **Todoist** 经�
 
 ![侧边栏图标分钟角标](./preview/screenshots/sidebar-badge.png)
 
+展开侧栏时，角标会收进图标右下角，不会压到「待办」两个字。
+
+![展开侧栏时的分钟角标](./preview/screenshots/sidebar-badge-wide.png)
+
 ### 番茄钟与 7 天统计
 ![番茄钟视图](./preview/screenshots/pomodoro.png)
 

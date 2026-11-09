@@ -126,7 +126,10 @@ function createEnv(options = {}) {
     env.exports = registration.factory((name) => {
       env.requireNames.push(name);
       if (name !== "react") throw new Error(`不允许 require ${name}`);
-      return {};
+      // 只需要 createElement：测试会直接调用注册出来的组件来检查 props 转发。
+      return {
+        createElement: (type, props, ...children) => ({ type, props: props || {}, children }),
+      };
     });
   };
 
@@ -256,6 +259,20 @@ test("注册 sidebar.panellist、main 与输入框下方的番茄钟 dock", () =
   assert.equal(dock.opts.id, "dsh-todo-pomodoro");
   assert.equal(dock.opts.order, 2);
   assert.equal(typeof dock.Component, "function");
+});
+
+test("侧边栏组件把宿主的 size / active 原样转发（展开 16、收起 18 走不同排版）", () => {
+  const { env } = withPlugin({}, (env) => {
+    const sidebar = env.registrations.find((item) => item.opts.name === "sidebar.panellist");
+    const wide = sidebar.Component({ size: 16, active: true });
+    assert.equal(wide.props.size, 16, "宿主的 size 必须转发生效");
+    assert.equal(wide.props.active, true, "宿主的 active 必须转发生效");
+    const rail = sidebar.Component({ size: 18, active: false });
+    assert.equal(rail.props.size, 18);
+    const bare = sidebar.Component();
+    assert.equal(typeof bare.type, "function", "没有 props 时也要渲染组件");
+  });
+  assert.ok(env.registrations.length >= 3);
 });
 
 test("label() 跟随宿主语言切换（zh / en）", () => {

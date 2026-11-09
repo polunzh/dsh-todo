@@ -80,6 +80,13 @@ const shots = [
     narrative: "收起侧边栏时，待办图标右上角的番茄分钟角标",
   },
   {
+    name: "sidebar-badge-wide",
+    width: 1440,
+    height: 900,
+    url: "?mode=sidebar&pom=running&theme=light&locale=zh",
+    narrative: "展开侧栏时，图标角标与「待办」名称并排的实际效果",
+  },
+  {
     name: "mobile",
     width: 390,
     height: 844,

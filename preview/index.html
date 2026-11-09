@@ -207,6 +207,31 @@
       .pv-rail-btn.is-active { background: var(--dsw-alias-interactive-bg-bg-hover, var(--dsw-alias-interactive-bg-hover)); color: var(--dsw-alias-label-primary); }
       .pv-rail-btn svg { display: block; }
       .pv-rail-spacer { flex: 1 1 auto; }
+      /* 展开状态的侧边栏：图标 + 名称，用来看角标是否压到标题 */
+      #widebar {
+        display: none;
+        flex: none;
+        width: 232px;
+        height: 100%;
+        flex-direction: column;
+        gap: 2px;
+        padding: 12px 10px;
+        background: var(--dsw-specific-sidebar-fill, var(--dsw-alias-bg-layer-1));
+        border-right: 1px solid var(--dsw-alias-border-l1);
+      }
+      body[data-mode="sidebar"] #widebar { display: flex; }
+      body[data-mode="sidebar"] #main-mount { display: none; }
+      body[data-mode="sidebar"] #chat-shell { display: flex; }
+      .pv-side-row {
+        display: flex; align-items: center; gap: 10px;
+        min-height: 36px; padding: 7px 8px;
+        border-radius: var(--dsw-radius-md);
+        color: var(--dsw-alias-label-primary);
+        font-size: 14px; line-height: 22px;
+      }
+      .pv-side-row.is-active { background: var(--dsw-alias-interactive-bg-hover); }
+      .pv-side-glyph { flex: none; display: inline-flex; align-items: center; justify-content: center; }
+      .pv-side-row svg { display: block; }
       #dock-mount {
         display: flex;
         justify-content: center;
@@ -237,6 +262,20 @@
   </head>
   <body>
     <div id="host-shell">
+      <div id="widebar">
+        <div class="pv-side-row">
+          <span class="pv-side-glyph">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 6.4h16v9.2H9.6L5.6 19v-3.4H4z" />
+            </svg>
+          </span>
+          <span>对话</span>
+        </div>
+        <div class="pv-side-row is-active" data-wide-todo>
+          <span class="pv-side-glyph" id="wide-mount"></span>
+          <span id="wide-title">待办</span>
+        </div>
+      </div>
       <div id="rail">
         <button class="pv-rail-btn" type="button" aria-label="Conversation">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -300,7 +339,8 @@
       const targetLocale = params.get("locale") === "en" ? "en" : "zh";
       const targetView = params.get("view") || "today";
       const rawMode = params.get("mode");
-      const mode = rawMode === "dock" ? "dock" : rawMode === "rail" ? "rail" : "panel";
+      const mode =
+        rawMode === "dock" ? "dock" : rawMode === "rail" ? "rail" : rawMode === "sidebar" ? "sidebar" : "panel";
       if (mode !== "panel") document.body.setAttribute("data-mode", mode);
       if (params.get("debug") === "1") document.body.setAttribute("data-debug", "1");
 
@@ -783,7 +823,18 @@
             /* Mount the captured component into the visible surface */
             const Component = window.__previewComponent || (exports?.__preview?.TodoPage);
             if (Component) {
-              if (mode === "rail") {
+              if (mode === "sidebar") {
+                const wideRoot = ReactDOM.createRoot(document.getElementById("wide-mount"));
+                wideRoot.render(
+                  React.createElement(
+                    React.Fragment,
+                    null,
+                    ...window.__previewSidebar.map((Glyph, index) =>
+                      React.createElement(Glyph, { key: index, size: 16, active: true }),
+                    ),
+                  ),
+                );
+              } else if (mode === "rail") {
                 const railTarget = document.getElementById("rail-mount");
                 const railRoot = ReactDOM.createRoot(railTarget);
                 railRoot.render(
@@ -825,13 +876,14 @@
               }
               // Wait for React to mount and dataStore to fetch state
               const checkMounted = () => {
-                const mount = mode === "rail" ? document.getElementById("rail-mount") :
+                const mount = mode === "sidebar" ? document.getElementById("wide-mount") :
+                  mode === "rail" ? document.getElementById("rail-mount") :
                   mode === "dock" ? document.getElementById("dock-mount") :
                   document.getElementById("main-mount");
                 const hasContent = Boolean(
                   mount &&
                     mount.children.length > 0 &&
-                    (mode === "rail" || (mount.innerText || "").trim().length > 4),
+                    (mode === "rail" || mode === "sidebar" || (mount.innerText || "").trim().length > 4),
                 );
                 if (hasContent) {
                   window.__previewReady = true;

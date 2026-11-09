@@ -28,6 +28,10 @@ With the sidebar collapsed, the running session's remaining minutes sit on the t
 
 ![Minute badge on the sidebar icon](./preview/screenshots/sidebar-badge.png)
 
+With the sidebar expanded, the badge shrinks into the icon's corner so the title stays readable.
+
+![Minute badge with the sidebar expanded](./preview/screenshots/sidebar-badge-wide.png)
+
 ### Pomodoro Timer & 7-Day Stats
 ![Pomodoro View](./preview/screenshots/pomodoro.png)
 
