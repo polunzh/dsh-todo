@@ -57,4 +57,8 @@ test("index.html handles theme and locale parameters and stubs /todo/api/state",
   assert.match(html, /route === "state"/);
   assert.match(html, /data-ds-dark-theme/);
   assert.match(html, /--dsw-alias-bg-base/);
+  // 会话模式：用来给「输入框下方的番茄钟」出截图
+  assert.match(html, /dock-mount/);
+  assert.match(html, /data-mode/);
+  assert.match(html, /dsh-todo\/pomodoro/);
 });

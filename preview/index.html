@@ -105,6 +105,90 @@
         display: flex;
         overflow: hidden;
       }
+      /* 会话模式：模拟 DSH 对话页，用来展示输入框下方的番茄钟条 */
+      #chat-shell {
+        display: none;
+        flex: 1 1 auto;
+        min-width: 0;
+        height: 100%;
+        flex-direction: column;
+        background: var(--dsw-alias-bg-base);
+      }
+      body[data-mode="dock"] #main-mount { display: none; }
+      body[data-mode="dock"] #chat-shell { display: flex; }
+      #chat-scroll {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
+        padding: 40px 32px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+        align-items: center;
+      }
+      .pv-turn { width: min(760px, 100%); display: flex; flex-direction: column; gap: 10px; }
+      .pv-user {
+        align-self: flex-end;
+        max-width: 80%;
+        padding: 10px 14px;
+        border-radius: var(--dsw-radius-lg);
+        background: var(--dsw-alias-bg-layer-2);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .pv-assistant { font-size: 14px; line-height: 1.75; color: var(--dsw-alias-label-primary); }
+      .pv-assistant p { margin: 0 0 10px; }
+      .pv-assistant ul { margin: 0; padding-left: 20px; color: var(--dsw-alias-label-secondary); }
+      .pv-assistant li { margin: 2px 0; }
+      #composer-shell {
+        flex: none;
+        width: min(820px, calc(100% - 64px));
+        margin: 0 auto;
+        padding: 8px 0 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .pv-composer {
+        box-sizing: border-box;
+        min-height: 92px;
+        border: 1px solid var(--dsw-alias-border-l2);
+        border-radius: var(--dsw-radius-lg);
+        background: var(--dsw-alias-bg-layer-2);
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .pv-composer-text { font-size: 14px; color: var(--dsw-alias-label-tertiary); }
+      .pv-composer-row { display: flex; align-items: center; gap: 8px; }
+      .pv-composer-chip {
+        font-size: 12px;
+        color: var(--dsw-alias-label-secondary);
+        border: 1px solid var(--dsw-alias-border-l1);
+        border-radius: var(--dsw-radius-sm);
+        padding: 2px 8px;
+      }
+      .pv-composer-send {
+        margin-left: auto;
+        display: grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: var(--dsw-alias-label-primary);
+        color: var(--dsw-alias-bg-base);
+        font-size: 14px;
+      }
+      #dock-mount {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        min-height: 26px;
+        padding-top: 4px;
+      }
       #preview-banner {
         display: none;
       }
@@ -128,6 +212,36 @@
   <body>
     <div id="host-shell">
       <div id="main-mount"></div>
+      <div id="chat-shell">
+        <div id="chat-scroll">
+          <div class="pv-turn">
+            <div class="pv-user">帮我看看今天的安排，顺便开一个番茄钟。</div>
+          </div>
+          <div class="pv-turn">
+            <div class="pv-assistant">
+              <p>今天有 4 项要处理，其中 1 项已经逾期：</p>
+              <ul>
+                <li>审阅 Q4 路线图初稿（P1，今天 14:30）</li>
+                <li>周常 1-on-1 准备与记录（P2，今天 16:00）</li>
+                <li>晨读：《现代系统性能》第四章（P3）</li>
+                <li>逾期：提交上季度外设发票报销（P1，11 月 6 日）</li>
+              </ul>
+              <p>先从最紧的一项开始，番茄钟已经准备好，随时可以在下面开始或暂停。</p>
+            </div>
+          </div>
+        </div>
+        <div id="composer-shell">
+          <div class="pv-composer">
+            <div class="pv-composer-text">给 DeepSeek 发送消息…</div>
+            <div class="pv-composer-row">
+              <span class="pv-composer-chip">工作区</span>
+              <span class="pv-composer-chip">默认模型</span>
+              <span class="pv-composer-send">↑</span>
+            </div>
+          </div>
+          <div id="dock-mount"></div>
+        </div>
+      </div>
     </div>
     <div id="preview-banner">dsh-todo preview harness</div>
 
@@ -137,7 +251,27 @@
       const isDark = params.get("theme") === "dark";
       const targetLocale = params.get("locale") === "en" ? "en" : "zh";
       const targetView = params.get("view") || "today";
+      const mode = params.get("mode") === "dock" ? "dock" : "panel";
+      if (mode === "dock") document.body.setAttribute("data-mode", "dock");
       if (params.get("debug") === "1") document.body.setAttribute("data-debug", "1");
+
+      /* 会话截图需要一个正在跑的番茄钟：先写 localStorage，客户端启动时会读它。 */
+      if (params.get("pom") === "running") {
+        const remaining = 18 * 60000 + 42000;
+        try {
+          window.localStorage.setItem(
+            "dsh-todo/pomodoro",
+            JSON.stringify({
+              mode: "focus",
+              endsAt: Date.now() + remaining,
+              remainingMs: remaining,
+              running: true,
+              taskId: "t-01",
+              cycle: 1,
+            }),
+          );
+        } catch {}
+      }
       if (isDark) {
         document.body.setAttribute("data-ds-dark-theme", "");
         document.documentElement.style.colorScheme = "dark";
@@ -529,6 +663,7 @@
       /* __ModuleLoader__ stub that captures registration                   */
       /* ------------------------------------------------------------------ */
       window.__previewComponent = null;
+      window.__previewDock = [];
       window.__previewReady = false;
 
       window.__ModuleLoader__ = {
@@ -573,6 +708,9 @@
                   if (options.name === "main" || options.key === "dsh-todo") {
                     window.__previewComponent = Component;
                   }
+                  if (options.name === "conversation.composer.dock") {
+                    window.__previewDock.push(Component);
+                  }
                 },
               },
               effect(fn, label) {
@@ -589,15 +727,32 @@
               exports.apply(fakeCtx);
             }
 
-            /* Mount into #main-mount */
+            /* Mount the captured component into the visible surface */
             const Component = window.__previewComponent || (exports?.__preview?.TodoPage);
             if (Component) {
-              const root = ReactDOM.createRoot(document.getElementById("main-mount"));
-              root.render(React.createElement(Component, { ctx: fakeCtx }));
+              if (mode === "dock") {
+                const dockTarget = document.getElementById("dock-mount");
+                const dockRoot = ReactDOM.createRoot(dockTarget);
+                const dockComponents = window.__previewDock;
+                dockRoot.render(
+                  React.createElement(
+                    React.Fragment,
+                    null,
+                    ...dockComponents.map((Dock, index) =>
+                      React.createElement(Dock, { key: index, ctx: fakeCtx }),
+                    ),
+                  ),
+                );
+              } else {
+                const root = ReactDOM.createRoot(document.getElementById("main-mount"));
+                root.render(React.createElement(Component, { ctx: fakeCtx }));
+              }
               // Wait for React to mount and dataStore to fetch state
               const checkMounted = () => {
-                const mount = document.getElementById("main-mount");
-                const hasContent = mount && mount.innerText && mount.innerText.trim().length > 20;
+                const mount = document.getElementById(mode === "dock" ? "dock-mount" : "main-mount");
+                const hasContent = Boolean(
+                  mount && mount.children.length > 0 && (mount.innerText || "").trim().length > 4,
+                );
                 if (hasContent) {
                   window.__previewReady = true;
                   document.documentElement.dataset.ready = "1";

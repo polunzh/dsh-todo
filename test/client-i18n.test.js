@@ -234,10 +234,10 @@ test("__preview 暴露契约要求的 8 个入口", () => {
   });
 });
 
-test("注册 sidebar.panellist 与 main 两个 slot", () => {
+test("注册 sidebar.panellist、main 与输入框下方的番茄钟 dock", () => {
   const { env } = withPlugin({}, () => {});
-  assert.deepEqual(env.injections, ["sidebar.panellist", "main"]);
-  assert.equal(env.registrations.length, 2);
+  assert.deepEqual(env.injections, ["sidebar.panellist", "main", "conversation.composer.dock"]);
+  assert.equal(env.registrations.length, 3);
 
   const sidebar = env.registrations.find((item) => item.opts.name === "sidebar.panellist");
   assert.ok(sidebar, "缺少 sidebar.panellist 注册");
@@ -250,6 +250,12 @@ test("注册 sidebar.panellist 与 main 两个 slot", () => {
   assert.ok(main, "缺少 main 注册");
   assert.equal(main.opts.key, PANEL_ID);
   assert.equal(typeof main.Component, "function");
+
+  const dock = env.registrations.find((item) => item.opts.name === "conversation.composer.dock");
+  assert.ok(dock, "缺少 conversation.composer.dock 注册");
+  assert.equal(dock.opts.id, "dsh-todo-pomodoro");
+  assert.equal(dock.opts.order, 2);
+  assert.equal(typeof dock.Component, "function");
 });
 
 test("label() 跟随宿主语言切换（zh / en）", () => {

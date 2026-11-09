@@ -18,6 +18,11 @@ Runs entirely local: tasks, projects, settings, and Pomodoro sessions are saved 
 ### Calendar View
 ![Calendar View](./preview/screenshots/calendar.png)
 
+### Always-visible timer in the conversation
+The timer lives under the composer, so it stays in view while you chat: countdown, bound task, pause and skip without leaving the conversation.
+
+![Pomodoro under the composer](./preview/screenshots/dock-in-chat.png)
+
 ### Pomodoro Timer & 7-Day Stats
 ![Pomodoro View](./preview/screenshots/pomodoro.png)
 
@@ -40,6 +45,7 @@ Runs entirely local: tasks, projects, settings, and Pomodoro sessions are saved 
 ### Pomodoro Timer
 - **Work Cycles**: 25-minute focus, 5-minute short break, 15-minute long break every 4 focus sessions (all durations and cycle counts configurable).
 - **Task Binding**: Bind the active timer to any task; completing a focus session increments that task's Pomodoro counter.
+- **Composer dock**: A compact timer row sits under chat composer in every session — idle shows the configured focus length, running shows the countdown with the bound task and pause/skip controls. The sidebar icon shows a pulsing dot while a session runs.
 - **Persistent Countdown**: Timer state is preserved in browser storage (`localStorage`) with absolute timestamps, surviving page refreshes without drifting.
 - **Audio & Visual Alerts**: Synthetic Web Audio chime and optional browser notification when a session ends.
 - **Statistics**: Today's Pomodoros vs daily goal, focus minutes, cumulative totals, current streak (in days), and a 7-day bar chart.

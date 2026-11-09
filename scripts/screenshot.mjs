@@ -66,6 +66,13 @@ const shots = [
     narrative: "番茄钟视图（圆形环进度、任务绑定、近 7 天柱状图统计）",
   },
   {
+    name: "dock-in-chat",
+    width: 1440,
+    height: 900,
+    url: "?mode=dock&pom=running&theme=light&locale=zh",
+    narrative: "会话视图中输入框下方的常驻番茄钟（倒计时 + 绑定任务 + 暂停/跳过）",
+  },
+  {
     name: "mobile",
     width: 390,
     height: 844,
