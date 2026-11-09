@@ -28,7 +28,7 @@ DeepSeek Harness 待办清单与番茄钟插件。深度融合 **Todoist** 经�
 
 ![侧边栏图标倒计时](./preview/screenshots/sidebar-badge.png)
 
-展开侧栏时，倒计时落在该行右端，就在「待办」名称后面。
+展开侧栏时，倒计时落在该行右端，就在「待办」名称后面；行右端有置顶图钉时自动让位。
 
 ![名称后面的倒计时](./preview/screenshots/sidebar-badge-wide.png)
 

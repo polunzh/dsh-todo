@@ -28,7 +28,7 @@ The remaining time sits under the to-do icon and ticks every second, so the logo
 
 ![Countdown under the sidebar icon](./preview/screenshots/sidebar-badge.png)
 
-With the sidebar expanded, the countdown sits at the end of the row, right after the panel name.
+With the sidebar expanded, the countdown sits at the end of the row, right after the panel name, and steps aside when a pin button occupies the row tail.
 
 ![Countdown after the panel name](./preview/screenshots/sidebar-badge-wide.png)
 

@@ -277,7 +277,35 @@ test("侧边栏倒计时用 mm:ss，休息带模式名，展开时挂到所在�
   assert.match(SOURCE, /\.todo-row-timer/, "需要行尾倒计时的样式");
   assert.match(SOURCE, /\.todo-panel-timer/, "需要收起态图标下方倒计时的样式");
   assert.match(SOURCE, /\.todo-row-timer\.is-break/, "展开态休息需要单独配色");
+  assert.match(body, /sidebarRowInset\(/, "行尾倒计时要给置顶图钉一类控件让位");
   assert.match(SOURCE, /\.todo-panel-timer\.is-break/, "收起态休息需要单独配色");
+});
+
+test("展开栏倒计时给行右侧的置顶图钉让位", () => {
+  const { env } = withPlugin({}, (env) => {
+    const { sidebarRowInset } = env.exports.__preview;
+    const row = { left: 0, right: 232, top: 100, bottom: 136 };
+    const pin = { left: 206, top: 108, bottom: 128, width: 20, height: 20 };
+    assert.equal(sidebarRowInset(row, [], 10), 10, "没有控件时用默认间距");
+    assert.equal(sidebarRowInset(row, [pin], 10), 32, "图钉右侧 6px：6 + 20 + 6");
+    assert.equal(
+      sidebarRowInset(row, [{ ...pin, top: 200, bottom: 220 }], 10),
+      10,
+      "不在这一行上的控件不该影响间距",
+    );
+    assert.equal(sidebarRowInset(row, [{ ...pin, width: 0, height: 0 }], 10), 10, "隐藏的控件量不到尺寸");
+    assert.equal(
+      sidebarRowInset(row, [{ ...pin, left: 160, width: 72 }], 10),
+      78,
+      "更宽的右侧控件按它的左缘让位",
+    );
+    assert.equal(
+      sidebarRowInset(row, [{ ...pin, left: 100, width: 132 }], 10),
+      10,
+      "铺开整行的浮层不算行尾控件，避免把倒计时推走",
+    );
+  });
+  assert.ok(env.registrations.length >= 3);
 });
 
 test("侧边栏倒计时：专注未开始不打扰，休息未开始也带模式名显示", () => {
