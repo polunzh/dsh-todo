@@ -225,9 +225,11 @@
       .pv-side-row {
         display: flex; align-items: center; gap: 10px;
         min-height: 36px; padding: 7px 8px;
+        border: none; background: transparent;
         border-radius: var(--dsw-radius-md);
         color: var(--dsw-alias-label-primary);
-        font-size: 14px; line-height: 22px;
+        font: inherit; font-size: 14px; line-height: 22px;
+        text-align: left; cursor: default;
       }
       .pv-side-row.is-active { background: var(--dsw-alias-interactive-bg-hover); }
       .pv-side-glyph { flex: none; display: inline-flex; align-items: center; justify-content: center; }
@@ -263,18 +265,18 @@
   <body>
     <div id="host-shell">
       <div id="widebar">
-        <div class="pv-side-row">
+        <button type="button" class="pv-side-row">
           <span class="pv-side-glyph">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 6.4h16v9.2H9.6L5.6 19v-3.4H4z" />
             </svg>
           </span>
           <span>对话</span>
-        </div>
-        <div class="pv-side-row is-active" data-wide-todo>
+        </button>
+        <button type="button" class="pv-side-row is-active" data-wide-todo>
           <span class="pv-side-glyph" id="wide-mount"></span>
           <span id="wide-title">待办</span>
-        </div>
+        </button>
       </div>
       <div id="rail">
         <button class="pv-rail-btn" type="button" aria-label="Conversation">

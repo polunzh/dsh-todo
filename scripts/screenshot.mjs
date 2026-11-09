@@ -84,7 +84,7 @@ const shots = [
     width: 1440,
     height: 900,
     url: "?mode=sidebar&pom=running&theme=light&locale=zh",
-    narrative: "展开侧栏时，秒级倒计时贴在图标右侧",
+    narrative: "展开侧栏时，秒级倒计时落在「待办」名称后面",
   },
   {
     name: "mobile",

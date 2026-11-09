@@ -28,9 +28,9 @@ The remaining time sits under the to-do icon and ticks every second, so the logo
 
 ![Countdown under the sidebar icon](./preview/screenshots/sidebar-badge.png)
 
-With the sidebar expanded, the countdown moves next to the icon as a compact pill.
+With the sidebar expanded, the countdown sits at the end of the row, right after the panel name.
 
-![Countdown beside the icon](./preview/screenshots/sidebar-badge-wide.png)
+![Countdown after the panel name](./preview/screenshots/sidebar-badge-wide.png)
 
 ### Pomodoro Timer & 7-Day Stats
 ![Pomodoro View](./preview/screenshots/pomodoro.png)
