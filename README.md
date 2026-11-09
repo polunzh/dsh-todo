@@ -56,7 +56,7 @@ With the sidebar expanded, the countdown sits at the end of the row, right after
 - **Task Binding**: Bind the active timer to any task; completing a focus session increments that task's Pomodoro counter.
 - **Composer dock**: A compact timer row sits under chat composer in every session — idle shows the configured focus length, running shows the countdown with the bound task and pause/skip controls. The sidebar icon shows a pulsing dot while a session runs.
 - **Persistent Countdown**: Timer state is preserved in browser storage (`localStorage`) with absolute timestamps, surviving page refreshes without drifting.
-- **Audio & Visual Alerts**: Synthetic Web Audio chime and optional browser notification when a session ends.
+- **Audio & Visual Alerts**: A browser notification when a session ends, plus a synthetic Web Audio chime that is **off by default** — turn it on in the pomodoro settings, where a Test button plays it immediately.
 - **Statistics**: Today's Pomodoros vs daily goal, focus minutes, cumulative totals, current streak (in days), and a 7-day bar chart.
 
 ### Keyboard shortcuts

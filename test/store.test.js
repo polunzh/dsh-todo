@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, mkdtempSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, test } from "node:test";
@@ -39,7 +39,7 @@ afterEach(() => {
 
 test("readState returns default empty state when file does not exist", () => {
   const state = readState({ dataDir: testDir });
-  assert.equal(state.version, 1);
+  assert.equal(state.version, 2);
   assert.deepEqual(state.tasks, []);
   assert.deepEqual(state.projects, []);
   assert.deepEqual(state.sessions, []);
@@ -328,7 +328,7 @@ test("corrupt state file is quarantined and recovered to empty state", () => {
   const fakeLogger = { warn: (msg) => warnings.push(msg) };
   const recovered = readState({ dataDir: testDir, logger: fakeLogger });
 
-  assert.equal(recovered.version, 1);
+  assert.equal(recovered.version, 2);
   assert.deepEqual(recovered.tasks, []);
   assert.ok(warnings.length > 0);
 
@@ -498,4 +498,35 @@ test("summary counts views and computes a multi-day streak", () => {
   assert.equal(stats.pomodoro.todayFocus, 1);
   assert.equal(stats.pomodoro.week.length, 7);
   assert.equal(stats.pomodoro.week.at(-1).date, "2026-11-09");
+});
+
+test("提示音默认关闭，且 v1 旧文件迁移为关闭", () => {
+  // 新文件：默认不响
+  const fresh = readState({ dataDir: testDir });
+  assert.equal(fresh.settings.sound, false);
+  assert.equal(DEFAULT_SETTINGS.sound, false);
+
+  // 旧 v1 文件（当年默认 true）读出来必须关掉
+  mkdirSync(testDir, { recursive: true });
+  writeFileSync(
+    dataFile({ dataDir: testDir }),
+    JSON.stringify({
+      version: 1,
+      tasks: [],
+      projects: [],
+      sessions: [],
+      settings: { ...DEFAULT_SETTINGS, sound: true, dailyGoal: 12 },
+    }),
+    { mode: 0o600 },
+  );
+  const migrated = readState({ dataDir: testDir });
+  assert.equal(migrated.settings.sound, false, "v1 迁移后应关闭提示音");
+  assert.equal(migrated.settings.dailyGoal, 12, "其他设置不受迁移影响");
+  assert.equal(migrated.version, 2);
+});
+
+test("用户在面板里打开提示音后保持开启", () => {
+  updateSettings({ sound: true }, { dataDir: testDir });
+  const state = readState({ dataDir: testDir });
+  assert.equal(state.settings.sound, true, "version 2 文件不应再被迁移覆盖");
 });
