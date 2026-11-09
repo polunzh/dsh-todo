@@ -264,6 +264,17 @@ test("注册 sidebar.panellist、main 与输入框下方的番茄钟 dock", () =
   assert.equal(typeof dock.Component, "function");
 });
 
+test("侧边栏倒计时用 mm:ss（formatClock），不再只显示分钟数", () => {
+  const start = SOURCE.indexOf("function PanelIcon(props)");
+  assert.ok(start > 0, "找不到 PanelIcon");
+  const end = SOURCE.indexOf("/* ============================ 小组件", start);
+  const body = SOURCE.slice(start, end);
+  assert.match(body, /formatClock\(remaining\)/, "倒计时必须走 formatClock（mm:ss）");
+  assert.equal(/String\(minutes\)/.test(body), false, "旧的整分钟写法应当已经移除");
+  assert.equal(/todo-panel-badge/.test(SOURCE), false, "旧的分钟角标样式应当已经移除");
+  assert.ok(SOURCE.includes("todo-panel-timer"), "应当渲染 todo-panel-timer 节点");
+});
+
 test("侧边栏组件把宿主的 size / active 原样转发（展开 16、收起 18 走不同排版）", () => {
   const { env } = withPlugin({}, (env) => {
     const sidebar = env.registrations.find((item) => item.opts.name === "sidebar.panellist");

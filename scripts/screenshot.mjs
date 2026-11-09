@@ -77,14 +77,14 @@ const shots = [
     width: 1440,
     height: 900,
     url: "?mode=rail&pom=running&theme=light&locale=zh",
-    narrative: "收起侧边栏时，待办图标右上角的番茄分钟角标",
+    narrative: "收起侧边栏时，倒计时精确到秒贴在图标下方，Logo 完整可见",
   },
   {
     name: "sidebar-badge-wide",
     width: 1440,
     height: 900,
     url: "?mode=sidebar&pom=running&theme=light&locale=zh",
-    narrative: "展开侧栏时，图标角标与「待办」名称并排的实际效果",
+    narrative: "展开侧栏时，秒级倒计时贴在图标右侧",
   },
   {
     name: "mobile",

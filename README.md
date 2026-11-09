@@ -23,14 +23,14 @@ The timer lives under the composer, so it stays in view while you chat: countdow
 
 ![Pomodoro under the composer](./preview/screenshots/dock-in-chat.png)
 
-### Minute badge on the sidebar icon
-With the sidebar collapsed, the running session's remaining minutes sit on the to-do icon, so the countdown is visible from any page.
+### Second-precision countdown on the sidebar icon
+The remaining time sits under the to-do icon and ticks every second, so the logo stays fully visible while the sidebar is collapsed.
 
-![Minute badge on the sidebar icon](./preview/screenshots/sidebar-badge.png)
+![Countdown under the sidebar icon](./preview/screenshots/sidebar-badge.png)
 
-With the sidebar expanded, the badge shrinks into the icon's corner so the title stays readable.
+With the sidebar expanded, the countdown moves next to the icon as a compact pill.
 
-![Minute badge with the sidebar expanded](./preview/screenshots/sidebar-badge-wide.png)
+![Countdown beside the icon](./preview/screenshots/sidebar-badge-wide.png)
 
 ### Pomodoro Timer & 7-Day Stats
 ![Pomodoro View](./preview/screenshots/pomodoro.png)
