@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>dsh-todo · preview</title>
+    <style>
+      /* Base host tokens matching DeepSeek Harness Client Theme */
+      :root {
+        --dsw-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        --dsw-static-neutral-bluish-00: #ffffff;
+        --dsw-static-neutral-bluish-50: #f9fafb;
+        --dsw-static-neutral-bluish-100: #ebeef2;
+        --dsw-static-neutral-bluish-150: #e9ecf2;
+        --dsw-static-neutral-bluish-300: #cfd3d6;
+        --dsw-static-neutral-bluish-400: #adb2b8;
+        --dsw-static-neutral-bluish-600: #81858c;
+        --dsw-static-neutral-bluish-700: #61666b;
+        --dsw-static-neutral-bluish-750: #43454a;
+        --dsw-static-neutral-bluish-800: #353638;
+        --dsw-static-neutral-bluish-850: #2c2c2e;
+        --dsw-static-neutral-bluish-875: #232324;
+        --dsw-static-neutral-bluish-950: #151517;
+        --dsw-static-neutral-bluish-1000: #0f1115;
+        --dsw-static-red-400: #f25a5a;
+        --dsw-static-red-600: #ec1313;
+        --dsw-static-amber-500: #f59e0b;
+        --dsw-static-green-500: #22c55e;
+
+        --dsw-alias-bg-base: var(--dsw-static-neutral-bluish-00);
+        --dsw-alias-bg-layer-1: var(--dsw-static-neutral-bluish-00);
+        --dsw-alias-bg-layer-2: var(--dsw-static-neutral-bluish-50);
+        --dsw-alias-bg-overlay: var(--dsw-static-neutral-bluish-150);
+        --dsw-alias-label-primary: var(--dsw-static-neutral-bluish-1000);
+        --dsw-alias-label-secondary: var(--dsw-static-neutral-bluish-700);
+        --dsw-alias-label-tertiary: var(--dsw-static-neutral-bluish-600);
+        --dsw-alias-label-caption: var(--dsw-static-neutral-bluish-400);
+        --dsw-alias-label-primary-inverted: var(--dsw-static-neutral-bluish-00);
+        --dsw-alias-border-l1: rgba(15, 17, 21, 0.08);
+        --dsw-alias-border-l2: rgba(15, 17, 21, 0.16);
+        --dsw-alias-brand-primary: #0f1115;
+        --dsw-alias-brand-text: #0f1115;
+        --dsw-alias-interactive-bg-hover: rgba(38, 49, 72, 0.06);
+        --dsw-alias-interactive-bg-active: rgba(38, 49, 72, 0.12);
+        --dsw-alias-state-error-primary: var(--dsw-static-red-600);
+        --dsw-alias-state-warn-primary: var(--dsw-static-amber-500);
+        --dsw-alias-state-success-primary: var(--dsw-static-green-500);
+        --dsw-alias-button-primary-fill: #0f1115;
+        --dsw-alias-button-primary-hover: #43454a;
+
+        --dsw-radius-xs: 4px;
+        --dsw-radius-sm: 8px;
+        --dsw-radius-md: 12px;
+        --dsw-radius-lg: 16px;
+        --dsw-radius-xl: 20px;
+        --dsw-radius-panel: 12px;
+        --dsw-shadow-lv1: 0 1px 3px rgba(0, 0, 0, 0.06);
+        --dsw-shadow-lv2: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --dsw-shadow-lv3: 0 12px 32px rgba(0, 0, 0, 0.12);
+      }
+
+      body[data-ds-dark-theme] {
+        color-scheme: dark;
+        --dsw-alias-bg-base: var(--dsw-static-neutral-bluish-950);
+        --dsw-alias-bg-layer-1: var(--dsw-static-neutral-bluish-875);
+        --dsw-alias-bg-layer-2: var(--dsw-static-neutral-bluish-850);
+        --dsw-alias-bg-overlay: var(--dsw-static-neutral-bluish-700);
+        --dsw-alias-label-primary: var(--dsw-static-neutral-bluish-50);
+        --dsw-alias-label-secondary: var(--dsw-static-neutral-bluish-300);
+        --dsw-alias-label-tertiary: var(--dsw-static-neutral-bluish-400);
+        --dsw-alias-label-caption: var(--dsw-static-neutral-bluish-600);
+        --dsw-alias-label-primary-inverted: var(--dsw-static-neutral-bluish-800);
+        --dsw-alias-border-l1: rgba(255, 255, 255, 0.08);
+        --dsw-alias-border-l2: rgba(255, 255, 255, 0.14);
+        --dsw-alias-brand-primary: var(--dsw-static-neutral-bluish-50);
+        --dsw-alias-brand-text: var(--dsw-static-neutral-bluish-50);
+        --dsw-alias-interactive-bg-hover: rgba(255, 255, 255, 0.08);
+        --dsw-alias-interactive-bg-active: rgba(255, 255, 255, 0.14);
+        --dsw-alias-state-error-primary: var(--dsw-static-red-400);
+        --dsw-alias-button-primary-fill: var(--dsw-static-neutral-bluish-50);
+        --dsw-alias-button-primary-hover: var(--dsw-static-neutral-bluish-100);
+      }
+
+      * { box-sizing: border-box; }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: var(--dsw-alias-bg-base);
+        color: var(--dsw-alias-label-primary);
+        font-family: var(--dsw-font-family);
+        -webkit-font-smoothing: antialiased;
+        overflow: hidden;
+      }
+      #host-shell {
+        display: flex;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+      }
+      #main-mount {
+        flex: 1 1 auto;
+        min-width: 0;
+        height: 100%;
+        display: flex;
+        overflow: hidden;
+      }
+      #preview-banner {
+        display: none;
+      }
+      body[data-debug="1"] #preview-banner {
+        display: flex;
+        position: fixed;
+        bottom: 8px;
+        right: 8px;
+        z-index: 99999;
+        background: rgba(15, 17, 21, 0.85);
+        color: #fff;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+      }
+    </style>
+    <!-- React 18 UMD (local vendor) -->
+    <script src="vendor/react.production.min.js"></script>
+    <script src="vendor/react-dom.production.min.js"></script>
+  </head>
+  <body>
+    <div id="host-shell">
+      <div id="main-mount"></div>
+    </div>
+    <div id="preview-banner">dsh-todo preview harness</div>
+
+    <script>
+      /* URL params: ?theme=dark|light &locale=zh|en &view=today|calendar|pomodoro|upcoming|inbox|completed &debug=1 */
+      const params = new URLSearchParams(window.location.search);
+      const isDark = params.get("theme") === "dark";
+      const targetLocale = params.get("locale") === "en" ? "en" : "zh";
+      const targetView = params.get("view") || "today";
+      if (params.get("debug") === "1") document.body.setAttribute("data-debug", "1");
+      if (isDark) {
+        document.body.setAttribute("data-ds-dark-theme", "");
+        document.documentElement.style.colorScheme = "dark";
+      }
+
+      window.__dshTodoPreview = {
+        locale: targetLocale,
+        view: targetView,
+      };
+
+      /* ------------------------------------------------------------------ */
+      /* Seed data for mock API                                             */
+      /* ------------------------------------------------------------------ */
+      const todayDate = "2026-11-09";
+      const now = Date.now();
+
+      const seedProjects = [
+        { id: "p-work", name: targetLocale === "en" ? "Work" : "工作", color: "tomato", order: 0, createdAt: now - 86400000 * 10 },
+        { id: "p-life", name: targetLocale === "en" ? "Life" : "生活", color: "sky", order: 1, createdAt: now - 86400000 * 9 },
+        { id: "p-reading", name: targetLocale === "en" ? "Reading" : "阅读", color: "lime", order: 2, createdAt: now - 86400000 * 8 },
+      ];
+
+      const seedTasks = [
+        {
+          id: "t-01",
+          title: targetLocale === "en" ? "Review Q4 roadmap draft" : "审阅 Q4 路线图初稿",
+          note: targetLocale === "en" ? "Align milestones with engineering and design leads." : "对照工程与设计团队的排期，确认重点交付节点。",
+          due: { date: todayDate, time: "14:30" },
+          priority: 1,
+          projectId: "p-work",
+          labels: [targetLocale === "en" ? "Q4" : "Q4", targetLocale === "en" ? "Planning" : "规划"],
+          parentId: null,
+          recurrence: null,
+          done: false,
+          doneAt: null,
+          createdAt: now - 3600000 * 4,
+          updatedAt: now - 3600000 * 4,
+          order: 100,
+          pomodoros: 2,
+        },
+        {
+          id: "t-01-s1",
+          title: targetLocale === "en" ? "Collect feature list from product board" : "汇总需求看板上的待排期清单",
+          note: "",
+          due: null,
+          priority: null,
+          projectId: "p-work",
+          labels: [],
+          parentId: "t-01",
+          recurrence: null,
+          done: true,
+          doneAt: now - 3600000 * 2,
+          createdAt: now - 3600000 * 3,
+          updatedAt: now - 3600000 * 2,
+          order: 10,
+          pomodoros: 1,
+        },
+        {
+          id: "t-01-s2",
+          title: targetLocale === "en" ? "Confirm critical path with team" : "与团队敲定关键路径上的依赖",
+          note: "",
+          due: null,
+          priority: null,
+          projectId: "p-work",
+          labels: [],
+          parentId: "t-01",
+          recurrence: null,
+          done: false,
+          doneAt: null,
+          createdAt: now - 3600000 * 3,
+          updatedAt: now - 3600000 * 3,
+          order: 20,
+          pomodoros: 1,
+        },
+        {
+          id: "t-02",
+          title: targetLocale === "en" ? "Weekly 1-on-1 prep & notes" : "周常 1-on-1 准备与记录",
+          note: targetLocale === "en" ? "Review blockers and unblock items." : "聚焦本周阻塞项与协作反馈。",
+          due: { date: todayDate, time: "16:00" },
+          priority: 2,
+          projectId: "p-work",
+          labels: [targetLocale === "en" ? "Sync" : "同步"],
+          parentId: null,
+          recurrence: { freq: "weekly", interval: 1 },
+          done: false,
+          doneAt: null,
+          createdAt: now - 86400000 * 3,
+          updatedAt: now - 3600000 * 5,
+          order: 200,
+          pomodoros: 1,
+        },
+        {
+          id: "t-03",
+          title: targetLocale === "en" ? "Morning reading: System Performance (Ch. 4)" : "晨读：《现代系统性能》第四章",
+          note: "",
+          due: { date: todayDate, time: null },
+          priority: 3,
+          projectId: "p-reading",
+          labels: [targetLocale === "en" ? "Notes" : "笔记"],
+          parentId: null,
+          recurrence: { freq: "daily", interval: 1 },
+          done: false,
+          doneAt: null,
+          createdAt: now - 86400000 * 5,
+          updatedAt: now - 86400000,
+          order: 300,
+          pomodoros: 1,
+        },
+        {
+          id: "t-04",
+          title: targetLocale === "en" ? "Overdue: Submit equipment reimbursement" : "逾期：提交上季度外设发票报销",
+          note: targetLocale === "en" ? "Receipts attached in mail draft." : "发票已在邮件草稿夹。",
+          due: { date: "2026-11-06", time: null },
+          priority: 1,
+          projectId: "p-life",
+          labels: [targetLocale === "en" ? "Admin" : "行政"],
+          parentId: null,
+          recurrence: null,
+          done: false,
+          doneAt: null,
+          createdAt: now - 86400000 * 7,
+          updatedAt: now - 86400000 * 2,
+          order: 50,
+          pomodoros: 0,
+        },
+        {
+          id: "t-05",
+          title: targetLocale === "en" ? "Schedule annual dental checkup" : "预约年度牙科常规检查",
+          note: "",
+          due: { date: "2026-11-12", time: "10:00" },
+          priority: 4,
+          projectId: "p-life",
+          labels: [targetLocale === "en" ? "Health" : "健康"],
+          parentId: null,
+          recurrence: null,
+          done: false,
+          doneAt: null,
+          createdAt: now - 86400000 * 2,
+          updatedAt: now - 86400000 * 2,
+          order: 400,
+          pomodoros: 0,
+        },
+        {
+          id: "t-06",
+          title: targetLocale === "en" ? "Draft release notes for v0.2.0" : "草拟 v0.2.0 变更日志",
+          note: "",
+          due: { date: "2026-11-15", time: null },
+          priority: 2,
+          projectId: "p-work",
+          labels: [targetLocale === "en" ? "Release" : "发布"],
+          parentId: null,
+          recurrence: null,
+          done: false,
+          doneAt: null,
+          createdAt: now - 86400000,
+          updatedAt: now - 86400000,
+          order: 500,
+          pomodoros: 0,
+        },
+        {
+          id: "t-07",
+          title: targetLocale === "en" ? "Explore ideas for keyboard shortcuts overlay" : "梳理全局快捷键帮助浮层的交互草图",
+          note: "",
+          due: null,
+          priority: 3,
+          projectId: null,
+          labels: [targetLocale === "en" ? "Idea" : "灵感"],
+          parentId: null,
+          recurrence: null,
+          done: false,
+          doneAt: null,
+          createdAt: now - 86400000 * 4,
+          updatedAt: now - 86400000 * 4,
+          order: 600,
+          pomodoros: 0,
+        },
+        {
+          id: "t-08",
+          title: targetLocale === "en" ? "Refactor store atomicity test fixtures" : "重构存储层原子写入的测试用例",
+          note: "",
+          due: { date: todayDate, time: "11:00" },
+          priority: 2,
+          projectId: "p-work",
+          labels: [],
+          parentId: null,
+          recurrence: null,
+          done: true,
+          doneAt: now - 3600000,
+          createdAt: now - 86400000,
+          updatedAt: now - 3600000,
+          order: 70,
+          pomodoros: 2,
+        },
+      ];
+
+      const seedSessions = [
+        { id: "s-1", taskId: "t-01", kind: "focus", startedAt: now - 3600000 * 3, endedAt: now - 3600000 * 2.5, minutes: 25 },
+        { id: "s-2", taskId: "t-01", kind: "focus", startedAt: now - 3600000 * 2, endedAt: now - 3600000 * 1.5, minutes: 25 },
+        { id: "s-3", taskId: "t-08", kind: "focus", startedAt: now - 3600000 * 1.3, endedAt: now - 3600000 * 0.8, minutes: 25 },
+        { id: "s-4", taskId: "t-02", kind: "focus", startedAt: now - 86400000 - 3600000 * 2, endedAt: now - 86400000 - 3600000 * 1.5, minutes: 25 },
+        { id: "s-5", taskId: "t-03", kind: "focus", startedAt: now - 86400000 * 2 - 3600000 * 3, endedAt: now - 86400000 * 2 - 3600000 * 2.5, minutes: 25 },
+      ];
+
+      const mockDb = {
+        version: 1,
+        tasks: JSON.parse(JSON.stringify(seedTasks)),
+        projects: JSON.parse(JSON.stringify(seedProjects)),
+        sessions: JSON.parse(JSON.stringify(seedSessions)),
+        settings: {
+          focusMinutes: 25,
+          shortBreakMinutes: 5,
+          longBreakMinutes: 15,
+          longBreakEvery: 4,
+          autoStartNext: false,
+          sound: true,
+          dailyGoal: 8,
+        },
+      };
+
+      /* ------------------------------------------------------------------ */
+      /* Mock window.fetch for /todo/api/*                                  */
+      /* ------------------------------------------------------------------ */
+      const realFetch = window.fetch.bind(window);
+      window.fetch = async function (input, init) {
+        const urlStr = typeof input === "string" ? input : input?.url || "";
+        if (!urlStr.includes("todo/api")) {
+          return realFetch(input, init);
+        }
+        const method = (init?.method || "GET").toUpperCase();
+        let pathname = "";
+        try {
+          pathname = new URL(urlStr, window.location.href).pathname.replace(/\/+$/, "");
+        } catch {
+          pathname = urlStr;
+        }
+        const route = pathname.replace(/^.*\/todo\/api\/?/, "");
+
+        const readBody = () => {
+          if (!init?.body) return {};
+          try {
+            return JSON.parse(init.body);
+          } catch {
+            return {};
+          }
+        };
+
+        const json = (data, status = 200) => {
+          return new Response(JSON.stringify(data), {
+            status,
+            headers: { "Content-Type": "application/json; charset=utf-8" },
+          });
+        };
+
+        if (route === "health" && method === "GET") {
+          return json({ ok: true, plugin: "dsh-todo", limits: { tasks: 5000, projects: 100, sessions: 10000 } });
+        }
+        if (route === "state" && method === "GET") {
+          return json({
+            ok: true,
+            state: JSON.parse(JSON.stringify(mockDb)),
+            today: todayDate,
+            serverNow: Date.now(),
+          });
+        }
+        if (route === "tasks/create" && method === "POST") {
+          const body = readBody();
+          const task = {
+            id: "t-" + Math.random().toString(36).slice(2, 9),
+            title: String(body.title || "").trim(),
+            note: String(body.note || ""),
+            due: body.due || null,
+            priority: body.priority || null,
+            projectId: body.projectId || null,
+            labels: Array.isArray(body.labels) ? body.labels : [],
+            parentId: body.parentId || null,
+            recurrence: body.recurrence || null,
+            done: false,
+            doneAt: null,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            order: (mockDb.tasks.length + 1) * 10,
+            pomodoros: 0,
+          };
+          mockDb.tasks.unshift(task);
+          return json({ ok: true, task }, 201);
+        }
+        if (route === "tasks/update" && method === "POST") {
+          const body = readBody();
+          const idx = mockDb.tasks.findIndex((t) => t.id === body.id);
+          if (idx === -1) return json({ ok: false, error: "not-found", message: "Task not found" }, 404);
+          const current = mockDb.tasks[idx];
+          const updated = {
+            ...current,
+            ...body,
+            updatedAt: Date.now(),
+          };
+          mockDb.tasks[idx] = updated;
+          return json({ ok: true, task: updated });
+        }
+        if (route === "tasks/toggle" && method === "POST") {
+          const body = readBody();
+          const idx = mockDb.tasks.findIndex((t) => t.id === body.id);
+          if (idx === -1) return json({ ok: false, error: "not-found" }, 404);
+          const current = mockDb.tasks[idx];
+          const nextDone = body.done !== undefined ? Boolean(body.done) : !current.done;
+          current.done = nextDone;
+          current.doneAt = nextDone ? Date.now() : null;
+          current.updatedAt = Date.now();
+          return json({ ok: true, task: current });
+        }
+        if (route === "tasks/delete" && method === "POST") {
+          const body = readBody();
+          const removed = [];
+          const keep = [];
+          for (const t of mockDb.tasks) {
+            if (t.id === body.id || t.parentId === body.id) removed.push(t);
+            else keep.push(t);
+          }
+          mockDb.tasks = keep;
+          return json({ ok: true, tasks: removed });
+        }
+        if (route === "tasks/restore" && method === "POST") {
+          const body = readBody();
+          const list = Array.isArray(body.tasks) ? body.tasks : [];
+          for (const t of list) {
+            if (!mockDb.tasks.some((x) => x.id === t.id)) mockDb.tasks.push(t);
+          }
+          return json({ ok: true, tasks: list });
+        }
+        if (route === "tasks/move" && method === "POST") {
+          return json({ ok: true, tasks: mockDb.tasks });
+        }
+        if (route === "projects/create" && method === "POST") {
+          const body = readBody();
+          const project = {
+            id: "p-" + Math.random().toString(36).slice(2, 9),
+            name: String(body.name || "Project").trim(),
+            color: body.color || "tomato",
+            order: mockDb.projects.length,
+            createdAt: Date.now(),
+          };
+          mockDb.projects.push(project);
+          return json({ ok: true, project }, 201);
+        }
+        if (route === "projects/update" && method === "POST") {
+          const body = readBody();
+          const p = mockDb.projects.find((x) => x.id === body.id);
+          if (!p) return json({ ok: false, error: "not-found" }, 404);
+          if (body.name !== undefined) p.name = body.name;
+          if (body.color !== undefined) p.color = body.color;
+          return json({ ok: true, project: p });
+        }
+        if (route === "projects/delete" && method === "POST") {
+          const body = readBody();
+          mockDb.projects = mockDb.projects.filter((x) => x.id !== body.id);
+          for (const t of mockDb.tasks) {
+            if (t.projectId === body.id) t.projectId = null;
+          }
+          return json({ ok: true, deletedTasks: [] });
+        }
+        if (route === "settings" && method === "POST") {
+          const body = readBody();
+          Object.assign(mockDb.settings, body);
+          return json({ ok: true, settings: mockDb.settings });
+        }
+        if (route === "sessions/record" && method === "POST") {
+          const body = readBody();
+          const session = {
+            id: "s-" + Math.random().toString(36).slice(2, 9),
+            taskId: body.taskId || null,
+            kind: "focus",
+            startedAt: Number(body.startedAt) || Date.now() - 25 * 60000,
+            endedAt: Number(body.endedAt) || Date.now(),
+            minutes: Number(body.minutes) || 25,
+          };
+          mockDb.sessions.push(session);
+          let targetTask = null;
+          if (session.taskId) {
+            targetTask = mockDb.tasks.find((t) => t.id === session.taskId);
+            if (targetTask) targetTask.pomodoros = (targetTask.pomodoros || 0) + 1;
+          }
+          return json({ ok: true, session, task: targetTask });
+        }
+
+        return json({ ok: false, error: "not-found", route }, 404);
+      };
+
+      /* ------------------------------------------------------------------ */
+      /* __ModuleLoader__ stub that captures registration                   */
+      /* ------------------------------------------------------------------ */
+      window.__previewComponent = null;
+      window.__previewReady = false;
+
+      window.__ModuleLoader__ = {
+        load({ id, factory }) {
+          try {
+            const exports = factory((name) => {
+              if (name === "react") return window.React;
+              throw new Error("client requested unknown module: " + name);
+            });
+            window.__previewExports = exports;
+
+            /* Fake context to capture apply registrations */
+            const subscribers = new Set();
+            const fakeCtx = {
+              get(service) {
+                if (service === "locale") return this.locale;
+                if (service === "slots") return this.slots;
+                return undefined;
+              },
+              locale: {
+                getSnapshot() {
+                  return { active: targetLocale === "en" ? "en-US" : "zh-CN" };
+                },
+                getLocale() {
+                  return { active: targetLocale === "en" ? "en-US" : "zh-CN" };
+                },
+                subscribe(fn) {
+                  subscribers.add(fn);
+                  return () => subscribers.delete(fn);
+                },
+                register(ns, dicts) {},
+                bind(ns) {
+                  return (key, vars) => undefined;
+                },
+              },
+              slots: {
+                inject(slotKey, callback) {
+                  if (typeof callback === "function") callback();
+                  return () => {};
+                },
+                register(options, Component) {
+                  if (options.name === "main" || options.key === "dsh-todo") {
+                    window.__previewComponent = Component;
+                  }
+                },
+              },
+              effect(fn, label) {
+                try {
+                  const cleanup = fn();
+                  return typeof cleanup === "function" ? cleanup : () => {};
+                } catch {
+                  return () => {};
+                }
+              },
+            };
+
+            if (exports && typeof exports.apply === "function") {
+              exports.apply(fakeCtx);
+            }
+
+            /* Mount into #main-mount */
+            const Component = window.__previewComponent || (exports?.__preview?.TodoPage);
+            if (Component) {
+              const root = ReactDOM.createRoot(document.getElementById("main-mount"));
+              root.render(React.createElement(Component, { ctx: fakeCtx }));
+              // Wait for React to mount and dataStore to fetch state
+              const checkMounted = () => {
+                const mount = document.getElementById("main-mount");
+                const hasContent = mount && mount.innerText && mount.innerText.trim().length > 20;
+                if (hasContent) {
+                  window.__previewReady = true;
+                  document.documentElement.dataset.ready = "1";
+                } else {
+                  setTimeout(checkMounted, 50);
+                }
+              };
+              setTimeout(checkMounted, 100);
+            } else {
+              console.error("no component registered to main slot or exported in __preview");
+            }
+          } catch (err) {
+            console.error("ModuleLoader factory execution failed", err);
+            window.__previewLoadError = err;
+          }
+        },
+      };
+    </script>
+    <script src="../lib/client.js"></script>
+  </body>
+</html>

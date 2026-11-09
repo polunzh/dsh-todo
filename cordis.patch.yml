@@ -1,0 +1,6 @@
+# 待办清单与番茄钟：单行挂载。
+# 宿主侧负责 /todo/api/* 路由、本地 JSON 存储与 `todo` 智能体工具；
+# 浏览器侧注册侧边栏入口与主面板。
+- insert:
+    - id: todo
+      name: dsh-todo

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Todo and pomodoro">
+  <defs>
+    <linearGradient id="todo-tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff9a5a" />
+      <stop offset="0.55" stop-color="#f4614a" />
+      <stop offset="1" stop-color="#d83a54" />
+    </linearGradient>
+    <linearGradient id="todo-leaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fd28a" />
+      <stop offset="1" stop-color="#3f9e58" />
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="60" fill="url(#todo-tile)" />
+  <rect x="8" y="8" width="240" height="240" rx="60" fill="none" stroke="#ffffff" stroke-opacity="0.28" stroke-width="6" />
+  <path d="M64 138 L100 174 L188 86" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" />
+  <g transform="translate(186 62)">
+    <circle r="30" fill="#ffffff" fill-opacity="0.2" />
+    <path d="M-14 -2 C-14 -16 -6 -24 0 -24 C6 -24 14 -16 14 -2 C14 10 7 18 0 18 C-7 18 -14 10 -14 -2 Z" fill="url(#todo-leaf)" transform="translate(0 4) scale(0.95)" />
+    <path d="M-12 -14 C-6 -22 6 -22 12 -14 C4 -18 -4 -18 -12 -14 Z" fill="#ffffff" fill-opacity="0.85" />
+  </g>
+</svg>

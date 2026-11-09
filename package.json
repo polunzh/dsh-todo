@@ -1,0 +1,53 @@
+{
+  "name": "dsh-todo",
+  "version": "0.1.0",
+  "description": "待办清单与番茄钟：Todoist 式的今天/即将到来/收件箱/项目视图，TickTick 式的任务番茄钟与统计；侧边栏入口、主面板页面、智能体可读写同一份任务。",
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web"
+    },
+    "manifestVersion": 1
+  },
+  "files": [
+    "lib",
+    "locale",
+    "preview/screenshots",
+    "cordis.patch.yml",
+    "icon.svg",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "preview": "node preview/server.mjs",
+    "screenshot": "node scripts/screenshot.mjs"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "todo",
+    "tasks",
+    "pomodoro",
+    "productivity",
+    "sidebar"
+  ],
+  "author": "polunzh (https://github.com/polunzh)",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}
