@@ -135,6 +135,9 @@ function createEnv(options = {}) {
 
   env.makeContext = (localeAvailable = options.localeAvailable !== false) => {
     const ctx = {
+      get(name) {
+        return options.services ? options.services[name] : undefined;
+      },
       effect(fn) {
         const disposer = fn();
         if (typeof disposer === "function") env.effects.push(disposer);
@@ -273,6 +276,53 @@ test("侧边栏组件把宿主的 size / active 原样转发（展开 16、收�
     assert.equal(typeof bare.type, "function", "没有 props 时也要渲染组件");
   });
   assert.ok(env.registrations.length >= 3);
+});
+
+test("注册两个全局快捷键：番茄钟开关与打开面板", () => {
+  const registered = [];
+  const disposed = [];
+  const shortcuts = {
+    register(command) {
+      registered.push(command);
+      return () => disposed.push(command.id);
+    },
+  };
+  const { env } = withPlugin({ services: { shortcuts } }, (inner) => {
+    assert.deepEqual(
+      registered.map((command) => command.id),
+      ["dsh-todo.pomodoro.toggle", "dsh-todo.panel.open"],
+    );
+    const toggle = registered[0];
+    assert.equal(toggle.label(), "开始 / 暂停番茄钟");
+    assert.deepEqual(toggle.regions, ["page", "editable"]);
+    for (const profile of [
+      "desktop:macos",
+      "desktop:windows",
+      "desktop:linux",
+      "web:macos",
+      "web:windows",
+    ]) {
+      assert.ok(toggle.defaults[profile], `缺少 ${profile} 默认组合`);
+      assert.deepEqual(toggle.defaults[profile].modifiers, ["primary", "alt"]);
+    }
+    // 运行一次：真的把番茄钟切到运行态并写进 localStorage
+    const outcome = toggle.resolve({ modal: null });
+    assert.equal(outcome.status, "handled");
+    outcome.run();
+    const stored = JSON.parse(inner.storage.get(STORAGE_KEY));
+    assert.equal(stored.running, true);
+
+    const open = registered[1];
+    assert.equal(open.resolve({ modal: null }).status, "handled");
+  });
+  assert.equal(env.registrations.length, 3);
+  // withPlugin 退出时统一销毁 effect，快捷键 disposer 必须随之调用
+  assert.deepEqual(disposed, ["dsh-todo.pomodoro.toggle", "dsh-todo.panel.open"]);
+});
+
+test("没有 shortcuts 服务时不注册快捷键也不报错", () => {
+  const { env } = withPlugin({}, () => {});
+  assert.equal(env.registrations.length, 3);
 });
 
 test("label() 跟随宿主语言切换（zh / en）", () => {

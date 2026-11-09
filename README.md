@@ -59,6 +59,15 @@ With the sidebar expanded, the badge shrinks into the icon's corner so the title
 - **Audio & Visual Alerts**: Synthetic Web Audio chime and optional browser notification when a session ends.
 - **Statistics**: Today's Pomodoros vs daily goal, focus minutes, cumulative totals, current streak (in days), and a 7-day bar chart.
 
+### Keyboard shortcuts
+
+| Action | macOS / Windows |
+| --- | --- |
+| Start or pause the pomodoro | `⌘⌥P` / `Ctrl+Alt+P` |
+| Open the to-do panel | `⌘⌥J` / `Ctrl+Alt+J` |
+
+Both are editable in the host's own shortcut settings and fall back to the next free combination when another plugin already owns it.
+
 ### Agent Tool (`todo`)
 Autonomous agents can inspect, organize, and update your task database using the registered `todo` tool:
 
