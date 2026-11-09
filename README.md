@@ -91,7 +91,13 @@ Supported actions:
 
 ## Installation
 
-Inside DeepSeek Harness, open the Plugin Manager and install from local directory:
+Install from npm once published, or from a local checkout:
+
+```bash
+npm i -g @polunzh/dsh-todo   # or point the plugin manager at the folder
+```
+
+Inside DeepSeek Harness, open the Plugin Manager and install from a local directory:
 
 ```bash
 /path/to/dsh-plugins/dsh-todo

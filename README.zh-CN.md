@@ -94,6 +94,12 @@ DeepSeek Harness 待办清单与番茄钟插件。深度融合 **Todoist** 经�
 
 ## 安装说明
 
+发布后可从 npm 安装，也可以直接指向本地目录：
+
+```bash
+npm i -g @polunzh/dsh-todo
+```
+
 在 DeepSeek Harness 插件管理器中，选择从本地目录安装：
 
 ```bash
