@@ -2,6 +2,8 @@
 
 # dsh-todo
 
+[![DSH Plugin Index](https://dsh.127.dev/assets/badge-en.svg)](https://dsh.127.dev/)
+
 A full-featured to-do list and Pomodoro timer plugin for DeepSeek Harness. Combines the core workflow of **Todoist** (Today, Upcoming, Inbox, Projects, Priorities, Natural-Language Quick Add) with the focused timeboxing of **TickTick** (Pomodoro timer bound to tasks, 25/5/15 cycles, and 7-day stats).
 
 Runs entirely local: tasks, projects, settings, and Pomodoro sessions are saved to `$DSH_HOME/storages/todo/state.json` via atomic file writes. DeepSeek Harness agents can read and write the exact same task database via the built-in `todo` tool.

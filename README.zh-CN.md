@@ -2,6 +2,8 @@
 
 # dsh-todo
 
+[![DSH 插件索引](https://dsh.127.dev/assets/badge-zh.svg)](https://dsh.127.dev/)
+
 DeepSeek Harness 待办清单与番茄钟插件。深度融合 **Todoist** 经典的任务结构（今天、即将到来、收件箱、项目分类、五级优先级、自然语言快速添加）与 **TickTick** 的专注体验（任务绑定番茄钟、25/5/15 循环、7 天柱状图统计）。
 
 全部数据保存在本机 `$DSH_HOME/storages/todo/state.json`，通过临时文件加原子重命名（0o600 权限）落盘。智能体可通过内置的 `todo` 工具与用户读写同一份待办数据。
