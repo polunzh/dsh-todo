@@ -160,7 +160,7 @@ Settings = {
 - 模块 id / 包名：`dsh-todo`；`PANEL_ID = "dsh-todo"`。
 - `window.__ModuleLoader__.load({ id: "dsh-todo", factory(require) {...} })`，只 `require("react")`。
 - `inject = ["slots", "locale"]`；`ctx.slots.inject("sidebar.panellist", ...)`（id `dsh-todo`、order 22、`label: () => t("panel.title")`）、`ctx.slots.inject("main", ...)`（key `dsh-todo`）。
-- 样式：`ensureStyles()` 向 `document.head` 插一个 `<style>`，`ctx.effect` 返回删除函数；只用 `--dsw-alias-*` / `--dsw-radius-*` / `--dsw-shadow-*` token，字色用 `--dsw-alias-label-*`，边框用 `--dsw-alias-border-l*`。
+- 样式：`ensureStyles()` 向 `document.head` 插一个 `<style>`，`ctx.effect` 返回删除函数；背景/字色/边框只用 `--dsw-alias-*`，圆角/阴影用 `--dsw-radius-*` / `--dsw-shadow-*`，字色用 `--dsw-alias-label-*`。品牌强调色（Iris）集中在 CSS 末尾 `/* brand-palette:start */ … end */` 区块，是唯一允许字面色值的地方（见 `docs/design-v2.md`）。
 - API 基址：`"todo/api/"`，用 `new URL(API, document.baseURI)`。
 - i18n：`DICT = { zh: {...}, en: {...} }`，`ctx.locale?.register("dsh-todo", DICT)`；`ctx.locale?.getSnapshot()` 取当前语言；变化时 `ctx.locale?.subscribe` 触发重渲染；无 locale 服务时回退 `zh`。
 - 番茄钟状态存 `localStorage["dsh-todo/pomodoro"]`：`{ mode: "focus"|"short"|"long", endsAt: number|null, remainingMs: number, running: boolean, taskId: string|null, cycle: number }`。

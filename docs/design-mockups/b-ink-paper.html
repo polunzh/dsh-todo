@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>Direction B · Ink & Paper</title>
+<style>
+  :root{
+    --ui: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    --serif: "Songti SC", "STSong", "Noto Serif SC", Georgia, "Times New Roman", serif;
+    --paper: #f7f3ec;
+    --panel: #faf7f1;
+    --raise: #fffdf8;
+    --ink: #232019;
+    --ink2: #6b6459;
+    --ink3: #9b9284;
+    --ink4: #b3aa9a;
+    --line: #e7e0d3;
+    --line2: #efe9dd;
+    --hover: #f1ebdf;
+    --moss: #5d7350;
+    --moss-ink: #4a5d40;
+    --moss-tint: #e8ecdf;
+    --terra: #b0552f;
+    --terra-tint: #f2e2d7;
+    --amber: #b07d2e;
+    --shadow: 0 1px 2px rgba(70,55,30,.04), 0 10px 30px -18px rgba(70,55,30,.22);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:var(--ui);
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    font-size:13.5px;line-height:1.55;letter-spacing:-0.003em;
+  }
+  svg{display:block;flex:none}
+  .app{display:grid;grid-template-columns:224px minmax(0,1fr);height:100vh;overflow:hidden}
+
+  /* sidebar */
+  .side{
+    background:var(--panel);border-right:1px solid var(--line);
+    display:flex;flex-direction:column;padding:22px 14px 16px;min-height:0;
+  }
+  .brand{display:flex;align-items:center;gap:11px;padding:0 8px 22px}
+  .brand-logo{width:34px;height:34px;border-radius:11px;background:var(--moss);display:grid;place-items:center;box-shadow:0 3px 8px -2px rgba(74,93,64,.5)}
+  .brand-txt strong{display:block;font-family:var(--serif);font-size:17px;font-weight:600;letter-spacing:.02em}
+  .brand-txt span{display:block;font-size:10.5px;color:var(--ink3);margin-top:1px;letter-spacing:.02em}
+  .sec{
+    padding:16px 10px 7px;font-size:10px;font-weight:600;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink4);
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .sec .plus{color:var(--ink3);cursor:pointer}
+  .nav{display:flex;flex-direction:column}
+  .nav-item{
+    display:flex;align-items:center;gap:11px;height:35px;padding:0 11px;border-radius:8px;
+    color:var(--ink2);font-size:13.5px;cursor:pointer;position:relative;
+  }
+  .nav-item svg{width:16px;height:16px;color:var(--ink3)}
+  .nav-item:hover{background:var(--hover);color:var(--ink)}
+  .nav-item.active{color:var(--ink);font-weight:600}
+  .nav-item.active::after{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:2.5px;height:16px;border-radius:2px;background:var(--moss)}
+  .nav-item.active svg{color:var(--moss)}
+  .nav-item .count{margin-left:auto;font-size:11px;color:var(--ink4);font-variant-numeric:tabular-nums}
+  .nav-item.active .count{color:var(--ink3)}
+  .sep{height:1px;background:var(--line);margin:12px 11px}
+  .pdot{width:7px;height:7px;border-radius:50%;flex:none}
+  .spacer{flex:1;min-height:10px}
+  .stat{padding:14px 12px;border-top:1px solid var(--line)}
+  .stat .nums{display:flex;align-items:baseline;gap:6px}
+  .stat .nums b{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink)}
+  .stat .nums span{font-size:11px;color:var(--ink3)}
+  .stat .nums .goal{margin-left:auto;font-size:10.5px;color:var(--ink4)}
+  .stat .track{height:3px;border-radius:99px;background:var(--line);margin:9px 0 8px;overflow:hidden}
+  .stat .track i{display:block;height:100%;width:37.5%;background:var(--moss);border-radius:99px}
+  .stat .streak{font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:5px}
+  .stat .streak svg{color:var(--amber)}
+
+  /* main */
+  .main{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
+  .top{height:56px;flex:none;display:flex;align-items:center;padding:0 40px;gap:16px}
+  .top .date{font-size:11.5px;color:var(--ink3);letter-spacing:.04em}
+  .top .right{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .tsearch{display:flex;align-items:center;gap:7px;color:var(--ink3);font-size:12.5px;cursor:pointer}
+  .tsearch svg{width:15px;height:15px}
+  .pomo{
+    display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--moss-ink);font-weight:500;
+    border:1px solid var(--line);border-radius:99px;padding:5px 12px;background:var(--raise);cursor:pointer;
+  }
+  .pomo .tm{font-variant-numeric:tabular-nums}
+
+  .scroll{flex:1;overflow:hidden}
+  .col{max-width:720px;margin:0 auto;padding:20px 40px 60px}
+  .head{display:flex;align-items:flex-end;justify-content:space-between;padding:12px 0 4px}
+  .head h1{font-family:var(--serif);font-size:44px;font-weight:600;letter-spacing:.01em;line-height:1.05}
+  .head .sub{font-size:12px;color:var(--ink3);padding-bottom:8px;letter-spacing:.02em}
+  .head .sub b{color:var(--moss-ink);font-weight:600}
+  .rule{height:1px;background:var(--line);margin:16px 0 0}
+
+  .add{display:flex;align-items:center;gap:10px;margin:22px 0 8px;padding:12px 2px;border-bottom:1px solid var(--line2)}
+  .add svg{width:17px;height:17px;color:var(--moss)}
+  .add .ph{flex:1;font-size:14px;color:var(--ink4)}
+  .add .ph b{color:var(--ink3);font-weight:400}
+  .add .go{font-size:12px;color:var(--moss-ink);font-weight:600;letter-spacing:.02em}
+
+  .group{padding-top:20px}
+  .ghead{display:flex;align-items:baseline;gap:9px;margin-bottom:2px;padding:0 2px}
+  .ghead h3{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink2);letter-spacing:.03em}
+  .ghead .n{font-size:11px;color:var(--ink4);font-variant-numeric:tabular-nums}
+  .group.overdue .ghead h3{color:var(--terra)}
+
+  .task{display:flex;align-items:flex-start;gap:14px;padding:13px 4px;border-radius:8px;position:relative}
+  .task:hover{background:var(--hover)}
+  .task + .task{border-top:1px solid var(--line2)}
+  .task:hover + .task{border-color:transparent}
+  .check{width:19px;height:19px;border-radius:50%;border:1.5px solid var(--ink4);margin-top:3px;flex:none;display:grid;place-items:center;color:#fff;transition:.15s}
+  .task:hover .check{border-color:var(--moss)}
+  .task.done .check{background:var(--moss);border-color:var(--moss)}
+  .body{min-width:0;flex:1}
+  .title{font-size:15px;font-weight:500;letter-spacing:-.005em;display:flex;align-items:center;gap:8px}
+  .task.done .title{color:var(--ink3);text-decoration:line-through;text-decoration-color:var(--ink4)}
+  .meta{display:flex;align-items:center;gap:12px;margin-top:5px;flex-wrap:wrap}
+  .mi{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:var(--ink3)}
+  .mi svg{width:12px;height:12px}
+  .mi.late{color:var(--terra)}
+  .mi.today{color:var(--moss-ink)}
+  .dotsep{width:2.5px;height:2.5px;border-radius:50%;background:var(--ink4)}
+  .tag{font-size:11px;color:var(--ink3);letter-spacing:.02em}
+  .pri{margin-left:auto;font-family:var(--serif);font-size:12px;font-weight:600;color:var(--ink3);align-self:center;letter-spacing:.03em}
+  .pri.p0{color:var(--terra)}
+  .pri.p1{color:#a4623d}
+  .pri.p2{color:var(--amber)}
+  .pri.p3{color:var(--moss)}
+  .flag{width:6px;height:6px;border-radius:50%;flex:none;margin-top:1px}
+
+  .subs{margin:4px 0 0 33px;padding-left:14px;border-left:1px solid var(--line)}
+  .sub{display:flex;align-items:center;gap:10px;padding:5px 0}
+  .sub .check{width:15px;height:15px;margin-top:0}
+  .sub.done .check{background:var(--moss);border-color:var(--moss)}
+  .sub .t{font-size:13px;color:var(--ink2)}
+  .sub.done .t{color:var(--ink3);text-decoration:line-through;text-decoration-color:var(--ink4)}
+  .stoggle{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:var(--ink3);font-weight:400}
+  .stoggle svg{width:11px;height:11px}
+
+  .empty-note{font-family:var(--serif);font-size:13px;color:var(--ink3);margin-top:34px;font-style:italic;text-align:center}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="brand-logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.2 4.2L19 7" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="brand-txt"><strong>待办</strong><span>任务 · 项目 · 番茄钟</span></div>
+    </div>
+
+    <div class="sec">视图</div>
+    <nav class="nav">
+      <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11H3v10h6V11zM15 3H9v18h6V3zM21 7h-6v14h6V7z"/></svg><span>今天</span><span class="count">5</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg><span>即将到来</span><span class="count">2</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16l-6.5 8v6.5L10 20v-8L4 4z"/></svg><span>收件箱</span><span class="count">1</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>已完成</span><span class="count">2</span></div>
+    </nav>
+    <div class="sep"></div>
+    <nav class="nav">
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg><span>日历</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span>番茄钟</span></div>
+    </nav>
+
+    <div class="sec">项目 <span class="plus"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></div>
+    <nav class="nav">
+      <div class="nav-item"><span class="pdot" style="background:#c0603a"></span><span>工作</span><span class="count">4</span></div>
+      <div class="nav-item"><span class="pdot" style="background:#6f8757"></span><span>生活</span><span class="count">2</span></div>
+      <div class="nav-item"><span class="pdot" style="background:#8a7a54"></span><span>阅读</span><span class="count">1</span></div>
+    </nav>
+
+    <div class="spacer"></div>
+    <div class="stat">
+      <div class="nums"><b>3</b><span>今日番茄</span><span class="goal">目标 8</span></div>
+      <div class="track"><i></i></div>
+      <div class="streak"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2s5 4.5 5 9a5 5 0 0 1-10 0c0-1.2.4-2.3 1-3.2C8.6 9.6 9 11 10 11.5 10 8 12 5 12 2z"/></svg>连续 3 天 · 专注 75 分钟</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="top">
+      <span class="date">2026 年 11 月 9 日 · 周一</span>
+      <div class="right">
+        <div class="tsearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>搜索</div>
+        <div class="pomo"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>专注 <span class="tm">25:00</span></div>
+      </div>
+    </div>
+
+    <div class="scroll">
+      <div class="col">
+        <div class="head">
+          <h1>今天</h1>
+          <div class="sub">今日完成 <b>3 / 5</b></div>
+        </div>
+        <div class="rule"></div>
+
+        <div class="add">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          <span class="ph">记下一件事… <b>明天 15:00 写周报 #工作 !p1</b></span>
+          <span class="go">添加 ↵</span>
+        </div>
+
+        <div class="group overdue">
+          <div class="ghead"><h3>逾期</h3><span class="n">1</span></div>
+          <div class="task">
+            <div class="check"></div>
+            <div class="body">
+              <div class="title">提交上季度外设发票报销</div>
+              <div class="meta">
+                <span class="mi late"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>11 月 6 日</span>
+                <span class="dotsep"></span><span class="mi"><span class="pdot" style="background:#6f8757"></span>生活</span>
+                <span class="tag">#行政</span>
+              </div>
+            </div>
+            <span class="pri p1">P1</span>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="ghead"><h3>今天</h3><span class="n">4</span></div>
+
+          <div class="task">
+            <div class="check"></div>
+            <div class="body">
+              <div class="title">修线上 502（结算页）</div>
+              <div class="meta">
+                <span class="mi today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今天 11:00</span>
+                <span class="dotsep"></span><span class="mi"><span class="pdot" style="background:#c0603a"></span>工作</span>
+                <span class="tag">#故障</span>
+              </div>
+            </div>
+            <span class="pri p0">P0</span>
+          </div>
+
+          <div class="task">
+            <div class="check"></div>
+            <div class="body">
+              <div class="title">审阅 Q4 路线图初稿 <span class="stoggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>1/2</span></div>
+              <div class="meta">
+                <span class="mi today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今天 14:30</span>
+                <span class="dotsep"></span><span class="mi"><span class="pdot" style="background:#c0603a"></span>工作</span>
+                <span class="tag">#Q4</span><span class="tag">#规划</span>
+                <span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>2</span>
+              </div>
+            </div>
+            <span class="pri p1">P1</span>
+          </div>
+          <div class="subs">
+            <div class="sub done"><div class="check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div><span class="t">汇总需求看板上的待排期清单</span></div>
+            <div class="sub"><div class="check"></div><span class="t">与团队敲定关键路径上的依赖</span></div>
+          </div>
+
+          <div class="task">
+            <div class="check"></div>
+            <div class="body">
+              <div class="title">周常 1-on-1 准备与记录</div>
+              <div class="meta">
+                <span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今天 16:00</span>
+                <span class="dotsep"></span><span class="mi"><span class="pdot" style="background:#c0603a"></span>工作</span>
+                <span class="tag">#同步</span>
+                <span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 9a8 8 0 0 1 14-3M20 15a8 8 0 0 1-14 3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg>每周</span>
+              </div>
+            </div>
+            <span class="pri p2">P2</span>
+          </div>
+
+          <div class="task">
+            <div class="check"></div>
+            <div class="body">
+              <div class="title">晨读：《现代系统性能》第四章</div>
+              <div class="meta">
+                <span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今天</span>
+                <span class="dotsep"></span><span class="mi"><span class="pdot" style="background:#8a7a54"></span>阅读</span>
+                <span class="tag">#笔记</span>
+                <span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 9a8 8 0 0 1 14-3M20 15a8 8 0 0 1-14 3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg>每天</span>
+              </div>
+            </div>
+            <span class="pri p3">P3</span>
+          </div>
+        </div>
+
+        <p class="empty-note">— 把今天过得从容一些。</p>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

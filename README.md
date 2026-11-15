@@ -8,6 +8,10 @@ A full-featured to-do list and Pomodoro timer plugin for DeepSeek Harness. Combi
 
 Runs entirely local: tasks, projects, settings, and Pomodoro sessions are saved to `$DSH_HOME/storages/todo/state.json` via atomic file writes. DeepSeek Harness agents can read and write the exact same task database via the built-in `todo` tool.
 
+## Interface
+
+One Iris brand accent, a 4/8 spacing rhythm, shared radii and elevation, full light/dark parity, and a persistent right-side context rail (today's progress, weekly focus, what's next) keep every view consistent.
+
 ---
 
 ## Screenshots
@@ -123,7 +127,7 @@ Refresh the DeepSeek Harness Web GUI to see the **Todo** entry in the left sideb
 
 ## Development & Testing
 
-Run the full test suite (117 unit and integration tests across storage, recurrence rules, HTTP routes, agent tool, natural language parsing, Pomodoro state machine, and bilingual dictionaries):
+Run the full test suite (126 unit and integration tests across storage, recurrence rules, HTTP routes, agent tool, natural language parsing, Pomodoro state machine, and bilingual dictionaries):
 
 ```bash
 npm test

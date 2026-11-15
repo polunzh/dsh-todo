@@ -565,7 +565,7 @@ test("解析词汇区域确实包含中文关键词（上面的排除不是空�
 
 /* ============================ 样式 ============================ */
 
-test("样式只用 --dsw-* token，没有硬编码黑白颜色", () => {
+test("样式只用 --dsw-* token，字面色值只允许集中在 brand-palette", () => {
   const cssStart = SOURCE.indexOf("const CSS = `");
   const cssEnd = SOURCE.indexOf("\n`;", cssStart);
   assert.ok(cssStart > 0 && cssEnd > cssStart, "找不到 CSS 字符串");
@@ -577,18 +577,24 @@ test("样式只用 --dsw-* token，没有硬编码黑白颜色", () => {
   assert.ok(/--dsw-radius-/.test(css), "应使用宿主圆角 token");
   assert.ok(/--dsw-shadow-/.test(css), "应使用宿主阴影 token");
 
-  // 不能出现具体色值
-  assert.equal(/#[0-9a-fA-F]{3,8}\b/.test(css), false, "不允许硬编码十六进制颜色");
-  assert.equal(/\brgba?\(/.test(css), false, "不允许硬编码 rgb 颜色");
-  assert.equal(/:\s*(white|black)\s*[;}]/.test(css), false, "不允许硬编码黑白色");
-  assert.equal(/\b(background|color|border-color)\s*:\s*(white|black)\b/.test(css), false);
+  // 品牌强调色集中在一个可审计的 brand-palette 区块；区块之外禁止任何字面色值
+  const brandStart = css.indexOf("/* brand-palette:start */");
+  const brandEnd = css.indexOf("/* brand-palette:end */");
+  assert.ok(brandStart > 0 && brandEnd > brandStart, "缺少 brand-palette 区块");
+  const outside =
+    css.slice(0, brandStart) + css.slice(brandEnd + "/* brand-palette:end */".length);
 
-  // 自定义变量必须由宿主 token 派生
-  for (const match of css.matchAll(/(--todo-[a-z-]+)\s*:\s*([^;]+);/g)) {
+  assert.equal(/#[0-9a-fA-F]{3,8}\b/.test(outside), false, "brand-palette 之外不允许硬编码十六进制颜色");
+  assert.equal(/\brgba?\(/.test(outside), false, "brand-palette 之外不允许硬编码 rgb 颜色");
+  assert.equal(/:\s*(white|black)\s*[;}]/.test(outside), false, "brand-palette 之外不允许硬编码黑白色");
+  assert.equal(/\b(background|color|border-color)\s*:\s*(white|black)\b/.test(outside), false);
+
+  // 品牌区块外，自定义变量必须由宿主 token 派生
+  for (const match of outside.matchAll(/(--todo-[a-z-]+)\s*:\s*([^;]+);/g)) {
     assert.match(match[2], /var\(--dsw-/, `${match[1]} 必须由 --dsw-* token 派生`);
   }
-  // 主题差异交给宿主 token，不在客户端写暗色分支
-  assert.equal(/data-ds-dark-theme/.test(css), false, "暗色适配应交给宿主 token");
+  // 暗色差异只交给品牌强调色，且必须落在 brand-palette 区块内
+  assert.equal(/data-ds-dark-theme/.test(outside), false, "暗色分支只应出现在 brand-palette 内");
 });
 
 /* ============================ 销毁清理 ============================ */

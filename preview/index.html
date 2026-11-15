@@ -592,12 +592,14 @@
         },
       ];
 
+      /* 会话按「钉住的今天」锚定，保证截图统计稳定（与真实时钟无关） */
+      const todayBase = new Date(todayDate + "T09:00:00").getTime();
       const seedSessions = [
-        { id: "s-1", taskId: "t-01", kind: "focus", startedAt: now - 3600000 * 3, endedAt: now - 3600000 * 2.5, minutes: 25 },
-        { id: "s-2", taskId: "t-01", kind: "focus", startedAt: now - 3600000 * 2, endedAt: now - 3600000 * 1.5, minutes: 25 },
-        { id: "s-3", taskId: "t-08", kind: "focus", startedAt: now - 3600000 * 1.3, endedAt: now - 3600000 * 0.8, minutes: 25 },
-        { id: "s-4", taskId: "t-02", kind: "focus", startedAt: now - 86400000 - 3600000 * 2, endedAt: now - 86400000 - 3600000 * 1.5, minutes: 25 },
-        { id: "s-5", taskId: "t-03", kind: "focus", startedAt: now - 86400000 * 2 - 3600000 * 3, endedAt: now - 86400000 * 2 - 3600000 * 2.5, minutes: 25 },
+        { id: "s-1", taskId: "t-01", kind: "focus", startedAt: todayBase - 3600000 * 3, endedAt: todayBase - 3600000 * 2.5, minutes: 25 },
+        { id: "s-2", taskId: "t-01", kind: "focus", startedAt: todayBase - 3600000 * 2, endedAt: todayBase - 3600000 * 1.5, minutes: 25 },
+        { id: "s-3", taskId: "t-08", kind: "focus", startedAt: todayBase - 3600000 * 1.3, endedAt: todayBase - 3600000 * 0.8, minutes: 25 },
+        { id: "s-4", taskId: "t-02", kind: "focus", startedAt: todayBase - 86400000 - 3600000 * 2, endedAt: todayBase - 86400000 - 3600000 * 1.5, minutes: 25 },
+        { id: "s-5", taskId: "t-03", kind: "focus", startedAt: todayBase - 86400000 * 2 - 3600000 * 3, endedAt: todayBase - 86400000 * 2 - 3600000 * 2.5, minutes: 25 },
       ];
 
       const mockDb = {
