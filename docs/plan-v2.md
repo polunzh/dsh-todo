@@ -14,11 +14,11 @@
 - [x] `client-i18n.test.js` 样式守卫改为放行 `brand-palette` 区块
 - [x] 预览种子会话按钉住的 `todayDate` 锚定（统计截图稳定）
 - [x] 全量截图回归（亮/暗、中/英、日历、番茄、dock、侧栏徽标、移动端）
-- [x] README 双语更新（设计说明 + 测试数 126）
+- [x] README 双语更新（设计说明 + 测试数 140）
 - [ ] 提交
 
 ## 验证
 
-1. `npm test` 全绿（126）。
+1. `npm test` 全绿（140）。
 2. `node --check lib/client.js`。
 3. `npm run screenshot` 生成 11 张；逐张检查无溢出/错位/色值不一致。

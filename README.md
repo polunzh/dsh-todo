@@ -56,7 +56,7 @@ An unstarted focus stays quiet; a short or long break shows as soon as it become
 - **Views**: Today (split into Overdue and Today), Upcoming (grouped by date), Inbox, Completed, Projects, Calendar, and Pomodoro.
 - **Natural-Language Quick Add**: Type `Tomorrow 3pm review roadmap #work !p1 ~weekly` to parse due dates, times, projects, priorities, and recurrence rules into structured fields automatically.
 - **Task Hierarchy**: One-level subtasks with progress tracking (`1/2 completed`), cascade completion, and cascade deletion with full undo support.
-- **Recurring Tasks**: Supports `daily`, `weekday` (skipping weekends), `weekly`, and `monthly` frequencies with catch-up logic. Marking a recurring task complete archives the current occurrence and immediately spawns the next scheduled occurrence with fresh subtasks.
+- **Recurring Tasks**: Supports `daily`, `weekday` (skipping weekends), `weekly` (optionally on multiple weekdays such as Mon/Wed/Fri), `monthly` (same day, last day of month, or the Nth weekday), and `yearly`, with catch-up logic. Marking a recurring task complete archives the current occurrence and immediately spawns the next one with fresh subtasks.
 - **Priorities & Labels**: P0 (Critical, filled red), P1 (Urgent, red), P2 (High, orange), P3 (Medium, blue), P4 (Low, gray); quick add accepts `!p0`–`!p4`, plus arbitrary `#project` and `@tag` labels.
 - **Calendar Grid**: Interactive monthly grid displaying task count dots; clicking any date filters tasks for that specific day.
 - **Search & Filter**: Real-time keyword search across titles and notes, combined with multi-select priority filters.
@@ -127,7 +127,7 @@ Refresh the DeepSeek Harness Web GUI to see the **Todo** entry in the left sideb
 
 ## Development & Testing
 
-Run the full test suite (126 unit and integration tests across storage, recurrence rules, HTTP routes, agent tool, natural language parsing, Pomodoro state machine, and bilingual dictionaries):
+Run the full test suite (140 unit and integration tests across storage, recurrence rules, HTTP routes, agent tool, natural language parsing, Pomodoro state machine, and bilingual dictionaries):
 
 ```bash
 npm test

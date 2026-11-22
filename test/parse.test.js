@@ -199,3 +199,43 @@ test("formatDue：今天 / 明天 / 昨天 / 周几 / 月日 / 跨年", () => {
   assert.equal(formatDue("2027-01-03", MONDAY), "Jan 3, 2027");
   preview.setPreviewLocale("zh");
 });
+
+/* ============================ 扩展重复规则 ============================ */
+
+test("每年 / ~yearly 解析为 yearly", () => {
+  assert.deepEqual(parse("~yearly 纪念日").recurrence, { freq: "yearly", interval: 1 });
+  assert.deepEqual(parse("每年 结婚纪念").recurrence, { freq: "yearly", interval: 1 });
+  assert.equal(parse("每年 结婚纪念").title, "结婚纪念");
+});
+
+test("每周多选星期：一三五 / 一、三、五 / 一/三/五", () => {
+  const expected = { freq: "weekly", interval: 1, weekdays: [1, 3, 5] };
+  assert.deepEqual(parse("每周一三五 站会").recurrence, expected);
+  assert.deepEqual(parse("每周一、三、五 站会").recurrence, expected);
+  assert.deepEqual(parse("周一/三/五 站会").recurrence, expected);
+  assert.equal(parse("每周一三五 站会").title, "站会");
+});
+
+test("每月最后一天解析为 lastDay", () => {
+  const parsed = parse("每月最后一天 对账");
+  assert.deepEqual(parsed.recurrence, { freq: "monthly", interval: 1, monthMode: "lastDay" });
+  assert.equal(parsed.title, "对账");
+});
+
+test("每月第 N 个星期几 / 最后一个", () => {
+  assert.deepEqual(parse("每月第二个周二 复盘").recurrence, {
+    freq: "monthly",
+    interval: 1,
+    monthMode: "nthWeekday",
+    nth: 2,
+    weekday: 2,
+  });
+  assert.deepEqual(parse("每月最后一个周五 复盘").recurrence, {
+    freq: "monthly",
+    interval: 1,
+    monthMode: "nthWeekday",
+    nth: -1,
+    weekday: 5,
+  });
+  assert.equal(parse("每月第二个周二 复盘").title, "复盘");
+});

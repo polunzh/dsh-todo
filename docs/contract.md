@@ -31,7 +31,7 @@ Task = {
   "projectId": null | "uuid",
   "labels": ["工作"],                  // 最多 10 个，每个 1..40 字符，去重
   "parentId": null | "uuid",           // 子任务只允许一层：父任务的 parentId 必须是 null
-  "recurrence": null | { "freq": "daily" | "weekday" | "weekly" | "monthly", "interval": 1..30 },
+  "recurrence": null | { "freq": "daily"|"weekday"|"weekly"|"monthly"|"yearly", "interval": 1..30, "weekdays"?: [0..6], "monthMode"?: "date"|"lastDay"|"nthWeekday", "nth"?: 1|2|3|4|-1, "weekday"?: 0..6 },  // weekdays 仅 weekly；monthMode/nth/weekday 仅 monthly
   "done": false,
   "doneAt": null | epoch-ms,
   "createdAt": epoch-ms,
@@ -78,8 +78,12 @@ Settings = {
 
 - `daily`：+ interval 天
 - `weekday`：下一个工作日（跳过周六日），interval 固定视为 1
-- `weekly`：+ 7 × interval 天
-- `monthly`：+ interval 月，日超过目标月天数时取当月最后一天
+- `weekly`（无 `weekdays`）：+ 7 × interval 天（同一个星期几）
+- `weekly`（有 `weekdays`）：base 所在周为第 0 周，活动周 = 周序号 % interval == 0，取 base 之后最早、星期几 ∈ weekdays 且落在活动周的日期
+- `monthly` + `date`（默认）：+ interval 月，日超过目标月天数时取当月最后一天，以 base 为锚避免漂移
+- `monthly` + `lastDay`：base 月 + interval 月后的当月最后一天
+- `monthly` + `nthWeekday`：base 月 + interval 月后的「第 nth 个 weekday」，nth ∈ 1..4 或 -1（最后一个）
+- `yearly`：+ interval 年，2-29 在平年取 2-28
 - 结果早于 `today` 时继续前进，最多 400 次；仍早于 today 则返回 today
 - 任务没有 `due` 时，从 `today` 开始前进
 
@@ -139,7 +143,12 @@ Settings = {
     "priority": { "type": ["integer", "null"], "minimum": 0, "maximum": 4, "description": "0 = P0 最紧急，1..4 = P1..P4；null 或省略表示无" },
     "project": { "type": "string", "description": "项目名称或 id" },
     "labels": { "type": "array", "items": { "type": "string" } },
-    "recurrence": { "type": "string", "enum": ["none", "daily", "weekday", "weekly", "monthly"] },
+    "recurrence": { "type": "string", "enum": ["none", "daily", "weekday", "weekly", "monthly", "yearly"] },
+    "recurrenceInterval": { "type": "integer", "minimum": 1, "maximum": 30 },
+    "recurrenceWeekdays": { "type": "array", "items": { "type": "integer", "minimum": 0, "maximum": 6 } },
+    "recurrenceMonthMode": { "type": "string", "enum": ["date", "lastDay", "nthWeekday"] },
+    "recurrenceNth": { "type": "integer" },
+    "recurrenceWeekday": { "type": "integer", "minimum": 0, "maximum": 6 },
     "view": { "type": "string", "enum": ["today", "upcoming", "inbox", "completed", "all"] },
     "query": { "type": "string" },
     "limit": { "type": "integer" },

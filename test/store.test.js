@@ -113,7 +113,7 @@ test("createTask validation errors", () => {
   assert.equal(top.priority, 0);
   assert.equal(updateTask({ id: top.id, priority: null }, { dataDir: testDir }).priority, null);
   assert.throws(
-    () => createTask({ title: "ok", recurrence: "yearly" }, { dataDir: testDir }),
+    () => createTask({ title: "ok", recurrence: "fortnightly" }, { dataDir: testDir }),
     (err) => err instanceof StoreError && err.code === "invalid-recurrence",
   );
 });
@@ -533,4 +533,36 @@ test("用户在面板里打开提示音后保持开启", () => {
   updateSettings({ sound: true }, { dataDir: testDir });
   const state = readState({ dataDir: testDir });
   assert.equal(state.settings.sound, true, "version 2 文件不应再被迁移覆盖");
+});
+
+test("recurrence normalization: yearly / weekly weekdays / monthly modes", () => {
+  const yearly = createTask({ title: "纪念日", recurrence: { freq: "yearly", interval: 2 } }, { dataDir: testDir });
+  assert.deepEqual(yearly.recurrence, { freq: "yearly", interval: 2 });
+
+  const weekday = createTask({ title: "站会", recurrence: { freq: "weekday", interval: 5 } }, { dataDir: testDir });
+  assert.deepEqual(weekday.recurrence, { freq: "weekday", interval: 1 });
+
+  const weekly = createTask({ title: "例会", recurrence: { freq: "weekly", interval: 1, weekdays: [5, 1, 3, 1] } }, { dataDir: testDir });
+  assert.deepEqual(weekly.recurrence, { freq: "weekly", interval: 1, weekdays: [1, 3, 5] });
+
+  const plainWeekly = createTask({ title: "周报", recurrence: { freq: "weekly" } }, { dataDir: testDir });
+  assert.deepEqual(plainWeekly.recurrence, { freq: "weekly", interval: 1 });
+
+  const lastDay = createTask({ title: "对账", recurrence: { freq: "monthly", monthMode: "lastDay" } }, { dataDir: testDir });
+  assert.deepEqual(lastDay.recurrence, { freq: "monthly", interval: 1, monthMode: "lastDay" });
+
+  const nth = createTask(
+    { title: "复盘", recurrence: { freq: "monthly", monthMode: "nthWeekday", nth: -1, weekday: 5 } },
+    { dataDir: testDir },
+  );
+  assert.deepEqual(nth.recurrence, { freq: "monthly", interval: 1, monthMode: "nthWeekday", nth: -1, weekday: 5 });
+
+  assert.throws(
+    () => createTask({ title: "坏", recurrence: { freq: "monthly", monthMode: "nthWeekday", nth: 9, weekday: 1 } }, { dataDir: testDir }),
+    (err) => err instanceof StoreError && err.code === "invalid-recurrence",
+  );
+  assert.throws(
+    () => createTask({ title: "坏", recurrence: { freq: "weekly", weekdays: [7] } }, { dataDir: testDir }),
+    (err) => err instanceof StoreError && err.code === "invalid-recurrence",
+  );
 });

@@ -59,6 +59,7 @@ test("the tool definition matches the contract", () => {
     "weekday",
     "weekly",
     "monthly",
+    "yearly",
   ]);
   assert.deepEqual(tool.parameters.properties.priority.type, ["integer", "null"]);
   assert.equal(tool.parameters.properties.labels.type, "array");
@@ -339,4 +340,37 @@ test("apply skips tool registration when tools service is missing", () => {
 
 test("inject still declares the three host services", () => {
   assert.deepEqual(inject, ["webServer", "connection", "tools"]);
+});
+
+test("action=add accepts structured recurrence params", async () => {
+  const weekly = await executeTodoAction(
+    { action: "add", title: "例会", recurrence: "weekly", recurrenceWeekdays: [1, 3, 5] },
+    opts,
+  );
+  assert.deepEqual(weekly.task.recurrence, { freq: "weekly", interval: 1, weekdays: [1, 3, 5] });
+
+  const monthly = await executeTodoAction(
+    {
+      action: "add",
+      title: "复盘",
+      recurrence: "monthly",
+      recurrenceMonthMode: "nthWeekday",
+      recurrenceNth: 2,
+      recurrenceWeekday: 2,
+    },
+    opts,
+  );
+  assert.deepEqual(monthly.task.recurrence, {
+    freq: "monthly",
+    interval: 1,
+    monthMode: "nthWeekday",
+    nth: 2,
+    weekday: 2,
+  });
+
+  const yearly = await executeTodoAction(
+    { action: "add", title: "纪念日", recurrence: "yearly", recurrenceInterval: 2 },
+    opts,
+  );
+  assert.deepEqual(yearly.task.recurrence, { freq: "yearly", interval: 2 });
 });

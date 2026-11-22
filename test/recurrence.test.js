@@ -5,9 +5,11 @@ import {
   MAX_STEPS,
   addDays,
   addMonths,
+  addYears,
   advanceDate,
   daysInMonth,
   isDateString,
+  nthWeekdayOfMonth,
   weekdayOf,
 } from "../lib/recurrence.js";
 
@@ -137,6 +139,73 @@ test("advanceDate: returns today if still before today after MAX_STEPS", () => {
 });
 
 test("advanceDate: throws on invalid inputs", () => {
-  assert.throws(() => advanceDate("2026-11-09", { freq: "yearly" }, "2026-11-09"), TypeError);
+  assert.throws(() => advanceDate("2026-11-09", { freq: "fortnightly" }, "2026-11-09"), TypeError);
   assert.throws(() => advanceDate("2026-11-09", { freq: "daily" }, "bad-today"), TypeError);
+});
+
+test("addYears clamps Feb 29 to Feb 28 in non-leap years", () => {
+  assert.equal(addYears("2024-02-29", 1), "2025-02-28");
+  assert.equal(addYears("2024-02-29", 4), "2028-02-29");
+  assert.equal(addYears("2026-11-09", 2), "2028-11-09");
+});
+
+test("nthWeekdayOfMonth resolves nth and last weekday", () => {
+  assert.equal(nthWeekdayOfMonth(2026, 11, 2, 2), "2026-11-10"); // 第二个周二
+  assert.equal(nthWeekdayOfMonth(2026, 12, -1, 5), "2026-12-25"); // 最后一个周五
+});
+
+test("advanceDate: yearly advances by interval years", () => {
+  assert.equal(advanceDate("2026-11-09", { freq: "yearly", interval: 1 }, "2026-11-09"), "2027-11-09");
+  assert.equal(advanceDate("2026-11-09", { freq: "yearly", interval: 2 }, "2026-11-09"), "2028-11-09");
+});
+
+test("advanceDate: weekly with multiple weekdays picks the next matching day", () => {
+  assert.equal(
+    advanceDate("2026-11-09", { freq: "weekly", interval: 1, weekdays: [1, 3, 5] }, "2026-11-09"),
+    "2026-11-11",
+  );
+  assert.equal(
+    advanceDate("2026-11-13", { freq: "weekly", interval: 1, weekdays: [1, 3, 5] }, "2026-11-13"),
+    "2026-11-16",
+  );
+});
+
+test("advanceDate: weekly interval only fires on active weeks", () => {
+  assert.equal(
+    advanceDate("2026-11-09", { freq: "weekly", interval: 2, weekdays: [1] }, "2026-11-09"),
+    "2026-11-23",
+  );
+});
+
+test("advanceDate: weekly multi-weekday catches up past today", () => {
+  assert.equal(
+    advanceDate("2026-10-01", { freq: "weekly", interval: 1, weekdays: [4] }, "2026-11-09"),
+    "2026-11-12",
+  );
+});
+
+test("advanceDate: monthly lastDay follows month end", () => {
+  assert.equal(
+    advanceDate("2026-01-31", { freq: "monthly", interval: 1, monthMode: "lastDay" }, "2026-01-31"),
+    "2026-02-28",
+  );
+  assert.equal(
+    advanceDate("2024-01-31", { freq: "monthly", interval: 1, monthMode: "lastDay" }, "2024-01-31"),
+    "2024-02-29",
+  );
+  assert.equal(
+    advanceDate("2026-02-28", { freq: "monthly", interval: 1, monthMode: "lastDay" }, "2026-02-28"),
+    "2026-03-31",
+  );
+});
+
+test("advanceDate: monthly nthWeekday (nth and last)", () => {
+  assert.equal(
+    advanceDate("2026-11-10", { freq: "monthly", interval: 1, monthMode: "nthWeekday", nth: 2, weekday: 2 }, "2026-11-10"),
+    "2026-12-08",
+  );
+  assert.equal(
+    advanceDate("2026-11-27", { freq: "monthly", interval: 1, monthMode: "nthWeekday", nth: -1, weekday: 5 }, "2026-11-27"),
+    "2026-12-25",
+  );
 });
