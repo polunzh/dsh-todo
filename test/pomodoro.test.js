@@ -469,3 +469,39 @@ test("另一个标签页已经结束同一段时，不重复记录", () => {
   assert.equal(value.cycle, 1, "沿用先写入的那份状态，不重复计数");
   assert.equal(liveIntervals.size, 0);
 });
+
+test("configure：空闲时改时长立即刷新，运行/暂停不打断", () => {
+  const s0 = freshPomodoro(DEFAULT_SETTINGS);
+
+  const inc = pomodoroReducer(s0, {
+    type: "configure",
+    previousSettings: DEFAULT_SETTINGS,
+    settings: { ...DEFAULT_SETTINGS, focusMinutes: 50 },
+  });
+  assert.equal(inc.remainingMs, 50 * 60 * 1000, "空闲调大应立即显示 50");
+
+  const dec = pomodoroReducer(s0, {
+    type: "configure",
+    previousSettings: DEFAULT_SETTINGS,
+    settings: { ...DEFAULT_SETTINGS, focusMinutes: 10 },
+  });
+  assert.equal(dec.remainingMs, 10 * 60 * 1000, "空闲调小应立即显示 10");
+
+  const running = pomodoroReducer(s0, { type: "start", now: 0, settings: DEFAULT_SETTINGS });
+  const stillRunning = pomodoroReducer(running, {
+    type: "configure",
+    previousSettings: DEFAULT_SETTINGS,
+    settings: { ...DEFAULT_SETTINGS, focusMinutes: 50 },
+  });
+  assert.equal(stillRunning.running, true, "运行中不被打断");
+  assert.equal(stillRunning.remainingMs, MS_FOCUS, "运行中沿用原时长");
+
+  const paused = pomodoroReducer(running, { type: "pause", now: 5 * 60 * 1000, settings: DEFAULT_SETTINGS });
+  assert.equal(paused.remainingMs, 20 * 60 * 1000);
+  const kept = pomodoroReducer(paused, {
+    type: "configure",
+    previousSettings: DEFAULT_SETTINGS,
+    settings: { ...DEFAULT_SETTINGS, focusMinutes: 50 },
+  });
+  assert.equal(kept.remainingMs, 20 * 60 * 1000, "暂停中保留进度");
+});

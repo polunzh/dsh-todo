@@ -45,6 +45,7 @@ test("the tool definition matches the contract", () => {
     "delete",
     "stats",
     "project",
+    "settings",
   ]);
   assert.deepEqual(tool.parameters.properties.view.enum, [
     "today",
@@ -373,4 +374,21 @@ test("action=add accepts structured recurrence params", async () => {
     opts,
   );
   assert.deepEqual(yearly.task.recurrence, { freq: "yearly", interval: 2 });
+});
+
+test("action=settings updates pomodoro settings", async () => {
+  const result = await executeTodoAction(
+    { action: "settings", focusMinutes: 50, shortBreakMinutes: 8 },
+    opts,
+  );
+  assert.equal(result.ok, true);
+  assert.equal(result.settings.focusMinutes, 50);
+  assert.equal(result.settings.shortBreakMinutes, 8);
+  assert.match(result.summary, /番茄设置/);
+  assert.equal(readState(opts).settings.focusMinutes, 50);
+
+  await assert.rejects(
+    () => executeTodoAction({ action: "settings", focusMinutes: 999 }, opts),
+    (err) => err.code === "invalid-settings",
+  );
 });

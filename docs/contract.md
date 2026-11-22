@@ -135,7 +135,7 @@ Settings = {
 {
   "type": "object",
   "properties": {
-    "action": { "type": "string", "enum": ["list", "add", "update", "complete", "delete", "stats", "project"] },
+    "action": { "type": "string", "enum": ["list", "add", "update", "complete", "delete", "stats", "project", "settings"] },
     "id": { "type": "string" },
     "title": { "type": "string" },
     "note": { "type": "string" },
@@ -149,6 +149,13 @@ Settings = {
     "recurrenceMonthMode": { "type": "string", "enum": ["date", "lastDay", "nthWeekday"] },
     "recurrenceNth": { "type": "integer" },
     "recurrenceWeekday": { "type": "integer", "minimum": 0, "maximum": 6 },
+    "focusMinutes": { "type": "integer", "minimum": 1, "maximum": 180 },
+    "shortBreakMinutes": { "type": "integer", "minimum": 1, "maximum": 60 },
+    "longBreakMinutes": { "type": "integer", "minimum": 1, "maximum": 120 },
+    "longBreakEvery": { "type": "integer", "minimum": 2, "maximum": 12 },
+    "dailyGoal": { "type": "integer", "minimum": 1, "maximum": 40 },
+    "autoStartNext": { "type": "boolean" },
+    "sound": { "type": "boolean" },
     "view": { "type": "string", "enum": ["today", "upcoming", "inbox", "completed", "all"] },
     "query": { "type": "string" },
     "limit": { "type": "integer" },
@@ -162,7 +169,7 @@ Settings = {
 
 `output.schema`：`{ "type": "object", "properties": { "summary": {"type":"string"}, "tasks": {"type":"array"} } }`；`render` 返回 `[{ type: "text", text: summary + 任务行 }]`。
 
-行为：调用同一份 store 函数（与路由完全一致），返回文本摘要，例如 `今天 3 个任务（逾期 1）` 后跟每行 `- [ ] 写周报 · P1 · 今天 15:00 · #工作`。
+行为：调用同一份 store 函数（与路由完全一致），返回文本摘要，例如 `今天 3 个任务（逾期 1）` 后跟每行 `- [ ] 写周报 · P1 · 今天 15:00 · #工作`。`action: "settings"` 改番茄设置（专注/短休/长休时长、长休间隔、自动开始、提示音、每日目标），走 `updateSettings` 校验。
 
 ## 4. 客户端约定
 
