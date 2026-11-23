@@ -253,6 +253,18 @@ test("任务行播放按钮复用直接启动专注路径且不切换视图", ()
   assert.match(SOURCE, /onFocus: handleStartFocus/, "任务行播放按钮必须复用直接启动处理器");
 });
 
+test("番茄钟模式按钮垂直居中，且没有无用的沉浸模式入口", () => {
+  assert.match(SOURCE, /\.todo-pom-mode \{\s*display: inline-flex; align-items: center; justify-content: center;/, "模式按钮必须垂直居中");
+  assert.match(SOURCE, /height: 32px; padding: 0 14px;/, "模式按钮需要稳定的点击高度与水平内边距");
+  assert.equal(/immersive|Immersive/.test(SOURCE), false, "番茄钟不应保留沉浸模式状态、控件或文案");
+});
+
+test("任务详情抽屉覆盖当前页面，并使用轻量透明遮罩", () => {
+  assert.match(SOURCE, /\.todo-drawer-overlay \{\s*position: fixed; inset: 0; z-index: 30;/, "抽屉必须覆盖宿主视口");
+  assert.match(SOURCE, /background: color-mix\(in oklab, var\(--dsw-alias-label-primary\) 10%, transparent\);/, "遮罩必须保留当前页面内容可见");
+  assert.equal(/var\(--dsw-alias-bg-overlay/.test(SOURCE), false, "抽屉不能使用不透明的宿主 overlay 色块");
+});
+
 test("注册 sidebar.panellist、main 与会话右上角的番茄钟工具", () => {
   const { env } = withPlugin({}, () => {});
   assert.deepEqual(env.injections, ["sidebar.panellist", "main", "conversation.session.header.utilities"]);
