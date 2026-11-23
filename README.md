@@ -63,7 +63,7 @@ An unstarted focus stays quiet; a short or long break shows as soon as it become
 
 ### Pomodoro Timer
 - **Work Cycles**: 25-minute focus, 5-minute short break, 15-minute long break every 4 focus sessions. Pick the focus length right on the timer (25 / 45 / 60 or custom) or fine-tune every duration in settings; changes apply immediately when idle and never cut a running session short.
-- **Task Binding**: Bind the active timer to any task; completing a focus session increments that task's Pomodoro counter.
+- **Task Binding**: The play button on each task row starts a focus session for that task directly; completing it increments the task's Pomodoro counter.
 - **Composer dock**: A compact timer row sits under chat composer in every session — idle shows the configured focus length, running shows the countdown with the bound task and pause/skip controls. The sidebar icon mirrors the countdown as mm:ss, labelled with the mode while on a break.
 - **Persistent Countdown**: Timer state is preserved in browser storage (`localStorage`) with absolute timestamps, surviving page refreshes without drifting.
 - **Audio & Visual Alerts**: A browser notification when a session ends, plus a synthetic Web Audio chime that is **off by default** — turn it on in the pomodoro settings, where a Test button plays it immediately.
