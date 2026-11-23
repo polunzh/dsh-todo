@@ -24,10 +24,10 @@ One Iris brand accent, a 4/8 spacing rhythm, shared radii and elevation, full li
 ### Calendar View
 ![Calendar View](./preview/screenshots/calendar.png)
 
-### Always-visible timer in the conversation
-The timer lives under the composer, so it stays in view while you chat: countdown, bound task, pause and skip without leaving the conversation.
+### Always-visible timer in the conversation header
+The timer sits at the top right of every conversation, just before the host sidebar control: countdown, bound task, pause and skip stay within view while you chat.
 
-![Pomodoro under the composer](./preview/screenshots/dock-in-chat.png)
+![Pomodoro timer in the conversation header](./preview/screenshots/header-timer-en.png)
 
 ### Second-precision countdown on the sidebar icon
 The remaining time sits under the to-do icon and ticks every second, so the logo stays fully visible while the sidebar is collapsed.

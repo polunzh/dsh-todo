@@ -57,8 +57,10 @@ test("index.html handles theme and locale parameters and stubs /todo/api/state",
   assert.match(html, /route === "state"/);
   assert.match(html, /data-ds-dark-theme/);
   assert.match(html, /--dsw-alias-bg-base/);
-  // 会话模式：用来给「输入框下方的番茄钟」出截图
-  assert.match(html, /dock-mount/);
+  // 会话模式：用来给「右上角的番茄钟工具」出截图
+  assert.match(html, /header-mount/);
+  assert.match(html, /conversation\.session\.header\.utilities/);
+  assert.doesNotMatch(html, /dock-mount/);
   // 收起侧边栏模式：用来给图标倒计时出截图
   assert.match(html, /rail-mount/);
   assert.match(html, /__previewSidebar/);

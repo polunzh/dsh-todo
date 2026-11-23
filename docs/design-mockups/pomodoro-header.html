@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DSH · 番茄钟右上角设计稿</title>
+<style>
+  :root {
+    --canvas: #f8f9fb;
+    --sidebar: #eef1f6;
+    --surface: #ffffff;
+    --line: #e6e9ef;
+    --line-strong: #d9dee8;
+    --ink: #17191f;
+    --muted: #61666b;
+    --quiet: #61666b;
+    --accent: #4f46e5;
+    --accent-soft: #eeedff;
+    --accent-hover: #4338ca;
+    --focus: #3a9a72;
+    --focus-soft: #e7f6ef;
+    --shadow: 0 10px 26px rgba(20, 28, 45, .08), 0 2px 5px rgba(20, 28, 45, .05);
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-width: 1120px; min-height: 760px; background: var(--canvas); color: var(--ink); font-family: var(--font); }
+  body { font-size: 14px; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; }
+  .window { height: 100vh; min-height: 760px; display: grid; grid-template-columns: 232px 1fr; overflow: hidden; }
+  .sidebar { background: linear-gradient(180deg, #f1f3f7, #e9edf4); border-right: 1px solid #dfe4ed; padding: 20px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .traffic { display: flex; gap: 9px; padding: 4px 7px 18px; }
+  .traffic i { width: 12px; height: 12px; border-radius: 50%; display:block; }
+  .traffic i:nth-child(1){background:#fb5b57}.traffic i:nth-child(2){background:#f5bb42}.traffic i:nth-child(3){background:#42c552}
+  .brand { display: flex; align-items: center; gap: 9px; padding: 3px 6px 25px; font-weight: 720; font-size: 19px; letter-spacing: -.025em; }
+  .brand-mark { width: 27px; height: 22px; position: relative; }
+  .brand-mark:before, .brand-mark:after { content:""; position:absolute; border-radius: 14px 3px 14px 3px; background:#17191f; transform:rotate(34deg); }
+  .brand-mark:before { width:25px;height:13px;top:5px;left:0;}.brand-mark:after{width:12px;height:7px;top:0;right:0;transform:rotate(-10deg)}
+  .brand b { font-size: 11px; padding: 3px 5px; border-radius: 3px; background:#17191f;color:white;letter-spacing:.05em; }
+  .new { height: 46px; border: 1px solid #dde2eb; background: rgba(255,255,255,.78); border-radius: 11px; display:flex;align-items:center;justify-content:center;gap:9px; font-weight:650; font-size:15px; }
+  .new .plus { font-size:21px; font-weight:300; line-height:1; }
+  .section { padding: 12px 8px 4px; color: var(--quiet); font-size: 13px; }
+  .nav { display:flex; flex-direction:column; gap:2px; }
+  .nav div { height: 38px; display:flex;align-items:center; gap:10px; padding:0 10px; border-radius:8px; color:#282b32; }
+  .nav div.active { background:rgba(255,255,255,.72); box-shadow: 0 1px 2px rgba(18,25,38,.04); font-weight:650; }
+  .nav svg { width:18px; height:18px; color:#707783; }
+  .workspaces { margin-top:12px; border-top: 1px solid #dce1e9; padding-top:12px; }
+  .folder { color:#2d3037; font-size:14px; padding:9px 10px; display:flex;gap:8px;align-items:center; }
+  .folder small{margin-left:auto;color:#9197a1;font-size:12px}
+  .main { min-width: 0; display: flex; flex-direction:column; background: var(--surface); }
+  .header { height: 70px; border-bottom: 1px solid var(--line); display:flex; align-items:center; padding: 0 28px 0 34px; gap: 18px; }
+  .crumb { display:flex; align-items:center; gap:8px; color:var(--muted); min-width: 0; }
+  .crumb strong { color:var(--ink); font-size:15px; font-weight:650; white-space:nowrap; }
+  .crumb .chev { color:#a3a8b1; font-size:18px; }
+  .header-spacer { flex:1; }
+  .branch { display:flex; align-items:center; gap:7px; color:#61666b; font-size:13px; white-space:nowrap; }
+  .branch:before { content:"⌘"; font-size:17px; color:#818792; }
+  .timer { height: 42px; display:flex; align-items:center; gap:8px; padding: 4px 5px 4px 10px; border: 1px solid #dcdffc; border-radius: 12px; background: #fbfbff; box-shadow: 0 2px 6px rgba(20,28,45,.08); }
+  .timer:hover { border-color:#bcb8fb; background:#f8f7ff; }
+  .ring { width:25px;height:25px;position:relative;flex:none; }
+  .ring svg{width:25px;height:25px;transform:rotate(-90deg);}.ring circle{fill:none;stroke-width:2.8}.ring .track{stroke:#deddf9}.ring .progress{stroke:var(--accent);stroke-linecap:round;stroke-dasharray:57 69}
+  .timer-copy { min-width: 104px; display:flex; align-items:baseline; gap:7px; white-space:nowrap; }
+  .mode { color:var(--muted); font-size:12px; font-weight:550; }.time { font-variant-numeric:tabular-nums; letter-spacing:.025em; font-size:15px; font-weight:720; }
+  .task { max-width: 154px; overflow:hidden;text-overflow:ellipsis;white-space:nowrap; padding-left:9px; border-left:1px solid #e2e4ec; color:#4d5360; font-size:12px; }
+  .round { width:31px;height:31px;border:0;border-radius:8px;background:var(--accent);color:white;display:grid;place-items:center;box-shadow:0 2px 5px rgba(20,28,45,.16); }
+  .round svg { width:15px;height:15px; margin-left:1px; }.skip { width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:#626876;display:grid;place-items:center; }.skip svg{width:16px;height:16px}.host-toggle { width:32px;height:32px;border:1px solid var(--line-strong);border-radius:8px;display:grid;place-items:center;color:#535862;background:#fff;margin-left:3px; }.host-toggle svg{width:16px;height:16px}
+  .stage { flex:1; display:grid; place-items:center; position:relative; overflow:hidden; }
+  .ghost { width:min(600px, 58%); color:#1d2027; text-align:center; transform: translateY(-6px); }
+  .ghost h1 { font-size:38px;letter-spacing:-.045em;margin:0 0 9px;font-weight:720; }.ghost p{margin:0;color:#61666b;font-size:15px}.ghost .start{margin-top:28px;height:46px;padding:0 20px;border:0;border-radius:12px;background:var(--accent);color:white;font-weight:650;box-shadow:0 7px 16px rgba(20,28,45,.16)}
+  .callout { position:absolute; top:35px; right:50px; width:275px; padding:14px 15px; border-radius:12px; background:#fff; border:1px solid #dedffc; box-shadow:var(--shadow); color:#343846; }.callout:after { content:""; position:absolute;right:95px;top:-39px;width:1px;height:39px;background:#928df2; }.callout:before{content:"";position:absolute;right:91px;top:-44px;width:9px;height:9px;border:2px solid #fff;border-radius:50%;background:var(--accent);box-shadow:0 0 0 1px #aaa7fa}.callout strong{display:block;font-size:13px;margin-bottom:5px}.callout span{font-size:12px;color:var(--muted);line-height:1.55}
+  .caption { position:absolute;left:34px;bottom:25px;display:flex;align-items:center;gap:9px;color:#666c77;font-size:12px;}.caption i{width:8px;height:8px;border-radius:50%;background:var(--focus);box-shadow:0 0 0 4px var(--focus-soft)}
+  @media (max-width: 1240px) { .task{display:none}.timer-copy{min-width:82px}.mode{display:none}.callout{right:36px}.sidebar{width:auto}.window{grid-template-columns:210px 1fr} }
+</style>
+</head>
+<body>
+<div class="window">
+  <aside class="sidebar">
+    <div class="traffic"><i></i><i></i><i></i></div>
+    <div class="brand"><span class="brand-mark"></span><span>deepseek</span><b>HARNESS</b></div>
+    <button class="new"><span class="plus">＋</span>新会话</button>
+    <div class="section">工作区</div>
+    <div class="nav">
+      <div class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>搜索会话</div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3h14v18H5z"/><path d="M8 7h8M8 11h8"/></svg>设计插件 README 图标</div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16M12 4v16"/></svg>番茄时钟位置</div>
+    </div>
+    <div class="workspaces">
+      <div class="folder">▱ dsh-todo <small>⌄</small></div>
+      <div class="folder">▱ Downloads</div>
+      <div class="folder">▱ dsh-doc</div>
+      <div class="folder">▱ backup</div>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="header">
+      <div class="crumb"><strong>dsh-todo</strong><span class="chev">⌄</span><span class="chev">·</span><span>创造模式</span><span class="chev">⌄</span></div>
+      <div class="header-spacer"></div>
+      <div class="branch">main</div>
+      <div class="timer" aria-label="专注计时器，剩余 18 分 42 秒">
+        <span class="ring"><svg viewBox="0 0 24 24" aria-hidden="true"><circle class="track" cx="12" cy="12" r="10.8"/><circle class="progress" cx="12" cy="12" r="10.8"/></svg></span>
+        <span class="timer-copy"><span class="mode">专注</span><span class="time">18:42</span></span>
+        <span class="task">完成番茄钟顶栏设计</span>
+        <button class="round" aria-label="暂停专注"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M8 5v14M16 5v14"/></svg></button>
+        <button class="skip" aria-label="跳过本轮"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5v14l9-7zM18 5v14"/></svg></button>
+      </div>
+      <button class="host-toggle" aria-label="切换侧边栏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4h16v16H4zM15 4v16"/></svg></button>
+    </header>
+    <section class="stage">
+      <div class="callout"><strong>顶栏常驻，随时可操作</strong><span>计时、暂停和跳过集中在阅读视线范围内；任务标题宽度不足时自动收起。</span></div>
+      <div class="ghost"><h1>探索未至之境</h1><p>在这里与 Agent 一起开始新的工作。</p><button class="start">开始一个新会话</button></div>
+      <div class="caption"><i></i><span>运行中 · 进度环每秒更新</span></div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

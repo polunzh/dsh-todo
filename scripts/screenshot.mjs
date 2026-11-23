@@ -5,7 +5,7 @@
  *   node scripts/screenshot.mjs
  *   node scripts/screenshot.mjs --keep
  *
- * Writes panel, calendar, pomodoro, dock and sidebar screenshots to
+ * Writes panel, calendar, pomodoro, header and sidebar screenshots to
  * preview/screenshots/ (1440×900 unless noted).
  */
 import { spawn } from "node:child_process";
@@ -61,11 +61,32 @@ const shots = [
     narrative: "番茄钟视图（圆形环进度、任务绑定、近 7 天柱状图统计）",
   },
   {
-    name: "dock-in-chat",
+    name: "header-timer",
     width: 1440,
     height: 900,
-    url: "?mode=dock&pom=running&theme=light&locale=zh",
-    narrative: "会话视图中输入框下方的常驻番茄钟（倒计时 + 绑定任务 + 暂停/跳过）",
+    url: "?mode=header&pom=running&theme=light&locale=zh",
+    narrative: "会话右上角的常驻番茄钟（倒计时 + 绑定任务 + 暂停/跳过）",
+  },
+  {
+    name: "header-timer-dark",
+    width: 1440,
+    height: 900,
+    url: "?mode=header&pom=running&theme=dark&locale=zh",
+    narrative: "会话右上角的番茄钟（深色主题）",
+  },
+  {
+    name: "header-timer-compact",
+    width: 1024,
+    height: 768,
+    url: "?mode=header&pom=running&theme=light&locale=zh",
+    narrative: "紧凑会话顶栏：任务名和模式收起，保留倒计时与操作",
+  },
+  {
+    name: "header-timer-en",
+    width: 1440,
+    height: 900,
+    url: "?mode=header&pom=running&theme=light&locale=en",
+    narrative: "English · Persistent Pomodoro timer in the session header",
   },
   {
     name: "sidebar-badge",

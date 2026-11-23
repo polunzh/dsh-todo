@@ -253,9 +253,9 @@ test("任务行播放按钮复用直接启动专注路径且不切换视图", ()
   assert.match(SOURCE, /onFocus: handleStartFocus/, "任务行播放按钮必须复用直接启动处理器");
 });
 
-test("注册 sidebar.panellist、main 与输入框下方的番茄钟 dock", () => {
+test("注册 sidebar.panellist、main 与会话右上角的番茄钟工具", () => {
   const { env } = withPlugin({}, () => {});
-  assert.deepEqual(env.injections, ["sidebar.panellist", "main", "conversation.composer.dock"]);
+  assert.deepEqual(env.injections, ["sidebar.panellist", "main", "conversation.session.header.utilities"]);
   assert.equal(env.registrations.length, 3);
 
   const sidebar = env.registrations.find((item) => item.opts.name === "sidebar.panellist");
@@ -270,11 +270,11 @@ test("注册 sidebar.panellist、main 与输入框下方的番茄钟 dock", () =
   assert.equal(main.opts.key, PANEL_ID);
   assert.equal(typeof main.Component, "function");
 
-  const dock = env.registrations.find((item) => item.opts.name === "conversation.composer.dock");
-  assert.ok(dock, "缺少 conversation.composer.dock 注册");
-  assert.equal(dock.opts.id, "dsh-todo-pomodoro");
-  assert.equal(dock.opts.order, 2);
-  assert.equal(typeof dock.Component, "function");
+  const headerTimer = env.registrations.find((item) => item.opts.name === "conversation.session.header.utilities");
+  assert.ok(headerTimer, "缺少 conversation.session.header.utilities 注册");
+  assert.equal(headerTimer.opts.id, "dsh-todo-pomodoro");
+  assert.equal(headerTimer.opts.order, 5);
+  assert.equal(typeof headerTimer.Component, "function");
 });
 
 test("侧边栏倒计时用 mm:ss，休息带模式名，展开时挂到所在行右端", () => {

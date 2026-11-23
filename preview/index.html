@@ -111,7 +111,7 @@
         display: flex;
         overflow: hidden;
       }
-      /* 会话模式：模拟 DSH 对话页，用来展示输入框下方的番茄钟条 */
+      /* 会话模式：模拟 DSH 对话页，用来展示右上角的番茄钟工具。 */
       #chat-shell {
         display: none;
         flex: 1 1 auto;
@@ -120,8 +120,27 @@
         flex-direction: column;
         background: var(--dsw-alias-bg-base);
       }
-      body[data-mode="dock"] #main-mount { display: none; }
-      body[data-mode="dock"] #chat-shell { display: flex; }
+      body[data-mode="header"] #main-mount { display: none; }
+      body[data-mode="header"] #chat-shell { display: flex; }
+      #chat-header {
+        flex: none;
+        height: 54px;
+        padding: 8px 18px 8px 24px;
+        border-bottom: 1px solid var(--dsw-alias-border-l1);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .pv-chat-title { color: var(--dsw-alias-label-primary); font-weight: 600; font-size: 13px; }
+      .pv-chat-crumb { color: var(--dsw-alias-label-secondary); font-size: 12px; }
+      .pv-header-spacer { flex: 1 1 auto; }
+      #header-mount { display: flex; align-items: center; min-width: 0; }
+      .pv-header-host-control {
+        display: grid; place-items: center; width: 28px; height: 28px; padding: 0;
+        border: 1px solid var(--dsw-alias-border-l1); border-radius: var(--dsw-radius-sm);
+        background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-secondary);
+      }
+      .pv-header-host-control svg { width: 15px; height: 15px; }
       #chat-scroll {
         flex: 1 1 auto;
         min-height: 0;
@@ -167,7 +186,7 @@
         justify-content: space-between;
         gap: 12px;
       }
-      .pv-composer-text { font-size: 14px; color: var(--dsw-alias-label-tertiary); }
+      .pv-composer-text { font-size: 14px; color: var(--dsw-alias-label-secondary); }
       .pv-composer-row { display: flex; align-items: center; gap: 8px; }
       .pv-composer-chip {
         font-size: 12px;
@@ -240,14 +259,6 @@
       .pv-side-row.is-active { background: var(--dsw-alias-interactive-bg-hover); }
       .pv-side-glyph { flex: none; display: inline-flex; align-items: center; justify-content: center; }
       .pv-side-row svg { display: block; }
-      #dock-mount {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 12px;
-        min-height: 26px;
-        padding-top: 4px;
-      }
       #preview-banner {
         display: none;
       }
@@ -308,6 +319,15 @@
       </div>
       <div id="main-mount"></div>
       <div id="chat-shell">
+        <div id="chat-header">
+          <span class="pv-chat-title">dsh-todo</span>
+          <span class="pv-chat-crumb">创造模式</span>
+          <span class="pv-header-spacer"></span>
+          <div id="header-mount"></div>
+          <button class="pv-header-host-control" type="button" aria-label="Toggle sidebar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4h16v16H4zM15 4v16" /></svg>
+          </button>
+        </div>
         <div id="chat-scroll">
           <div class="pv-turn">
             <div class="pv-user">帮我看看今天的安排，顺便开一个番茄钟。</div>
@@ -322,7 +342,7 @@
                 <li>晨读：《现代系统性能》第四章（P3）</li>
                 <li>逾期：提交上季度外设发票报销（P1，11 月 6 日）</li>
               </ul>
-              <p>先从最紧的一项开始，番茄钟已经准备好，随时可以在下面开始或暂停。</p>
+              <p>先从最紧的一项开始，番茄钟已经准备好，随时可以在右上角开始或暂停。</p>
             </div>
           </div>
         </div>
@@ -335,7 +355,6 @@
               <span class="pv-composer-send">↑</span>
             </div>
           </div>
-          <div id="dock-mount"></div>
         </div>
       </div>
     </div>
@@ -349,7 +368,7 @@
       const targetView = params.get("view") || "today";
       const rawMode = params.get("mode");
       const mode =
-        rawMode === "dock" ? "dock" : rawMode === "rail" ? "rail" : rawMode === "sidebar" ? "sidebar" : "panel";
+        rawMode === "header" ? "header" : rawMode === "rail" ? "rail" : rawMode === "sidebar" ? "sidebar" : "panel";
       if (mode !== "panel") document.body.setAttribute("data-mode", mode);
       if (params.get("debug") === "1") document.body.setAttribute("data-debug", "1");
 
@@ -790,7 +809,7 @@
       /* __ModuleLoader__ stub that captures registration                   */
       /* ------------------------------------------------------------------ */
       window.__previewComponent = null;
-      window.__previewDock = [];
+      window.__previewHeader = [];
       window.__previewSidebar = [];
       window.__previewReady = false;
 
@@ -836,8 +855,8 @@
                   if (options.name === "main" || options.key === "dsh-todo") {
                     window.__previewComponent = Component;
                   }
-                  if (options.name === "conversation.composer.dock") {
-                    window.__previewDock.push(Component);
+                  if (options.name === "conversation.session.header.utilities") {
+                    window.__previewHeader.push(Component);
                   }
                   if (options.name === "sidebar.panellist") {
                     window.__previewSidebar.push(Component);
@@ -884,27 +903,15 @@
                     ),
                   ),
                 );
-                const dockTarget = document.getElementById("dock-mount");
-                const dockRoot = ReactDOM.createRoot(dockTarget);
-                dockRoot.render(
+              } else if (mode === "header") {
+                const headerTarget = document.getElementById("header-mount");
+                const headerRoot = ReactDOM.createRoot(headerTarget);
+                headerRoot.render(
                   React.createElement(
                     React.Fragment,
                     null,
-                    ...window.__previewDock.map((Dock, index) =>
-                      React.createElement(Dock, { key: index }),
-                    ),
-                  ),
-                );
-              } else if (mode === "dock") {
-                const dockTarget = document.getElementById("dock-mount");
-                const dockRoot = ReactDOM.createRoot(dockTarget);
-                const dockComponents = window.__previewDock;
-                dockRoot.render(
-                  React.createElement(
-                    React.Fragment,
-                    null,
-                    ...dockComponents.map((Dock, index) =>
-                      React.createElement(Dock, { key: index, ctx: fakeCtx }),
+                    ...window.__previewHeader.map((Timer, index) =>
+                      React.createElement(Timer, { key: index, ctx: fakeCtx }),
                     ),
                   ),
                 );
@@ -916,7 +923,7 @@
               const checkMounted = () => {
                 const mount = mode === "sidebar" ? document.getElementById("wide-mount") :
                   mode === "rail" ? document.getElementById("rail-mount") :
-                  mode === "dock" ? document.getElementById("dock-mount") :
+                  mode === "header" ? document.getElementById("header-mount") :
                   document.getElementById("main-mount");
                 const hasContent = Boolean(
                   mount &&
