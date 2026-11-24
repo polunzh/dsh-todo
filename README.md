@@ -60,7 +60,7 @@ An unstarted focus stays quiet; a short or long break shows as soon as it become
 - **Priorities & Labels**: P0 (Critical, filled red), P1 (Urgent, red), P2 (High, orange), P3 (Medium, blue), P4 (Low, gray); quick add accepts `!p0`–`!p4`, plus arbitrary `#project` and `@tag` labels.
 - **Calendar Grid**: Interactive monthly grid displaying task count dots; clicking any date filters tasks for that specific day.
 - **Search & Filter**: Real-time keyword search across titles and notes, combined with multi-select priority filters.
-- **Confident completion & editing**: The task drawer keeps autosave and adds an explicit Save button (`⌘/Ctrl+Enter`). Completing a task gets a focused confirmation with its title, a six-second Undo action, and the next date for recurring tasks.
+- **Confident completion & editing**: The task drawer keeps autosave and adds an explicit Save button (`⌘/Ctrl+Enter`). Completing a task gets a focused confirmation with its title, a six-second Undo action, and the next date for recurring tasks; Today summarizes progress with a direct completed/total count.
 
 ### Pomodoro Timer
 - **Work Cycles**: 25-minute focus, 5-minute short break, 15-minute long break every 4 focus sessions. Pick the focus length right on the timer (25 / 45 / 60 or custom) or fine-tune every duration in settings; changes apply immediately when idle and never cut a running session short.
