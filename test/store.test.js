@@ -504,13 +504,11 @@ test("summary counts views and computes a multi-day streak", () => {
   assert.equal(stats.pomodoro.week.at(-1).date, "2026-11-09");
 });
 
-test("提示音默认关闭，且 v1 旧文件迁移为关闭", () => {
-  // 新文件：默认不响
+test("新用户默认开启提示音，已有状态保留显式选择", () => {
   const fresh = readState({ dataDir: testDir });
-  assert.equal(fresh.settings.sound, false);
-  assert.equal(DEFAULT_SETTINGS.sound, false);
+  assert.equal(fresh.settings.sound, true);
+  assert.equal(DEFAULT_SETTINGS.sound, true);
 
-  // 旧 v1 文件（当年默认 true）读出来必须关掉
   mkdirSync(testDir, { recursive: true });
   writeFileSync(
     dataFile({ dataDir: testDir }),
@@ -519,20 +517,20 @@ test("提示音默认关闭，且 v1 旧文件迁移为关闭", () => {
       tasks: [],
       projects: [],
       sessions: [],
-      settings: { ...DEFAULT_SETTINGS, sound: true, dailyGoal: 12 },
+      settings: { ...DEFAULT_SETTINGS, sound: false, dailyGoal: 12 },
     }),
     { mode: 0o600 },
   );
   const migrated = readState({ dataDir: testDir });
-  assert.equal(migrated.settings.sound, false, "v1 迁移后应关闭提示音");
+  assert.equal(migrated.settings.sound, false, "旧文件的关闭选择必须保留");
   assert.equal(migrated.settings.dailyGoal, 12, "其他设置不受迁移影响");
   assert.equal(migrated.version, 2);
 });
 
-test("用户在面板里打开提示音后保持开启", () => {
-  updateSettings({ sound: true }, { dataDir: testDir });
+test("用户在面板里修改提示音后保持选择", () => {
+  updateSettings({ sound: false }, { dataDir: testDir });
   const state = readState({ dataDir: testDir });
-  assert.equal(state.settings.sound, true, "version 2 文件不应再被迁移覆盖");
+  assert.equal(state.settings.sound, false);
 });
 
 test("recurrence normalization: yearly / weekly weekdays / monthly modes", () => {

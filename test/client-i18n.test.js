@@ -621,6 +621,18 @@ test("样式只用 --dsw-* token，字面色值只允许集中在 brand-palette"
   assert.equal(/data-ds-dark-theme/.test(outside), false, "暗色分支只应出现在 brand-palette 内");
 });
 
+test("完成与保存反馈包含专属结构、撤销与共享提示音", () => {
+  assert.match(SOURCE, /kind: "completed"/, "完成提示需要专属 kind");
+  assert.match(SOURCE, /actionLabel: t\("toast\.undo"\)/, "完成提示需要撤销动作");
+  assert.match(SOURCE, /duration: 6000/, "完成提示需要保留六秒撤销窗口");
+  assert.match(SOURCE, /pauseToast/, "提示计时应可在悬停或聚焦时暂停");
+  assert.match(SOURCE, /playCompletionChime\(\)/, "完成成功后应播放专属确认音");
+  assert.match(SOURCE, /primeAudio\(\)/, "勾选任务的用户手势应预热音频");
+  assert.match(SOURCE, /todo-drawer-save/, "详情抽屉需要显式保存按钮");
+  assert.match(SOURCE, /event\.metaKey \|\| event\.ctrlKey/, "详情抽屉需要支持 Cmd\/Ctrl + Enter");
+  assert.match(SOURCE, /saveQueueRef/, "手动保存与自动保存需要串行化");
+});
+
 /* ============================ 销毁清理 ============================ */
 
 test("销毁时清理样式、定时器、storage 监听与 locale 注册", () => {

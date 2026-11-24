@@ -1,4 +1,4 @@
-[中文](./README.zh-CN.md) | **English**
+[English](./README.md) | **简体中文**
 
 # dsh-todo
 
@@ -60,13 +60,14 @@ An unstarted focus stays quiet; a short or long break shows as soon as it become
 - **Priorities & Labels**: P0 (Critical, filled red), P1 (Urgent, red), P2 (High, orange), P3 (Medium, blue), P4 (Low, gray); quick add accepts `!p0`–`!p4`, plus arbitrary `#project` and `@tag` labels.
 - **Calendar Grid**: Interactive monthly grid displaying task count dots; clicking any date filters tasks for that specific day.
 - **Search & Filter**: Real-time keyword search across titles and notes, combined with multi-select priority filters.
+- **Confident completion & editing**: The task drawer keeps autosave and adds an explicit Save button (`⌘/Ctrl+Enter`). Completing a task gets a focused confirmation with its title, a six-second Undo action, and the next date for recurring tasks.
 
 ### Pomodoro Timer
 - **Work Cycles**: 25-minute focus, 5-minute short break, 15-minute long break every 4 focus sessions. Pick the focus length right on the timer (25 / 45 / 60 or custom) or fine-tune every duration in settings; changes apply immediately when idle and never cut a running session short.
 - **Task Binding**: The play button on each task row starts a focus session for that task directly; completing it increments the task's Pomodoro counter.
 - **Conversation-header timer**: A compact timer sits at the top right of every session — idle shows the configured focus length, running shows the countdown with the bound task and pause/skip controls. The sidebar icon mirrors the countdown as mm:ss, labelled with the mode while on a break.
 - **Persistent Countdown**: Timer state is preserved in browser storage (`localStorage`) with absolute timestamps, surviving page refreshes without drifting.
-- **Audio & Visual Alerts**: A browser notification when a session ends, plus a synthetic Web Audio chime that is **off by default** — turn it on in the pomodoro settings, where a Test button plays it immediately.
+- **Audio & Visual Alerts**: One Alerts setting, enabled by default for new users, covers both task completion and Pomodoro endings. Task completion uses a brief ascending two-note confirmation; Pomodoro keeps its three-note chime. Existing saved choices remain unchanged, and the Test button plays the Pomodoro chime immediately.
 - **Statistics**: Today's Pomodoros vs daily goal, focus minutes, cumulative totals, current streak (in days), and a 7-day bar chart.
 
 ### Keyboard shortcuts
@@ -128,7 +129,7 @@ Refresh the DeepSeek Harness Web GUI to see the **Todo** entry in the left sideb
 
 ## Development & Testing
 
-Run the full test suite (142 unit and integration tests across storage, recurrence rules, HTTP routes, agent tool, natural language parsing, Pomodoro state machine, and bilingual dictionaries):
+Run the full test suite (145 unit and integration tests across storage, recurrence rules, HTTP routes, agent tool, natural language parsing, Pomodoro state machine, settings persistence, and bilingual dictionaries):
 
 ```bash
 npm test
