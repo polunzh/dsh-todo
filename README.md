@@ -25,7 +25,7 @@ One Iris brand accent, a 4/8 spacing rhythm, shared radii and elevation, full li
 ![Calendar View](./preview/screenshots/calendar.png)
 
 ### Always-visible timer in the conversation header
-The timer sits at the top right of every conversation, just before the host sidebar control: countdown, bound task, pause and skip stay within view while you chat.
+The timer sits at the top right of every conversation, just before the host sidebar control: its second-precision countdown stays legible while the bound task, pause and skip remain within view as you chat.
 
 ![Pomodoro timer in the conversation header](./preview/screenshots/header-timer-en.png)
 

@@ -289,6 +289,19 @@ test("注册 sidebar.panellist、main 与会话右上角的番茄钟工具", () 
   assert.equal(typeof headerTimer.Component, "function");
 });
 
+test("会话顶栏倒计时独立于打开面板入口，并始终优先保留", () => {
+  const start = SOURCE.indexOf("function PomodoroHeaderTimer()");
+  const end = SOURCE.indexOf("function TopBar", start);
+  assert.ok(start > 0 && end > start, "找不到会话顶栏番茄钟组件");
+  const body = SOURCE.slice(start, end);
+  assert.match(body, /const timerText = formatClock\(remaining\)/, "顶栏读数必须使用 mm:ss");
+  assert.match(body, /h\("span", \{ className: "todo-header-timer-readout" \}, timerText\)/, "顶栏读数必须是独立元素");
+  assert.match(body, /role: "group",[\s\S]*?"aria-label": timerLabel/, "顶栏容器必须提供当前模式和时间的可访问名称");
+  assert.match(body, /className: "todo-header-timer-main",[\s\S]*?onClick: openPanel/, "原有主入口必须继续打开待办面板");
+  assert.match(SOURCE, /\.todo-header-timer-readout \{[\s\S]*?display: inline-flex; flex: none;[\s\S]*?min-width: 4\.5ch;[\s\S]*?font-variant-numeric: tabular-nums;/, "读数必须显式显示、禁止收缩并保持表格数字");
+  assert.match(SOURCE, /@media \(max-width: 920px\) \{ \.todo-header-timer-skip \{ display: none; \} \}/, "空间不足时应先收起跳过按钮");
+});
+
 test("侧边栏倒计时用 mm:ss，休息带模式名，展开时挂到所在行右端", () => {
   const start = SOURCE.indexOf("function sidebarBadge(");
   assert.ok(start > 0, "找不到 sidebarBadge");
