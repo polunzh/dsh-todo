@@ -32,6 +32,7 @@
   ],
   "scripts": {
     "test": "node --test \"test/*.test.js\"",
+    "test:native": "node test/e2e/native-slot.js",
     "preview": "node preview/server.mjs",
     "screenshot": "node scripts/screenshot.mjs"
   },
