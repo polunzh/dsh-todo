@@ -366,6 +366,10 @@
       const isDark = params.get("theme") === "dark";
       const targetLocale = params.get("locale") === "en" ? "en" : "zh";
       const targetView = params.get("view") || "today";
+      const requestedTodoTheme = params.get("todoTheme");
+      const todoTheme = ["studio-vivid", "deep-teal", "warm-orange", "navy-blue", "rose-warm-gray"].includes(requestedTodoTheme)
+        ? requestedTodoTheme
+        : "studio-vivid";
       const rawMode = params.get("mode");
       const mode =
         rawMode === "header" ? "header" : rawMode === "rail" ? "rail" : rawMode === "sidebar" ? "sidebar" : "panel";
@@ -634,6 +638,7 @@
           autoStartNext: false,
           sound: false,
           dailyGoal: 8,
+          theme: todoTheme,
         },
       };
 

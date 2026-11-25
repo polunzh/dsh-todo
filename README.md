@@ -10,7 +10,7 @@ Runs entirely local: tasks, projects, settings, and Pomodoro sessions are saved 
 
 ## Interface
 
-One Iris brand accent, a 4/8 spacing rhythm, shared radii and elevation, full light/dark parity, and a persistent right-side context rail (today's progress, weekly focus, what's next) keep every view consistent.
+Studio Vivid green is the default brand accent. Five persistent themes—Studio Vivid, Deep Teal Professional, Warm Orange Energy, Navy Blue Composure, and Rose Warm Gray—share the same semantic priority colors, 4/8 spacing rhythm, radii, elevation, light/dark parity, and persistent right-side context rail.
 
 ---
 
@@ -45,8 +45,17 @@ An unstarted focus stays quiet; a short or long break shows as soon as it become
 ### Pomodoro Timer & 7-Day Stats
 ![Pomodoro View](./preview/screenshots/pomodoro.png)
 
+### Theme picker
+Choose a theme from the single **Pomodoro settings → Appearance → Theme** control. It applies immediately, persists locally, supports keyboard navigation, and follows the host light or dark mode.
+
+![Theme picker in Chinese](./preview/screenshots/theme-switcher.png)
+
+![Theme picker in English](./preview/screenshots/theme-switcher-en.png)
+
 ### Mobile & Responsive Layout
 ![Mobile View](./preview/screenshots/mobile.png)
+
+![Mobile theme picker](./preview/screenshots/theme-switcher-mobile.png)
 
 ---
 
@@ -68,6 +77,7 @@ An unstarted focus stays quiet; a short or long break shows as soon as it become
 - **Conversation-header timer**: A compact timer sits at the top right of every session — idle shows the configured focus length, running shows the countdown with the bound task and pause/skip controls. The sidebar icon mirrors the countdown as mm:ss, labelled with the mode while on a break.
 - **Persistent Countdown**: Timer state is preserved in browser storage (`localStorage`) with absolute timestamps, surviving page refreshes without drifting.
 - **Audio & Visual Alerts**: One Alerts setting, enabled by default for new users, covers both task completion and Pomodoro endings. Task completion uses a brief ascending two-note confirmation; Pomodoro keeps its three-note chime. Existing saved choices remain unchanged, and the Test button plays the Pomodoro chime immediately.
+- **Theme picker**: Pomodoro settings includes one Appearance control for five locally persisted themes. Studio Vivid green is the default; the picker works with keyboard navigation, click-outside dismissal, and host light/dark mode.
 - **Statistics**: Today's Pomodoros vs daily goal, focus minutes, cumulative totals, current streak (in days), and a 7-day bar chart.
 
 ### Keyboard shortcuts
@@ -97,7 +107,7 @@ Supported actions:
 - `delete`: Remove tasks and their child subtasks.
 - `stats`: Retrieve today's completed task count, focus minutes, and Pomodoro counts.
 - `project`: Create a new project.
-- `settings`: Adjust Pomodoro focus/short/long lengths, long-break interval, auto-start, sound, and daily goal.
+- `settings`: Adjust Pomodoro focus/short/long lengths, long-break interval, auto-start, sound, daily goal, and the theme (`studio-vivid`, `deep-teal`, `warm-orange`, `navy-blue`, or `rose-warm-gray`).
 
 ---
 

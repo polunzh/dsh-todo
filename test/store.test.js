@@ -6,6 +6,7 @@ import { afterEach, beforeEach, test } from "node:test";
 
 import {
   DEFAULT_SETTINGS,
+  THEMES,
   LIMITS,
   StoreError,
   createProject,
@@ -292,6 +293,23 @@ test("updateSettings validates boundaries", () => {
     () => updateSettings({ dailyGoal: 50 }, { dataDir: testDir }),
     (err) => err instanceof StoreError && err.code === "invalid-settings",
   );
+});
+
+test("theme settings default, normalize, validate, and persist", () => {
+  assert.equal(DEFAULT_SETTINGS.theme, "studio-vivid");
+  assert.deepEqual(THEMES, ["studio-vivid", "deep-teal", "warm-orange", "navy-blue", "rose-warm-gray"]);
+
+  const updated = updateSettings({ theme: "deep-teal" }, { dataDir: testDir });
+  assert.equal(updated.theme, "deep-teal");
+  assert.equal(readState({ dataDir: testDir }).settings.theme, "deep-teal");
+
+  assert.throws(
+    () => updateSettings({ theme: "untrusted-purple" }, { dataDir: testDir }),
+    (err) => err instanceof StoreError && err.code === "invalid-settings",
+  );
+
+  writeState({ version: 2, tasks: [], projects: [], sessions: [], settings: { theme: "unknown" } }, { dataDir: testDir });
+  assert.equal(readState({ dataDir: testDir }).settings.theme, "studio-vivid", "unknown stored themes fall back safely");
 });
 
 test("recordSession validates, increments task pomodoros, and feeds summary", () => {

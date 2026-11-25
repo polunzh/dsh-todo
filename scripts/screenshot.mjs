@@ -61,6 +61,30 @@ const shots = [
     narrative: "番茄钟视图（圆形环进度、任务绑定、近 7 天柱状图统计）",
   },
   {
+    name: "theme-switcher",
+    width: 1440,
+    height: 900,
+    url: "?view=pomodoro&theme=light&locale=zh",
+    afterReady: `document.querySelector(".todo-theme-trigger")?.click()`,
+    narrative: "中文 · 番茄设置中的主题选择器（五套主题、当前选择与色板预览）",
+  },
+  {
+    name: "theme-switcher-en",
+    width: 1440,
+    height: 900,
+    url: "?view=pomodoro&theme=light&locale=en&todoTheme=navy-blue",
+    afterReady: `document.querySelector(".todo-theme-trigger")?.click()`,
+    narrative: "English · Theme picker with Navy Blue selected",
+  },
+  {
+    name: "theme-switcher-mobile",
+    width: 390,
+    height: 844,
+    url: "?view=pomodoro&theme=light&locale=zh",
+    afterReady: `document.querySelector(".todo-theme-trigger")?.click()`,
+    narrative: "中文 · 窄屏主题选择器（全宽锚定弹层与 44px 触控项）",
+  },
+  {
     name: "header-timer",
     width: 1440,
     height: 900,
@@ -275,6 +299,10 @@ async function captureShot(cdp, baseUrl, spec) {
 
   if (!ready) throw new Error(`Timed out waiting for preview readiness on ${spec.url}`);
   await new Promise((r) => setTimeout(r, settleMs));
+  if (spec.afterReady) {
+    await cdp.send("Runtime.evaluate", { expression: spec.afterReady, awaitPromise: true });
+    await new Promise((r) => setTimeout(r, 150));
+  }
 
   // Assert banner is hidden
   const bannerVisible = await cdp.send("Runtime.evaluate", {

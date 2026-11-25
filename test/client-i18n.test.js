@@ -634,6 +634,40 @@ test("样式只用 --dsw-* token，字面色值只允许集中在 brand-palette"
   assert.equal(/data-ds-dark-theme/.test(outside), false, "暗色分支只应出现在 brand-palette 内");
 });
 
+test("主题选择器提供五个持久化主题与无障碍键盘交互", () => {
+  withPlugin({}, (env) => {
+    const { THEMES, resolveThemeId } = env.exports.__preview.__internal;
+    assert.deepEqual(
+      THEMES.map((theme) => theme.id),
+      ["studio-vivid", "deep-teal", "warm-orange", "navy-blue", "rose-warm-gray"],
+    );
+    assert.equal(resolveThemeId("unknown"), "studio-vivid");
+  });
+
+  assert.match(SOURCE, /data-todo-theme": resolveThemeId\(state\.settings\.theme\)/, "主题应挂在应用根节点");
+  assert.match(SOURCE, /role: "listbox"/, "主题弹层必须是 listbox");
+  assert.match(SOURCE, /role: "option"/, "主题项必须是 option");
+  assert.match(SOURCE, /"aria-haspopup": "listbox"/, "触发器必须声明 listbox");
+  assert.match(SOURCE, /"aria-expanded": open/, "触发器必须暴露展开状态");
+  assert.match(SOURCE, /"pointerdown"/, "打开时点击外部应关闭选择器");
+  assert.match(SOURCE, /event\.key === "Escape"/, "Escape 应关闭选择器");
+  assert.match(SOURCE, /event\.key === "ArrowDown"/, "方向键应移动选项焦点");
+  assert.match(SOURCE, /ui\.onTheme\(id\)/, "选择主题需要立即保存");
+  assert.match(SOURCE, /updateTheme\(theme\)/, "主题写入需要单独处理乐观更新与回滚");
+  assert.match(SOURCE, /min-height: 44px/, "窄屏主题触控目标至少 44px");
+  assert.match(SOURCE, /width: 320px/, "桌面主题弹层保持紧凑宽度");
+});
+
+test("主题调色板覆盖五个主题、深浅宿主模式与宿主入口令牌", () => {
+  for (const id of ["studio-vivid", "deep-teal", "warm-orange", "navy-blue", "rose-warm-gray"]) {
+    assert.match(SOURCE, new RegExp(`data-todo-theme=\\"${id}\\"`), `缺少 ${id} 的主题令牌`);
+  }
+  assert.match(SOURCE, /body\[data-ds-dark-theme\] \.todo-root\[data-todo-theme="deep-teal"\]/);
+  assert.match(SOURCE, /:root:has\(\.todo-root\[data-todo-theme="warm-orange"\]\)/);
+  assert.match(SOURCE, /--dsh-todo-accent/, "面板外的宿主入口应使用同步令牌");
+  assert.match(SOURCE, /--todo-on-accent/, "强调按钮必须有显式对比色");
+});
+
 test("完成与保存反馈包含专属结构、撤销与共享提示音", () => {
   assert.match(SOURCE, /kind: "completed"/, "完成提示需要专属 kind");
   assert.match(SOURCE, /actionLabel: t\("toast\.undo"\)/, "完成提示需要撤销动作");

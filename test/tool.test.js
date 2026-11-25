@@ -65,6 +65,13 @@ test("the tool definition matches the contract", () => {
   assert.deepEqual(tool.parameters.properties.priority.type, ["integer", "null"]);
   assert.equal(tool.parameters.properties.labels.type, "array");
   assert.equal(tool.parameters.properties.labels.items.type, "string");
+  assert.deepEqual(tool.parameters.properties.theme.enum, [
+    "studio-vivid",
+    "deep-teal",
+    "warm-orange",
+    "navy-blue",
+    "rose-warm-gray",
+  ]);
 
   assert.equal(tool.output.schema.type, "object");
   assert.equal(tool.output.schema.properties.summary.type, "string");
@@ -378,17 +385,22 @@ test("action=add accepts structured recurrence params", async () => {
 
 test("action=settings updates pomodoro settings", async () => {
   const result = await executeTodoAction(
-    { action: "settings", focusMinutes: 50, shortBreakMinutes: 8 },
+    { action: "settings", focusMinutes: 50, shortBreakMinutes: 8, theme: "navy-blue" },
     opts,
   );
   assert.equal(result.ok, true);
   assert.equal(result.settings.focusMinutes, 50);
   assert.equal(result.settings.shortBreakMinutes, 8);
+  assert.equal(result.settings.theme, "navy-blue");
   assert.match(result.summary, /番茄设置/);
   assert.equal(readState(opts).settings.focusMinutes, 50);
 
   await assert.rejects(
     () => executeTodoAction({ action: "settings", focusMinutes: 999 }, opts),
+    (err) => err.code === "invalid-settings",
+  );
+  await assert.rejects(
+    () => executeTodoAction({ action: "settings", theme: "untrusted-purple" }, opts),
     (err) => err.code === "invalid-settings",
   );
 });

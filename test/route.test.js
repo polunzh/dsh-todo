@@ -206,10 +206,11 @@ test("project routes create, update and delete with both modes", async () => {
 });
 
 test("settings and sessions routes respond with stored values", async () => {
-  const settings = await call("POST", `${PREFIX}/settings`, { focusMinutes: 30, sound: false });
+  const settings = await call("POST", `${PREFIX}/settings`, { focusMinutes: 30, sound: false, theme: "rose-warm-gray" });
   assert.equal(settings.status, 200);
   assert.equal(settings.body.settings.focusMinutes, 30);
   assert.equal(settings.body.settings.sound, false);
+  assert.equal(settings.body.settings.theme, "rose-warm-gray");
 
   const task = (await call("POST", `${PREFIX}/tasks/create`, { title: "专注" })).body.task;
   const now = Date.now();
@@ -251,6 +252,10 @@ test("error mapping: 400 for invalid input", async () => {
   const badSettings = await call("POST", `${PREFIX}/settings`, { focusMinutes: 999 });
   assert.equal(badSettings.status, 400);
   assert.equal(badSettings.body.error, "invalid-settings");
+
+  const badTheme = await call("POST", `${PREFIX}/settings`, { theme: "untrusted-purple" });
+  assert.equal(badTheme.status, 400);
+  assert.equal(badTheme.body.error, "invalid-settings");
 
   const badSession = await call("POST", `${PREFIX}/sessions/record`, {
     startedAt: "yesterday",

@@ -68,4 +68,6 @@ test("index.html handles theme and locale parameters and stubs /todo/api/state",
   assert.match(html, /short-idle/);
   assert.match(html, /data-mode/);
   assert.match(html, /dsh-todo\/pomodoro/);
+  assert.match(html, /todoTheme/, "预览应支持指定要展示的主题");
+  assert.match(html, /: "studio-vivid"/, "预览默认主题应为 Studio Vivid");
 });
