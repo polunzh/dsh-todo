@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>Direction D1 · Deep Teal Professional</title>
+<style>
+  :root{
+    --ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    --canvas: #eef5f5;
+    --card: #fbfdfd;
+    --ink: #172326;
+    --ink2: #4d6267;
+    --ink3: #7a9297;
+    --ink4: #a5b9bc;
+    --line: #dce8e9;
+    --line2: #edf4f4;
+    --hover: #f1f7f7;
+    --jade: #087f82;
+    --jade-ink: #05666a;
+    --jade-tint: #dff3f2;
+    --p0: #e5484d; --p0t: #fdecec;
+    --p1: #f76b15; --p1t: #fef0e6;
+    --p2: #e0a020; --p2t: #fbf3dd;
+    --p3: #3b82f6; --p3t: #e9f1fe;
+    --p4: #7a9297; --p4t: #eef5f5;
+    --shadow-card: 0 1px 2px rgba(20,30,45,.04), 0 8px 24px -16px rgba(20,30,45,.22);
+    --shadow-pop: 0 2px 6px rgba(20,30,45,.06), 0 16px 40px -20px rgba(20,30,45,.28);
+    --r: 14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--ui);background:var(--canvas);color:var(--ink);-webkit-font-smoothing:antialiased;font-size:13.5px;line-height:1.5;letter-spacing:-0.005em}
+  svg{display:block;flex:none}
+  .app{display:grid;grid-template-columns:252px minmax(0,1fr);height:100vh;overflow:hidden}
+
+  /* sidebar */
+  .side{background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:16px 13px 14px;min-height:0}
+  .brand{display:flex;align-items:center;gap:10px;padding:4px 8px 14px}
+  .brand-logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(150deg,#159da0,#05666a);display:grid;place-items:center;box-shadow:0 4px 10px -3px rgba(8,127,130,.42),inset 0 1px 0 rgba(255,255,255,.3)}
+  .brand-txt strong{display:block;font-size:14.5px;font-weight:700;letter-spacing:-.015em}
+  .brand-txt span{display:block;font-size:10.5px;color:var(--ink3);margin-top:1px}
+  .badge-streak{margin-left:auto;display:flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:#c2410c;background:#fff1e6;border-radius:99px;padding:3px 8px}
+  .badge-streak svg{width:12px;height:12px}
+
+  .sec{display:flex;align-items:center;justify-content:space-between;padding:13px 10px 6px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4)}
+  .sec .plus{width:18px;height:18px;border-radius:5px;display:grid;place-items:center;color:var(--ink3);cursor:pointer}
+  .sec .plus:hover{background:var(--hover);color:var(--ink)}
+  .nav{display:flex;flex-direction:column;gap:1px}
+  .nav-item{display:flex;align-items:center;gap:10px;height:34px;padding:0 10px;border-radius:9px;color:var(--ink2);font-size:13px;font-weight:500;cursor:pointer}
+  .nav-item svg{width:16px;height:16px;color:var(--ink3)}
+  .nav-item:hover{background:var(--hover);color:var(--ink)}
+  .nav-item.active{background:var(--jade-tint);color:var(--jade-ink);font-weight:650}
+  .nav-item.active svg{color:var(--jade-ink)}
+  .nav-item .count{margin-left:auto;font-size:11px;font-weight:600;color:var(--ink4);font-variant-numeric:tabular-nums}
+  .nav-item.active .count{color:var(--jade-ink)}
+  .sep{height:1px;background:var(--line);margin:10px 10px}
+  .pdot{width:8px;height:8px;border-radius:50%;flex:none}
+  .spacer{flex:1;min-height:10px}
+  .fcard{background:linear-gradient(160deg,#f2faf9,#e7f4f3);border:1px solid #cde7e6;border-radius:12px;padding:12px 13px}
+  .fcard .row{display:flex;align-items:baseline;gap:6px}
+  .fcard .row b{font-size:17px;font-weight:800;color:var(--jade-ink);font-variant-numeric:tabular-nums}
+  .fcard .row span{font-size:11px;color:var(--ink2)}
+  .fcard .row .g{margin-left:auto;font-size:10.5px;color:var(--ink3)}
+  .fcard .track{height:5px;border-radius:99px;background:#cae7e5;margin:9px 0 8px;overflow:hidden}
+  .fcard .track i{display:block;height:100%;width:37.5%;border-radius:99px;background:linear-gradient(90deg,#159da0,#05666a)}
+  .fcard .mini{font-size:10.5px;color:var(--ink2)}
+
+  /* main */
+  .main{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
+  .top{height:58px;flex:none;display:flex;align-items:center;gap:14px;padding:0 26px}
+  .top .crumbs{font-size:12px;color:var(--ink3)}
+  .top .crumbs b{color:var(--ink);font-weight:650}
+  .top .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .search{display:flex;align-items:center;gap:7px;width:210px;height:34px;padding:0 11px;background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--ink3);font-size:12.5px;box-shadow:0 1px 2px rgba(20,30,45,.03)}
+  .search svg{width:15px;height:15px}
+  .search kbd{margin-left:auto;font-family:var(--ui);font-size:10.5px;color:var(--ink4);background:var(--line2);border-radius:4px;padding:1px 5px}
+  .iconbtn{width:34px;height:34px;border-radius:10px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;color:var(--ink2);cursor:pointer;box-shadow:0 1px 2px rgba(20,30,45,.03)}
+  .iconbtn svg{width:16px;height:16px}
+  .avatar{width:34px;height:34px;border-radius:99px;background:linear-gradient(150deg,#159da0,#05666a);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px}
+
+  .scroll{flex:1;overflow:hidden;padding:4px 26px 26px;display:grid;grid-template-columns:minmax(0,1fr) 272px;gap:18px}
+  .colL{min-width:0;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+
+  /* hero */
+  .hero{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-card);padding:20px 22px;display:flex;align-items:center;gap:22px}
+  .hero .hL{flex:1;min-width:0}
+  .hero .eyebrow{font-size:12px;color:var(--jade-ink);font-weight:600;letter-spacing:.02em;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .hero .eyebrow svg{width:13px;height:13px}
+  .hero h1{font-size:27px;font-weight:750;letter-spacing:-.03em;line-height:1.1}
+  .hero .sub{font-size:12.5px;color:var(--ink3);margin-top:7px}
+  .hero .sub b{color:var(--ink);font-weight:650}
+  .ringwrap{display:flex;align-items:center;gap:14px;flex:none;padding-left:18px;border-left:1px solid var(--line)}
+  .ring{width:74px;height:74px;position:relative}
+  .ring .pct{position:absolute;inset:0;display:grid;place-items:center;font-size:17px;font-weight:800;font-variant-numeric:tabular-nums}
+  .ring .pct small{font-size:9px;font-weight:600;color:var(--ink3);display:block;text-align:center;margin-top:-2px}
+  .herostats{display:flex;flex-direction:column;gap:8px}
+  .herostats .hs{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2)}
+  .herostats .hs .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:none}
+  .herostats .hs .ic svg{width:14px;height:14px}
+  .herostats .hs b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+  .pomo-btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;background:var(--ink);color:#fff;border-radius:11px;font-size:13px;font-weight:600;box-shadow:0 6px 16px -8px rgba(20,24,31,.5);cursor:pointer;flex:none}
+  .pomo-btn .tm{font-variant-numeric:tabular-nums;letter-spacing:.01em}
+  .pomo-btn .st{color:rgba(255,255,255,.6);font-weight:500;font-size:11.5px}
+  .pomo-btn svg{color:#78d7c7}
+
+  /* quick add */
+  .add{background:var(--card);border:1.5px solid var(--line);border-radius:12px;display:flex;align-items:center;gap:11px;height:50px;padding:0 8px 0 15px;box-shadow:var(--shadow-card);transition:.15s}
+  .add:focus-within{border-color:var(--jade);box-shadow:0 0 0 3px rgba(8,127,130,.14),var(--shadow-card)}
+  .add .plus{width:20px;height:20px;color:var(--jade)}
+  .add .ph{flex:1;font-size:13px;color:var(--ink4)}
+  .add .ph b{color:var(--ink3);font-weight:500}
+  .add .go{height:34px;padding:0 15px;border-radius:8px;background:var(--jade);color:#fff;font-size:12.5px;font-weight:650;display:flex;align-items:center;gap:6px;box-shadow:0 3px 8px -3px rgba(8,127,130,.46)}
+  .add .go svg{width:14px;height:14px}
+
+  /* list card */
+  .listcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-card);padding:8px 8px 10px;overflow:hidden;flex:1;min-height:0}
+  .lhead{display:flex;align-items:center;gap:8px;padding:9px 12px 7px}
+  .lhead h3{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3)}
+  .lhead .n{font-size:10.5px;font-weight:600;color:var(--ink4);background:var(--line2);border-radius:99px;padding:1px 7px}
+  .lhead .fill{flex:1}
+  .lhead .sort{font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:4px;cursor:pointer}
+  .overdue .lhead h3{color:var(--p0)}
+
+  .task{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-radius:10px;position:relative}
+  .task:hover{background:var(--hover)}
+  .check{width:20px;height:20px;border-radius:6px;border:1.7px solid #ccd3dc;margin-top:1px;flex:none;display:grid;place-items:center;color:#fff;transition:.14s}
+  .task:hover .check{border-color:var(--jade)}
+  .task.done .check{background:var(--jade);border-color:var(--jade)}
+  .body{min-width:0;flex:1}
+  .title{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:8px;letter-spacing:-.005em}
+  .task.done .title{color:var(--ink3);text-decoration:line-through;text-decoration-color:var(--ink4)}
+  .meta{display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap}
+  .chip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:var(--ink2);background:var(--line2);border-radius:6px;padding:2px 7px}
+  .chip svg{width:12px;height:12px}
+  .chip.late{color:var(--p0);background:var(--p0t)}
+  .chip.today{color:var(--jade-ink);background:var(--jade-tint)}
+  .proj{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--ink2)}
+  .proj .pdot{width:7px;height:7px}
+  .tag{font-size:11px;color:var(--ink3)}
+  .pf{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 7px;letter-spacing:.02em}
+  .pf.p0{color:#fff;background:var(--p0)}
+  .pf.p1{color:var(--p1);background:var(--p1t)}
+  .pf.p2{color:var(--p2);background:var(--p2t)}
+  .pf.p3{color:var(--p3);background:var(--p3t)}
+  .pf.p4{color:var(--p4);background:var(--p4t)}
+  .task .pf{margin-left:auto;align-self:center;flex:none}
+
+  .subs{margin:2px 0 4px 44px;padding-left:13px;border-left:2px solid var(--line2)}
+  .sub{display:flex;align-items:center;gap:9px;padding:4px 0}
+  .sub .check{width:16px;height:16px;border-radius:5px;margin-top:0}
+  .sub.done .check{background:var(--jade);border-color:var(--jade)}
+  .sub .t{font-size:12.5px;color:var(--ink2)}
+  .sub.done .t{color:var(--ink4);text-decoration:line-through;text-decoration-color:var(--ink4)}
+  .stoggle{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:var(--ink3);font-weight:500;background:var(--line2);border-radius:6px;padding:1px 6px}
+  .stoggle svg{width:11px;height:11px}
+
+  /* right rail */
+  .rail{display:flex;flex-direction:column;gap:16px;overflow:hidden}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-card);padding:16px}
+  .card h4{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+  .card h4 .link{font-size:11px;color:var(--jade-ink);font-weight:600;cursor:pointer}
+  .up{display:flex;align-items:center;gap:10px;padding:8px 0}
+  .up+.up{border-top:1px solid var(--line2)}
+  .up .d{width:34px;height:34px;border-radius:9px;background:var(--line2);text-align:center;flex:none;display:flex;flex-direction:column;justify-content:center}
+  .up .d b{font-size:13px;font-weight:800;line-height:1}
+  .up .d span{font-size:8px;color:var(--ink3);margin-top:2px}
+  .up .txt{flex:1;min-width:0}
+  .up .txt b{display:block;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .up .txt span{display:block;font-size:10.5px;color:var(--ink3);margin-top:1px}
+  .weekgrid{display:flex;align-items:flex-end;gap:9px;height:56px;margin-top:2px}
+  .weekgrid .c{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+  .weekgrid .c i{width:100%;border-radius:4px 4px 2px 2px;background:var(--jade-tint)}
+  .weekgrid .c.on i{background:linear-gradient(180deg,#159da0,#05666a)}
+  .weekgrid .c span{font-size:9px;color:var(--ink3)}
+  .legend{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid var(--line2);font-size:11.5px;color:var(--ink3)}
+  .legend b{color:var(--ink);font-weight:700}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- sidebar -->
+  <aside class="side">
+    <div class="brand">
+      <div class="brand-logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.2 4.2L19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="brand-txt"><strong>待办</strong><span>任务 · 项目 · 番茄钟</span></div>
+      <div class="badge-streak"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2s5 4.5 5 9a5 5 0 0 1-10 0c0-1.2.4-2.3 1-3.2C8.6 9.6 9 11 10 11.5 10 8 12 5 12 2z"/></svg>3</div>
+    </div>
+
+    <div class="sec">视图</div>
+    <nav class="nav">
+      <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11H3v10h6V11zM15 3H9v18h6V3zM21 7h-6v14h6V7z"/></svg><span>今天</span><span class="count">5</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg><span>即将到来</span><span class="count">2</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16l-6.5 8v6.5L10 20v-8L4 4z"/></svg><span>收件箱</span><span class="count">1</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>已完成</span><span class="count">2</span></div>
+    </nav>
+    <div class="sep"></div>
+    <nav class="nav">
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg><span>日历</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span>番茄钟</span></div>
+    </nav>
+    <div class="sec">项目 <span class="plus"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></div>
+    <nav class="nav">
+      <div class="nav-item"><span class="pdot" style="background:#e5484d"></span><span>工作</span><span class="count">4</span></div>
+      <div class="nav-item"><span class="pdot" style="background:#087f82"></span><span>生活</span><span class="count">2</span></div>
+      <div class="nav-item"><span class="pdot" style="background:#7c6cf0"></span><span>阅读</span><span class="count">1</span></div>
+    </nav>
+
+    <div class="spacer"></div>
+    <div class="fcard">
+      <div class="row"><b>3</b><span>今日番茄</span><span class="g">目标 8</span></div>
+      <div class="track"><i></i></div>
+      <div class="mini">专注 75 分钟 · 连续 3 天</div>
+    </div>
+  </aside>
+
+  <!-- main -->
+  <main class="main">
+    <div class="top">
+      <div class="crumbs">工作台 / <b>今天</b></div>
+      <div class="right">
+        <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg><span>搜索任务</span><kbd>⌘K</kbd></div>
+        <div class="iconbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg></div>
+        <div class="iconbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+      </div>
+    </div>
+
+    <div class="scroll">
+      <div class="colL">
+        <!-- hero -->
+        <div class="hero">
+          <div class="hL">
+            <div class="eyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>周一 · 2026 年 11 月 9 日</div>
+            <h1>今天</h1>
+            <div class="sub">共 <b>5</b> 项任务 · 已完成 <b>3</b> · 还剩 <b>2</b> 项，其中 1 项逾期</div>
+          </div>
+          <div class="ringwrap">
+            <div class="ring">
+              <svg width="74" height="74" viewBox="0 0 74 74"><circle cx="37" cy="37" r="31" fill="none" stroke="#eef5f5" stroke-width="7"/><circle cx="37" cy="37" r="31" fill="none" stroke="url(#g1)" stroke-width="7" stroke-linecap="round" stroke-dasharray="117 195" transform="rotate(-90 37 37)"/><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#159da0"/><stop offset="1" stop-color="#05666a"/></linearGradient></defs></svg>
+              <div class="pct">60%<small>完成</small></div>
+            </div>
+            <div class="herostats">
+              <div class="hs"><span class="ic" style="background:#fdecec;color:#e5484d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span><b>25</b> 分钟后开始专注</span></div>
+              <div class="hs"><span class="ic" style="background:#dff3f2;color:#05666a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg></span><span>今日 <b>3</b> 番茄 · <b>75</b> 分钟</span></div>
+            </div>
+            <div class="pomo-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span class="st">专注</span><span class="tm">25:00</span></div>
+          </div>
+        </div>
+
+        <!-- quick add -->
+        <div class="add">
+          <svg class="plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          <span class="ph">添加任务：<b>明天 15:00 写周报 #工作 !p1</b></span>
+          <div class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>添加</div>
+        </div>
+
+        <!-- list -->
+        <div class="listcard">
+          <div class="overdue">
+            <div class="lhead"><h3>逾期</h3><span class="n">1</span><div class="fill"></div></div>
+            <div class="task">
+              <div class="check"></div>
+              <div class="body">
+                <div class="title">提交上季度外设发票报销</div>
+                <div class="meta">
+                  <span class="chip late"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>11 月 6 日</span>
+                  <span class="proj"><span class="pdot" style="background:#087f82"></span>生活</span>
+                  <span class="tag">#行政</span>
+                </div>
+              </div>
+              <span class="pf p1">P1</span>
+            </div>
+          </div>
+
+          <div class="lhead" style="margin-top:4px"><h3>今天</h3><span class="n">4</span><div class="fill"></div><span class="sort"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>排序</span></div>
+
+          <div class="task">
+            <div class="check"></div>
+            <div class="body">
+              <div class="title">修线上 502（结算页）</div>
+              <div class="meta">
+                <span class="chip today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今天 11:00</span>
+                <span class="proj"><span class="pdot" style="background:#e5484d"></span>工作</span>
+                <span class="tag">#故障</span>
+              </div>
+            </div>
+            <span class="pf p0">P0</span>
+          </div>
+
+          <div class="task">
+            <div class="check"></div>
+            <div class="body">
+              <div class="title">审阅 Q4 路线图初稿 <span class="stoggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>1/2</span></div>
+              <div class="meta">
+                <span class="chip today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今天 14:30</span>
+                <span class="proj"><span class="pdot" style="background:#e5484d"></span>工作</span>
+                <span class="tag">#Q4</span><span class="tag">#规划</span>
+                <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>2</span>
+              </div>
+            </div>
+            <span class="pf p1">P1</span>
+          </div>
+          <div class="subs">
+            <div class="sub done"><div class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div><span class="t">汇总需求看板上的待排期清单</span></div>
+            <div class="sub"><div class="check"></div><span class="t">与团队敲定关键路径上的依赖</span></div>
+          </div>
+
+          <div class="task">
+            <div class="check"></div>
+            <div class="body">
+              <div class="title">周常 1-on-1 准备与记录</div>
+              <div class="meta">
+                <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今天 16:00</span>
+                <span class="proj"><span class="pdot" style="background:#e5484d"></span>工作</span>
+                <span class="tag">#同步</span>
+                <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9a8 8 0 0 1 14-3M20 15a8 8 0 0 1-14 3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg>每周</span>
+              </div>
+            </div>
+            <span class="pf p2">P2</span>
+          </div>
+
+          <div class="task">
+            <div class="check"></div>
+            <div class="body">
+              <div class="title">晨读：《现代系统性能》第四章</div>
+              <div class="meta">
+                <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今天</span>
+                <span class="proj"><span class="pdot" style="background:#7c6cf0"></span>阅读</span>
+                <span class="tag">#笔记</span>
+                <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9a8 8 0 0 1 14-3M20 15a8 8 0 0 1-14 3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg>每天</span>
+              </div>
+            </div>
+            <span class="pf p3">P3</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- right rail -->
+      <aside class="rail">
+        <div class="card">
+          <h4>接下来 <span class="link">全部 ›</span></h4>
+          <div class="up"><div class="d"><b>12</b><span>周四</span></div><div class="txt"><b>预约年度牙科常规检查</b><span>10:00 · 健康</span></div><span class="pf p2">P2</span></div>
+          <div class="up"><div class="d"><b>15</b><span>周日</span></div><div class="txt"><b>草拟 v0.2.0 变更日志</b><span>发布 · 待办</span></div><span class="pf p2">P2</span></div>
+        </div>
+
+        <div class="card">
+          <h4>本周专注 <span class="link">统计 ›</span></h4>
+          <div class="weekgrid">
+            <div class="c"><i style="height:24%"></i><span>一</span></div>
+            <div class="c"><i style="height:34%"></i><span>二</span></div>
+            <div class="c"><i style="height:20%"></i><span>三</span></div>
+            <div class="c"><i style="height:44%"></i><span>四</span></div>
+            <div class="c"><i style="height:28%"></i><span>五</span></div>
+            <div class="c on"><i style="height:66%"></i><span>六</span></div>
+            <div class="c on"><i style="height:100%"></i><span>日</span></div>
+          </div>
+          <div class="legend"><span>连续 <b>3</b> 天</span><span>今日 <b>75</b> 分钟</span></div>
+        </div>
+
+        <div class="card">
+          <h4>今日目标</h4>
+          <div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:26px;font-weight:800;font-variant-numeric:tabular-nums">3</span><span style="font-size:12px;color:var(--ink3)">/ 8 个番茄</span></div>
+          <div style="height:6px;border-radius:99px;background:var(--line2);margin-top:10px;overflow:hidden"><div style="height:100%;width:37.5%;border-radius:99px;background:linear-gradient(90deg,#159da0,#05666a)"></div></div>
+        </div>
+      </aside>
+    </div>
+  </main>
+</div>
+</body>
+</html>
