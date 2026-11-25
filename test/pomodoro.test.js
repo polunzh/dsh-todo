@@ -505,3 +505,25 @@ test("configure：空闲时改时长立即刷新，运行/暂停不打断", () =
   });
   assert.equal(kept.remainingMs, 20 * 60 * 1000, "暂停中保留进度");
 });
+
+test("configure：设置未变化时保持同一状态且不广播（防止顶栏空闲态渲染期死循环）", () => {
+  const settings = { ...DEFAULT_SETTINGS };
+  const s0 = freshPomodoro(settings);
+  const same = pomodoroReducer(s0, { type: "configure", previousSettings: settings, settings });
+  assert.equal(same, s0, "剩余量未变时返回同一状态引用");
+
+  const engine = preview.createPomodoroEngine();
+  const release = engine.retain();
+  let emits = 0;
+  engine.subscribe(() => { emits += 1; });
+
+  engine.setSettings(settings);
+  engine.setSettings(settings);
+  assert.equal(emits, 0, "空闲态重复写入相同设置不应唤醒订阅者");
+
+  engine.dispatch({ type: "start" });
+  emits = 0;
+  engine.setSettings(settings);
+  assert.equal(emits, 0, "运行态写入设置也不应唤醒订阅者");
+  release();
+});
