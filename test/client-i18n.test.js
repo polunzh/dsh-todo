@@ -634,6 +634,18 @@ test("样式只用 --dsw-* token，字面色值只允许集中在 brand-palette"
   assert.equal(/data-ds-dark-theme/.test(outside), false, "暗色分支只应出现在 brand-palette 内");
 });
 
+test("插件设置从顶栏统一打开，不在番茄钟视图重复", () => {
+  assert.match(SOURCE, /function PluginSettingsDrawer\(props\)/, "需要统一设置面板组件");
+  assert.match(SOURCE, /className: "todo-icon-btn todo-open-settings"/, "顶栏必须提供设置入口");
+  assert.match(SOURCE, /onClick: ui\.onOpenSettings/, "顶栏设置入口必须可打开面板");
+  assert.match(SOURCE, /settingsOpen \? h\(PluginSettingsDrawer/, "根节点需要渲染统一设置面板");
+  assert.match(SOURCE, /role: "dialog"/, "设置面板必须声明对话框语义");
+  assert.match(SOURCE, /closeOnEscape/, "设置面板必须支持 Escape 关闭");
+  const pomodoroStart = SOURCE.indexOf("function PomodoroView(props)");
+  const pomodoroEnd = SOURCE.indexOf("function SettingNumber", pomodoroStart);
+  assert.equal(SOURCE.slice(pomodoroStart, pomodoroEnd).includes("todo-pom-settings"), false, "番茄钟视图不应重复设置控件");
+});
+
 test("主题选择器提供五个持久化主题与无障碍键盘交互", () => {
   withPlugin({}, (env) => {
     const { THEMES, resolveThemeId } = env.exports.__preview.__internal;

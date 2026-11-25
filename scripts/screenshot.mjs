@@ -65,15 +65,15 @@ const shots = [
     width: 1440,
     height: 900,
     url: "?view=pomodoro&theme=light&locale=zh",
-    afterReady: `document.querySelector(".todo-theme-trigger")?.click()`,
-    narrative: "中文 · 番茄设置中的主题选择器（五套主题、当前选择与色板预览）",
+    afterReady: `new Promise((resolve) => { document.querySelector(".todo-open-settings")?.click(); setTimeout(() => { document.querySelector(".todo-theme-trigger")?.click(); resolve(); }, 80); })`,
+    narrative: "中文 · 顶栏插件设置中的主题选择器（五套主题、当前选择与色板预览）",
   },
   {
     name: "theme-switcher-en",
     width: 1440,
     height: 900,
     url: "?view=pomodoro&theme=light&locale=en&todoTheme=navy-blue",
-    afterReady: `document.querySelector(".todo-theme-trigger")?.click()`,
+    afterReady: `new Promise((resolve) => { document.querySelector(".todo-open-settings")?.click(); setTimeout(() => { document.querySelector(".todo-theme-trigger")?.click(); resolve(); }, 80); })`,
     narrative: "English · Theme picker with Navy Blue selected",
   },
   {
@@ -81,7 +81,7 @@ const shots = [
     width: 390,
     height: 844,
     url: "?view=pomodoro&theme=light&locale=zh",
-    afterReady: `document.querySelector(".todo-theme-trigger")?.click()`,
+    afterReady: `new Promise((resolve) => { document.querySelector(".todo-open-settings")?.click(); setTimeout(() => { document.querySelector(".todo-theme-trigger")?.click(); resolve(); }, 80); })`,
     narrative: "中文 · 窄屏主题选择器（全宽锚定弹层与 44px 触控项）",
   },
   {
