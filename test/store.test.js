@@ -677,3 +677,61 @@ test("recurrence normalization: yearly / weekly weekdays / monthly modes", () =>
     (err) => err instanceof StoreError && err.code === "invalid-recurrence",
   );
 });
+
+test("task focusMinutes defaults to null, accepts 1–180 and clears", () => {
+  const plain = createTask({ title: "无时长" }, { dataDir: testDir });
+  assert.equal(plain.focusMinutes, null);
+
+  const task = createTask({ title: "学习多邻国+背单词", focusMinutes: 15 }, { dataDir: testDir });
+  assert.equal(task.focusMinutes, 15);
+
+  const updated = updateTask({ id: task.id, focusMinutes: 45 }, { dataDir: testDir });
+  assert.equal(updated.focusMinutes, 45);
+
+  // 空字符串 / null 都表示清除，回到跟随全局设置。
+  assert.equal(updateTask({ id: task.id, focusMinutes: "" }, { dataDir: testDir }).focusMinutes, null);
+  assert.equal(updateTask({ id: task.id, focusMinutes: 30 }, { dataDir: testDir }).focusMinutes, 30);
+  assert.equal(updateTask({ id: task.id, focusMinutes: null }, { dataDir: testDir }).focusMinutes, null);
+
+  // 未传字段时不动已有值。
+  const kept = createTask({ title: "保持", focusMinutes: 20 }, { dataDir: testDir });
+  assert.equal(updateTask({ id: kept.id, title: "改名" }, { dataDir: testDir }).focusMinutes, 20);
+});
+
+test("task focusMinutes rejects out-of-range and non-integer values", () => {
+  for (const bad of [0, -1, 181, 1.5, "abc", true]) {
+    assert.throws(
+      () => createTask({ title: "坏", focusMinutes: bad }, { dataDir: testDir }),
+      (err) => err instanceof StoreError && err.code === "invalid-focus-minutes",
+      `expected invalid-focus-minutes for ${String(bad)}`,
+    );
+  }
+  const task = createTask({ title: "合法" }, { dataDir: testDir });
+  assert.throws(
+    () => updateTask({ id: task.id, focusMinutes: 999 }, { dataDir: testDir }),
+    (err) => err instanceof StoreError && err.code === "invalid-focus-minutes",
+  );
+});
+
+test("stored tasks normalize illegal focusMinutes back to null", () => {
+  const good = createTask({ title: "带时长", focusMinutes: 15 }, { dataDir: testDir });
+  const state = readState({ dataDir: testDir });
+  state.tasks.push({ ...good, id: "illegal00001", focusMinutes: 500 });
+  state.tasks.push({ ...good, id: "illegal00002", focusMinutes: "x" });
+  writeState(state, { dataDir: testDir });
+
+  const reread = readState({ dataDir: testDir });
+  const bad = reread.tasks.find((item) => item.id === "illegal00001");
+  const badType = reread.tasks.find((item) => item.id === "illegal00002");
+  assert.equal(bad.focusMinutes, null);
+  assert.equal(badType.focusMinutes, null);
+});
+
+test("recurring tasks carry focusMinutes into the next occurrence", () => {
+  const task = createTask(
+    { title: "每天背单词", due: "2026-11-26", recurrence: { freq: "daily" }, focusMinutes: 15 },
+    { dataDir: testDir, today: "2026-11-26", now: Date.parse("2026-11-26T09:00:00") },
+  );
+  const { next } = toggleTask({ id: task.id, done: true }, { dataDir: testDir, today: "2026-11-26" });
+  assert.equal(next.focusMinutes, 15);
+});

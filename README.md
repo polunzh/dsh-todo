@@ -49,6 +49,11 @@ An unstarted focus stays quiet; a short or long break shows as soon as it become
 
 ![A selected single day](./preview/screenshots/pomodoro-stats-day.png)
 
+### Per-task focus length
+Not every task deserves 25 minutes. Give a single todo its own focus length in the task drawer — 15 / 25 / 45 or any value from 1 to 180 minutes — and its play button starts exactly that session. Tasks without one keep following the global setting. The chip on the task row shows the assigned length, and the finished session is recorded with those minutes.
+
+![Per-task focus length](./preview/screenshots/task-focus-en.png)
+
 ### Theme picker
 Use the top-right **Plugin settings → Appearance → Theme** control. It applies immediately, persists locally, supports keyboard navigation, and follows the host light or dark mode.
 
@@ -78,6 +83,7 @@ Use the top-right **Plugin settings → Appearance → Theme** control. It appli
 ### Pomodoro Timer
 - **Work Cycles**: 25-minute focus, 5-minute short break, 15-minute long break every 4 focus sessions. Pick the focus length right on the timer (25 / 45 / 60 or custom) or fine-tune every duration in settings; changes apply immediately when idle and never cut a running session short.
 - **Task Binding**: The play button on each task row starts a focus session for that task directly; completing it increments the task's Pomodoro counter.
+- **Per-task focus length**: Each task can carry its own focus duration (15 / 25 / 45 or 1–180 minutes custom) set in the task drawer. Its play button starts that length right away, the task row shows the value, and leaving the field empty follows the global setting. The agent can set it too via `focusMinutes` on `add` / `update`.
 - **Conversation-header timer**: A compact timer sits at the top right of every session — idle shows the configured focus length, running shows the countdown with the bound task and pause/skip controls. The sidebar icon mirrors the countdown as mm:ss, labelled with the mode while on a break.
 - **Persistent Countdown**: Timer state is preserved in browser storage (`localStorage`) with absolute timestamps, surviving page refreshes without drifting.
 - **Audio & Visual Alerts**: One Alerts setting, enabled by default for new users, covers both task completion and Pomodoro endings. Task completion uses a brief ascending two-note confirmation; Pomodoro keeps its three-note chime. Existing saved choices remain unchanged, and the Test button plays the Pomodoro chime immediately. With the notification center plugin (`@polunzh/dsh-task-notifier`) installed, Pomodoro endings are published there and it owns the system notification and chime; dsh-todo's own notification is the fallback when the notification center is absent.
@@ -106,8 +112,8 @@ Autonomous agents can inspect, organize, and update your task database using the
 
 Supported actions:
 - `list`: Filter by view (`today`, `upcoming`, `inbox`, `completed`, `all`), project, or search query.
-- `add`: Create tasks with title, due date/time, priority, project, and recurrence.
-- `update`: Modify title, note, due date, priority, or project.
+- `add`: Create tasks with title, due date/time, priority, project, recurrence, and an optional per-task `focusMinutes`.
+- `update`: Modify title, note, due date, priority, project, or a task's `focusMinutes` (`null` clears it back to the global setting).
 - `complete`: Toggle task completion and generate recurring occurrences.
 - `delete`: Remove tasks and their child subtasks.
 - `stats`: Retrieve today's completed task count, focus minutes, and Pomodoro counts.
@@ -144,7 +150,7 @@ Refresh the DeepSeek Harness Web GUI to see the **Todo** entry in the left sideb
 
 ## Development & Testing
 
-Run the full test suite (146 unit and integration tests across storage, recurrence rules, HTTP routes, agent tool, natural language parsing, Pomodoro state machine, settings persistence, and bilingual dictionaries):
+Run the full test suite (184 unit and integration tests across storage, recurrence rules, HTTP routes, agent tool, natural language parsing, Pomodoro state machine, settings persistence, and bilingual dictionaries):
 
 ```bash
 npm test

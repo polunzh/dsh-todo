@@ -642,3 +642,104 @@ test("暂停期间不计时，恢复后接着累计", () => {
   });
   assert.equal(value.focusElapsedMs, 7 * 60000);
 });
+
+/* ============================ 任务级专注时长 ============================ */
+
+test("start 带 minutes 覆盖时按任务时长启动", () => {
+  const s0 = freshPomodoro(DEFAULT_SETTINGS);
+  const s1 = reduce(s0, { type: "start", minutes: 15, now: 1000 });
+  assert.equal(s1.running, true);
+  assert.equal(s1.focusMinutes, 15);
+  assert.equal(s1.remainingMs, 15 * 60 * 1000);
+  assert.equal(s1.endsAt, 1000 + 15 * 60 * 1000);
+});
+
+test("start 不带 minutes 时沿用全局专注时长", () => {
+  const s0 = freshPomodoro(DEFAULT_SETTINGS);
+  const s1 = reduce(s0, { type: "start", now: 1000 });
+  assert.equal(s1.focusMinutes, null);
+  assert.equal(s1.remainingMs, MS_FOCUS);
+});
+
+test("start 的 minutes 非法值被忽略，退回全局时长", () => {
+  const s0 = freshPomodoro(DEFAULT_SETTINGS);
+  for (const bad of [0, -5, 181, 1.5, "abc"]) {
+    const s1 = reduce(s0, { type: "start", minutes: bad, now: 0 });
+    assert.equal(s1.focusMinutes, null, `minutes=${String(bad)} 应被忽略`);
+    assert.equal(s1.remainingMs, MS_FOCUS);
+  }
+});
+
+test("break 模式不接受 minutes 覆盖", () => {
+  const s0 = reduce(freshPomodoro(DEFAULT_SETTINGS), { type: "setMode", mode: "short" });
+  const s1 = reduce(s0, { type: "start", minutes: 15, now: 0 });
+  assert.equal(s1.focusMinutes, null);
+  assert.equal(s1.remainingMs, MS_SHORT);
+});
+
+test("setMode / skip / abandon 清掉本轮覆盖，新一轮回到全局", () => {
+  const started = reduce(freshPomodoro(DEFAULT_SETTINGS), { type: "start", minutes: 15, now: 0 });
+  assert.equal(started.focusMinutes, 15);
+
+  const switched = reduce(started, { type: "setMode", mode: "focus" });
+  assert.equal(switched.focusMinutes, null);
+  assert.equal(switched.remainingMs, MS_FOCUS);
+
+  const skipped = reduce(started, { type: "skip", now: 0 });
+  assert.equal(skipped.focusMinutes, null);
+
+  const abandoned = reduce(started, { type: "abandon" });
+  assert.equal(abandoned.focusMinutes, null);
+  assert.equal(abandoned.remainingMs, MS_FOCUS);
+});
+
+test("到点切换到休息时清掉本轮覆盖", () => {
+  const started = reduce(freshPomodoro(DEFAULT_SETTINGS), { type: "start", minutes: 15, now: 0 });
+  const afterTick = reduce(started, { type: "tick", now: 15 * 60 * 1000 });
+  assert.equal(afterTick.mode, "short");
+  assert.equal(afterTick.focusMinutes, null);
+  assert.equal(afterTick.remainingMs, MS_SHORT);
+});
+
+test("带覆盖的轮次不受全局时长变更影响", () => {
+  const started = reduce(freshPomodoro(DEFAULT_SETTINGS), { type: "start", minutes: 15, now: 0 });
+  const paused = reduce(started, { type: "pause", now: 60 * 1000 });
+  const changed = pomodoroReducer(paused, {
+    type: "configure",
+    previousSettings: DEFAULT_SETTINGS,
+    settings: { ...DEFAULT_SETTINGS, focusMinutes: 50 },
+  });
+  assert.equal(changed, paused, "任务级时长应屏蔽全局设置变更");
+});
+
+test("normalizePomodoro 保留任务级覆盖并按其计算满值", () => {
+  const raw = { mode: "focus", remainingMs: 15 * 60 * 1000, running: false, focusMinutes: 15, cycle: 0, taskId: "t1" };
+  const restored = normalizePomodoro(raw, DEFAULT_SETTINGS);
+  assert.equal(restored.focusMinutes, 15);
+  assert.equal(restored.remainingMs, 15 * 60 * 1000);
+
+  // 剩余量不会超过覆盖后的满值。
+  const clamped = normalizePomodoro({ ...raw, remainingMs: 40 * 60 * 1000 }, DEFAULT_SETTINGS);
+  assert.equal(clamped.remainingMs, 15 * 60 * 1000);
+
+  // 非法覆盖值退回全局口径。
+  const fallback = normalizePomodoro({ ...raw, focusMinutes: 999 }, DEFAULT_SETTINGS);
+  assert.equal(fallback.focusMinutes, null);
+  // 覆盖失效后按全局满值（25′）归一，剩余量取分钟数不超出上限。
+  assert.equal(fallback.remainingMs, 15 * 60 * 1000);
+});
+
+test("sessionMinutesOf 按任务级时长落账，休息与默认走设置值", () => {
+  const { roundMinutesOf } = preview;
+  const focusDone = { mode: "focus", focusMinutes: 15, taskId: "task-1" };
+  assert.equal(roundMinutesOf(focusDone, DEFAULT_SETTINGS), 15, "任务级覆盖优先");
+
+  const focusDefault = { mode: "focus", focusMinutes: null, taskId: null };
+  assert.equal(roundMinutesOf(focusDefault, DEFAULT_SETTINGS), 25, "未设置时用全局专注时长");
+
+  const shortBreak = { mode: "short", focusMinutes: null };
+  assert.equal(roundMinutesOf(shortBreak, DEFAULT_SETTINGS), 5, "短休按短休时长");
+
+  const longBreak = { mode: "long", focusMinutes: null };
+  assert.equal(roundMinutesOf(longBreak, DEFAULT_SETTINGS), 15, "长休按长休时长");
+});

@@ -312,3 +312,20 @@ test("forbidden requests are rejected with 403", async () => {
   assert.equal(res.state.status, 403);
   assert.equal(JSON.parse(res.state.body).error, "forbidden");
 });
+
+test("tasks endpoints accept and validate focusMinutes", async () => {
+  const created = await call("POST", `${PREFIX}/tasks/create`, { title: "背单词", focusMinutes: 15 });
+  assert.equal(created.status, 200);
+  assert.equal(created.body.task.focusMinutes, 15);
+
+  const updated = await call("POST", `${PREFIX}/tasks/update`, { id: created.body.task.id, focusMinutes: 30 });
+  assert.equal(updated.status, 200);
+  assert.equal(updated.body.task.focusMinutes, 30);
+
+  const cleared = await call("POST", `${PREFIX}/tasks/update`, { id: created.body.task.id, focusMinutes: null });
+  assert.equal(cleared.body.task.focusMinutes, null);
+
+  const invalid = await call("POST", `${PREFIX}/tasks/update`, { id: created.body.task.id, focusMinutes: 0 });
+  assert.equal(invalid.status, 400);
+  assert.equal(invalid.body.error, "invalid-focus-minutes");
+});

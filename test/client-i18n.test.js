@@ -248,7 +248,11 @@ test("任务行播放按钮复用直接启动专注路径且不切换视图", ()
   const body = SOURCE.slice(start, end);
   assert.match(body, /pomodoroEngine\.dispatch\(\{ type: "bind", taskId: task\.id \}\)/, "必须绑定所选任务");
   assert.match(body, /pomodoroEngine\.dispatch\(\{ type: "setMode", mode: "focus" \}\)/, "空闲时必须切入专注模式");
-  assert.match(body, /pomodoroEngine\.dispatch\(\{ type: "start" \}\)/, "空闲时必须直接开始倒计时");
+  assert.match(
+    body,
+    /pomodoroEngine\.dispatch\(minutes \? \{ type: "start", minutes \} : \{ type: "start" \}\)/,
+    "空闲时必须直接开始倒计时，任务级专注时长优先",
+  );
   assert.equal(/setView\(/.test(body), false, "直接启动不应跳转番茄钟视图");
   assert.match(SOURCE, /onFocus: handleStartFocus/, "任务行播放按钮必须复用直接启动处理器");
 });

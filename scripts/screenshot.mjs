@@ -164,6 +164,30 @@ const shots = [
     narrative: "展开侧栏：「短休 05:00」落在「待办」名称后面，蓝色胶囊",
   },
   {
+    name: "task-focus",
+    width: 1440,
+    height: 900,
+    url: "?view=today&theme=light&locale=zh",
+    afterReady: `new Promise((resolve) => {
+      const row = [...document.querySelectorAll(".todo-item")].find((item) => item.querySelector(".todo-chip-focus"));
+      row?.querySelector(".todo-item-title")?.click();
+      setTimeout(resolve, 320);
+    })`,
+    narrative: "任务级专注时长：任务行带 15′ 徽标，详情抽屉是唯一设置入口",
+  },
+  {
+    name: "task-focus-en",
+    width: 1440,
+    height: 900,
+    url: "?view=today&theme=light&locale=en",
+    afterReady: `new Promise((resolve) => {
+      const row = [...document.querySelectorAll(".todo-item")].find((item) => item.querySelector(".todo-chip-focus"));
+      row?.querySelector(".todo-item-title")?.click();
+      setTimeout(resolve, 320);
+    })`,
+    narrative: "English · Per-task focus length with the 15′ chip and drawer field",
+  },
+  {
     name: "mobile",
     width: 390,
     height: 844,

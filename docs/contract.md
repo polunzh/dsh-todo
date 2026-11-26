@@ -37,7 +37,8 @@ Task = {
   "createdAt": epoch-ms,
   "updatedAt": epoch-ms,
   "order": 1024,                       // 数字，同级任务升序
-  "pomodoros": 0
+  "pomodoros": 0,
+  "focusMinutes": null                 // null = 跟随 Settings.focusMinutes；否则 1..180 的任务级专注时长
 }
 ```
 
@@ -86,6 +87,8 @@ Settings = {
 - `monthly` + `lastDay`：base 月 + interval 月后的当月最后一天
 - `monthly` + `nthWeekday`：base 月 + interval 月后的「第 nth 个 weekday」，nth ∈ 1..4 或 -1（最后一个）
 - `yearly`：+ interval 年，2-29 在平年取 2-28
+
+**任务级专注时长**：`focusMinutes` 存在时，从该任务启动的专注以它为满值（`start` 动作的 `minutes` 覆盖），结束后会话按该分钟数落账；未设置时沿用 `Settings.focusMinutes`。区间外（0、181、非整数、布尔）报 `invalid-focus-minutes`；磁盘上的非法值读取时收敛为 `null`。重复任务完成时，下一次 occurrence 继承该值。
 - 结果早于 `today` 时继续前进，最多 400 次；仍早于 today 则返回 today
 - 任务没有 `due` 时，从 `today` 开始前进
 
@@ -118,7 +121,7 @@ Settings = {
 
 错误码 → HTTP 状态：
 
-- 400：`invalid-body`、`invalid-title`、`title-too-long`、`invalid-due`、`invalid-priority`、`invalid-labels`、`invalid-parent`、`invalid-recurrence`、`invalid-id`、`invalid-project`、`invalid-settings`、`invalid-session`
+- 400：`invalid-body`、`invalid-title`、`title-too-long`、`invalid-due`、`invalid-priority`、`invalid-labels`、`invalid-parent`、`invalid-recurrence`、`invalid-focus-minutes`、`invalid-id`、`invalid-project`、`invalid-settings`、`invalid-session`
 - 404：`not-found`
 - 405：`method-not-allowed`
 - 409：`already-exists`、`tasks-limit`、`projects-limit`、`project-not-empty`（保留）
@@ -151,7 +154,7 @@ Settings = {
     "recurrenceMonthMode": { "type": "string", "enum": ["date", "lastDay", "nthWeekday"] },
     "recurrenceNth": { "type": "integer" },
     "recurrenceWeekday": { "type": "integer", "minimum": 0, "maximum": 6 },
-    "focusMinutes": { "type": "integer", "minimum": 1, "maximum": 180 },
+    "focusMinutes": { "type": ["integer", "null"], "minimum": 1, "maximum": 180, "description": "任务级专注时长；settings 动作下改全局默认" },
     "shortBreakMinutes": { "type": "integer", "minimum": 1, "maximum": 60 },
     "longBreakMinutes": { "type": "integer", "minimum": 1, "maximum": 120 },
     "longBreakEvery": { "type": "integer", "minimum": 2, "maximum": 12 },
@@ -173,6 +176,8 @@ Settings = {
 
 行为：调用同一份 store 函数（与路由完全一致），返回文本摘要，例如 `今天 3 个任务（逾期 1）` 后跟每行 `- [ ] 写周报 · P1 · 今天 15:00 · #工作`。`action: "settings"` 改番茄设置（专注/短休/长休时长、长休间隔、自动开始、提示音、每日目标），走 `updateSettings` 校验。
 
+`focusMinutes` 有两种语义：在 `add` / `update` 下写入任务级专注时长（`null` 或 `""` 清除覆盖，回到跟随全局）；在 `settings` 下改全局默认专注时长。任务带覆盖时，`list` / `add` / `update` 的摘要行追加 `⏱15 分钟`。
+
 ## 4. 客户端约定
 
 - 模块 id / 包名：`dsh-todo`；`PANEL_ID = "dsh-todo"`。
@@ -181,7 +186,7 @@ Settings = {
 - 样式：`ensureStyles()` 向 `document.head` 插一个 `<style>`，`ctx.effect` 返回删除函数；背景/字色/边框只用 `--dsw-alias-*`，圆角/阴影用 `--dsw-radius-*` / `--dsw-shadow-*`，字色用 `--dsw-alias-label-*`。品牌强调色（Iris）集中在 CSS 末尾 `/* brand-palette:start */ … end */` 区块，是唯一允许字面色值的地方（见 `docs/design-v2.md`）。
 - API 基址：`"todo/api/"`，用 `new URL(API, document.baseURI)`。
 - i18n：`DICT = { zh: {...}, en: {...} }`，`ctx.locale?.register("dsh-todo", DICT)`；`ctx.locale?.getSnapshot()` 取当前语言；变化时 `ctx.locale?.subscribe` 触发重渲染；无 locale 服务时回退 `zh`。
-- 番茄钟状态存 `localStorage["dsh-todo/pomodoro"]`：`{ mode: "focus"|"short"|"long", endsAt: number|null, remainingMs: number, running: boolean, taskId: string|null, cycle: number }`。
+- 番茄钟状态存 `localStorage["dsh-todo/pomodoro"]`：`{ mode: "focus"|"short"|"long", endsAt: number|null, remainingMs: number, running: boolean, taskId: string|null, cycle: number, focusMinutes: number|null }`。`focusMinutes` 是本轮的任务级时长覆盖（`start` 动作的 `minutes` 写入），切换到下一轮（`tick` / `skip` / `abandon` / `setMode`）时清空。
 - 导出 `__preview = { TodoPage, parseQuickAdd, pomodoroReducer, DICT, PANEL_ID, API, localDate, formatDue }` 供测试与预览。
 - `window.__previewMount` 不需要：预览页用桩 ctx 捕获 `ctx.slots.register` 的组件后自行渲染。
 

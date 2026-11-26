@@ -404,3 +404,20 @@ test("action=settings updates pomodoro settings", async () => {
     (err) => err.code === "invalid-settings",
   );
 });
+
+test("action=add / update 支持任务级专注时长", async () => {
+  const added = await tool.execute({ action: "add", title: "学习多邻国+背单词", focusMinutes: 15 });
+  assert.equal(added.task.focusMinutes, 15);
+  assert.match(added.summary, /15 分钟/);
+
+  const updated = await tool.execute({ action: "update", id: added.task.id, focusMinutes: 45 });
+  assert.equal(updated.task.focusMinutes, 45);
+
+  // 传 null 清除覆盖，回到跟随全局设置。
+  const cleared = await tool.execute({ action: "update", id: added.task.id, focusMinutes: null });
+  assert.equal(cleared.task.focusMinutes, null);
+
+  const invalid = await tool.execute({ action: "add", title: "越界", focusMinutes: 500 });
+  assert.equal(invalid.ok, false);
+  assert.equal(invalid.error, "invalid-focus-minutes");
+});
