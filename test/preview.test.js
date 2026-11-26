@@ -92,3 +92,11 @@ test("screenshot script covers the new stats ranges", () => {
   assert.match(script, /todo-stats-range-btn/);
   assert.match(script, /todo-pom-bar/);
 });
+
+test("icon.svg uses the default Studio Vivid brand accent", () => {
+  const svg = readFileSync(resolve(root, "icon.svg"), "utf8");
+  // 插件详情页与插件索引读的是这份静态图标，颜色必须跟着默认主题（Studio Vivid 绿）
+  assert.match(svg, /#10a37f/i, "图标应使用 Studio Vivid 强调色");
+  assert.match(svg, /#08745a/i, "图标渐变终点应使用 Studio Vivid 的 accent-ink");
+  assert.doesNotMatch(svg, /#7f79ff|#4b45cf/i, "图标不应残留已退役的 Iris 紫");
+});
