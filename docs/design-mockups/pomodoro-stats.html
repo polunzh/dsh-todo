@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DSH · 番茄钟统计改进设计稿</title>
+<style>
+  :root {
+    --canvas: #f8f9fb;
+    --surface: #ffffff;
+    --layer1: #ffffff;
+    --layer2: #f1f3f7;
+    --layer3: #e6e9ef;
+    --line: #e6e9ef;
+    --line-strong: #d9dee8;
+    --ink: #17191f;
+    --muted: #61666b;
+    --quiet: #8a9098;
+    --accent: #4f46e5;
+    --accent-soft: #eeedff;
+    --tomato: #e0523f;
+    --tomato-dim: rgba(224, 82, 63, .38);
+    --amber: #b98212;
+    --amber-soft: #fbf1dc;
+    --shadow: 0 10px 26px rgba(20, 28, 45, .08), 0 2px 5px rgba(20, 28, 45, .05);
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--canvas); color: var(--ink); font-family: var(--font); }
+  body { font-size: 14px; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; }
+
+  /* ---- DSH 环境（与 pomodoro-header.html 同一套） ---- */
+  .window { height: 100vh; min-height: 760px; display: grid; grid-template-columns: 232px 1fr; overflow: hidden; }
+  .sidebar { background: linear-gradient(180deg, #f1f3f7, #e9edf4); border-right: 1px solid #dfe4ed; padding: 20px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .traffic { display: flex; gap: 9px; padding: 4px 7px 18px; }
+  .traffic i { width: 12px; height: 12px; border-radius: 50%; display:block; }
+  .traffic i:nth-child(1){background:#fb5b57}.traffic i:nth-child(2){background:#f5bb42}.traffic i:nth-child(3){background:#42c552}
+  .brand { display: flex; align-items: center; gap: 9px; padding: 3px 6px 25px; font-weight: 720; font-size: 19px; letter-spacing: -.025em; }
+  .brand-mark { width: 27px; height: 22px; position: relative; }
+  .brand-mark:before, .brand-mark:after { content:""; position:absolute; border-radius: 14px 3px 14px 3px; background:#17191f; transform:rotate(34deg); }
+  .brand-mark:before { width:25px;height:13px;top:5px;left:0;}.brand-mark:after{width:12px;height:7px;top:0;right:0;transform:rotate(-10deg)}
+  .brand b { font-size: 11px; padding: 3px 5px; border-radius: 3px; background:#17191f;color:white;letter-spacing:.05em; }
+  .new { height: 46px; border: 1px solid #dde2eb; background: rgba(255,255,255,.78); border-radius: 11px; display:flex;align-items:center;justify-content:center;gap:9px; font-weight:650; font-size:15px; color: var(--ink); }
+  .new .plus { font-size:21px; font-weight:300; line-height:1; }
+  .section { padding: 12px 8px 4px; color: var(--quiet); font-size: 13px; }
+  .nav { display:flex; flex-direction:column; gap:2px; }
+  .nav div { height: 38px; display:flex;align-items:center; gap:10px; padding:0 10px; border-radius:8px; color:#282b32; }
+  .nav div.active { background:rgba(255,255,255,.72); box-shadow: 0 1px 2px rgba(18,25,38,.04); font-weight:650; }
+  .nav svg { width:18px; height:18px; color:#707783; }
+  .workspaces { margin-top:12px; border-top: 1px solid #dce1e9; padding-top:12px; }
+  .folder { color:#2d3037; font-size:14px; padding:9px 10px; display:flex;gap:8px;align-items:center; }
+  .folder small{margin-left:auto;color:#9197a1;font-size:12px}
+  .main { min-width: 0; display: flex; flex-direction:column; background: var(--surface); overflow: auto; }
+  .header { height: 70px; border-bottom: 1px solid var(--line); display:flex; align-items:center; padding: 0 28px 0 34px; gap: 18px; flex: none; }
+  .crumb { display:flex; align-items:center; gap:8px; color:var(--muted); min-width: 0; }
+  .crumb strong { color:var(--ink); font-size:15px; font-weight:650; white-space:nowrap; }
+  .crumb .chev { color:#a3a8b1; font-size:18px; }
+  .header-spacer { flex:1; }
+  .branch { display:flex; align-items:center; gap:7px; color:#61666b; font-size:13px; white-space:nowrap; }
+  .branch:before { content:"⌘"; font-size:17px; color:#818792; }
+  .timer { height: 42px; display:flex; align-items:center; gap:8px; padding: 4px 5px 4px 10px; border: 1px solid #dcdffc; border-radius: 12px; background: #fbfbff; box-shadow: 0 2px 6px rgba(20,28,45,.08); }
+  .ring { width:25px;height:25px;position:relative;flex:none; }
+  .ring svg{width:25px;height:25px;transform:rotate(-90deg);}.ring circle{fill:none;stroke-width:2.8}.ring .track{stroke:#deddf9}.ring .progress{stroke:var(--accent);stroke-linecap:round;stroke-dasharray:57 69}
+  .timer-copy { display:flex; align-items:baseline; gap:7px; white-space:nowrap; }
+  .mode { color:var(--muted); font-size:12px; font-weight:550; }.time { font-variant-numeric:tabular-nums; letter-spacing:.025em; font-size:15px; font-weight:720; }
+  .task { max-width: 154px; overflow:hidden;text-overflow:ellipsis;white-space:nowrap; padding-left:9px; border-left:1px solid #e2e4ec; color:#4d5360; font-size:12px; }
+  .round { width:31px;height:31px;border:0;border-radius:8px;background:var(--accent);color:white;display:grid;place-items:center;box-shadow:0 2px 5px rgba(20,28,45,.16); }
+  .round svg { width:15px; height:15px; margin-left:1px; }.skip { width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:#626876;display:grid;place-items:center; }.skip svg{width:16px;height:16px}
+  .stage { flex:1; display:grid; place-items:center; padding: 34px 0; position:relative; }
+
+  /* ---- 番茄页（复刻 .todo-pom 布局与字号体系） ---- */
+  .todo-pom { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 22px; width: min(980px, 88%); margin: 0 auto; align-items: start; }
+  .todo-pom-main { display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .todo-pom-modes { display:inline-flex; gap:3px; padding:3px; border-radius:999px; background:var(--layer2); border:1px solid var(--line); }
+  .todo-pom-mode { display:inline-flex; align-items:center; justify-content:center; gap:4px; height:32px; padding:0 14px; border:0; border-radius:999px; background:transparent; color:var(--quiet); font-size:12px; cursor:pointer; }
+  .todo-pom-mode span { font-size:10px; opacity:.75; }
+  .todo-pom-mode.is-active { background:var(--layer1); color:var(--ink); box-shadow: 0 1px 2px rgba(18,25,38,.06); }
+  .todo-pom-presets { display:inline-flex; align-items:center; gap:4px; flex-wrap:wrap; justify-content:center; }
+  .todo-pom-presets-label { font-size:11px; color:var(--quiet); margin-right:2px; }
+  .todo-pom-preset { height:26px; min-width:40px; padding:0 10px; border-radius:999px; border:1px solid var(--line-strong); background:#fff; color:var(--muted); cursor:pointer; font-size:12px; }
+  .todo-pom-preset.is-active { border-color:var(--accent); background:var(--accent-soft); color:var(--ink); }
+  .todo-pom-preset-input { width:66px; height:26px; padding:0 8px; border:1px solid var(--line-strong); border-radius:999px; font:inherit; font-size:12px; color:var(--ink); }
+  .todo-pom-clock { position:relative; display:grid; place-items:center; width:240px; height:240px; }
+  .todo-pom-ring { position:absolute; inset:0; transform:rotate(-90deg); }
+  .todo-pom-ring circle { fill:none; stroke-width:7; }
+  .todo-pom-ring .track { stroke:var(--layer3); }
+  .todo-pom-ring .fill { stroke:var(--tomato); stroke-linecap:round; stroke-dasharray: 527 660; }
+  .todo-pom-clock-inner { display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .todo-pom-time { font-size:44px; font-weight:300; font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+  .todo-pom-state { font-size:11.5px; color:var(--muted); }
+  .todo-pom-cycle { display:flex; gap:5px; }
+  .todo-pom-cycle i { width:7px; height:7px; border-radius:50%; background:var(--layer3); }
+  .todo-pom-cycle i.on { background:var(--tomato); }
+  .todo-pom-actions { display:flex; gap:8px; }
+  .todo-btn { height:36px; padding:0 16px; border-radius:9px; border:1px solid var(--line-strong); background:#fff; color:var(--ink); font-size:12.5px; font-weight:560; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+  .todo-btn.primary { border-color:var(--accent); background:var(--accent); color:#fff; box-shadow:0 3px 8px rgba(79,70,229,.25); }
+  .todo-btn.ghost { border-color:transparent; background:transparent; color:var(--muted); }
+  .todo-pom-bind { display:inline-flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); }
+  .todo-pom-bind select { height:30px; border:1px solid var(--line-strong); border-radius:8px; padding:0 8px; font:inherit; font-size:12px; color:var(--ink); background:#fff; max-width:220px; }
+  .todo-pom-hint { margin:0; font-size:11.5px; color:var(--quiet); }
+
+  /* ---- 统计侧栏（本次重做） ---- */
+  .todo-pom-side { display:flex; flex-direction:column; gap:12px; min-width:0; }
+  .card { padding:11px; border-radius:12px; background:var(--layer1); border:1px solid var(--line); }
+
+  .stat-card { display:flex; flex-direction:column; gap:9px; }
+  .seg { display:inline-flex; gap:2px; padding:3px; border-radius:999px; background:var(--layer2); border:1px solid var(--line); align-self:flex-start; }
+  .seg button { height:24px; padding:0 12px; border:0; border-radius:999px; background:transparent; color:var(--quiet); font-size:11.5px; cursor:pointer; }
+  .seg button.is-active { background:var(--layer1); color:var(--ink); box-shadow:0 1px 2px rgba(18,25,38,.06); font-weight:600; }
+  .todo-stat-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+  .todo-stat { display:flex; flex-direction:column; gap:1px; padding:9px 10px; border-radius:9px; background:var(--layer2); border:1px solid var(--line); min-width:0; }
+  .todo-stat-label { font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--quiet); }
+  .todo-stat-value { font-size:20px; font-weight:600; font-variant-numeric:tabular-nums; }
+  .todo-stat-sub { font-size:10.5px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .chart-card { display:flex; flex-direction:column; gap:10px; }
+  .chart-head { display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
+  .chart-title { margin:0; font-size:11.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); }
+  .chart-total { font-size:11px; color:var(--quiet); font-variant-numeric:tabular-nums; }
+  .chart-drill { display:flex; align-items:center; gap:8px; }
+  .back { border:0; background:transparent; color:var(--accent); font-size:11.5px; padding:2px 0; cursor:pointer; }
+  .day-detail { display:flex; align-items:baseline; gap:8px; font-size:11px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .day-detail b { color:var(--ink); font-size:12px; }
+  .bars { display:flex; align-items:flex-end; gap:6px; height:118px; }
+  .bar { display:flex; flex-direction:column; align-items:center; gap:3px; flex:1; height:100%; min-width:0; background:none; border:0; padding:0; cursor:pointer; font:inherit; }
+  .bar.is-selected .bar-track { outline:2px solid var(--accent); outline-offset:2px; }
+  .bar-value { font-size:9.5px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .bar-track { flex:1; display:flex; flex-direction:column; justify-content:flex-end; width:100%; max-width:18px; border-radius:3px; background:var(--layer2); overflow:hidden; }
+  .bar-fill { width:100%; border-radius:3px; background:var(--tomato); }
+  .bar-fill.dim { background:var(--tomato-dim); border-radius:3px 3px 0 0; }
+  .bar-day { font-size:9.5px; color:var(--quiet); }
+
+  .rank-card { display:flex; flex-direction:column; gap:9px; }
+  .rank-row { display:flex; flex-direction:column; gap:3px; }
+  .rank-line { display:flex; align-items:baseline; gap:8px; font-size:11.5px; }
+  .rank-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--ink); }
+  .rank-mins { margin-left:auto; font-variant-numeric:tabular-nums; color:var(--muted); font-size:11px; }
+  .rank-track { height:5px; border-radius:3px; background:var(--layer2); overflow:hidden; }
+  .rank-fill { height:100%; border-radius:3px; background:var(--tomato); }
+  .rank-sub { font-size:10px; color:var(--quiet); padding-left:1px; }
+
+  .log-card { display:flex; flex-direction:column; gap:8px; }
+  .log-head { display:flex; align-items:center; justify-content:space-between; }
+  .log-title { margin:0; font-size:11.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); }
+  .log-tabs { display:inline-flex; gap:2px; padding:2px; border-radius:999px; background:var(--layer2); }
+  .log-tabs button { height:20px; padding:0 10px; border:0; border-radius:999px; background:transparent; color:var(--quiet); font-size:10.5px; cursor:pointer; }
+  .log-tabs button.is-active { background:var(--layer1); color:var(--ink); font-weight:600; }
+  .log-day { font-size:10.5px; color:var(--quiet); margin:4px 0 0; }
+  .log-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:3px; }
+  .log-list li { display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--muted); }
+  .log-list li svg { flex:none; color:var(--tomato); }
+  .log-task { margin-left:auto; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--quiet); }
+  .tag-interrupted { font-size:9.5px; line-height:1; padding:3px 6px; border-radius:4px; background:var(--amber-soft); color:var(--amber); font-weight:600; }
+  .log-more { border:0; background:transparent; color:var(--accent); font-size:11px; padding:2px 0; cursor:pointer; align-self:flex-start; }
+
+  /* ---- 标注 ---- */
+  .callout { position:absolute; background:#fff; border:1px solid #dedffc; box-shadow:var(--shadow); border-radius:12px; padding:13px 15px; color:#343846; z-index:9; }
+  .callout:after { content:""; position:absolute; background:#928df2; }
+  .callout strong { display:block; font-size:13px; margin-bottom:5px; }
+  .callout span { font-size:12px; color:var(--muted); line-height:1.55; }
+  .c1 { top:6px; right:6px; width:270px; }
+  .c1:after { right:100px; top:100%; width:1px; height:34px; }
+  .c2 { bottom:60px; left:-6px; width:270px; }
+  .c2:after { left:96px; top:100%; width:1px; height:30px; }
+  .c3 { bottom:14px; right:-8px; width:262px; }
+  .c3:after { right:88px; top:100%; width:1px; height:26px; }
+
+  .caption { position:absolute; left:34px; bottom:25px; display:flex; align-items:center; gap:9px; color:#666c77; font-size:12px; }
+  .caption i { width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 4px var(--accent-soft); }
+  .hint-badges { display:grid; grid-template-columns: 300px 1fr; gap: 26px; padding: 26px 60px 40px; }
+  .hint-col h4 { margin:0 0 10px; font-size:12px; letter-spacing:.07em; text-transform:uppercase; color:var(--quiet); }
+  .badge-row { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); margin-bottom:8px; }
+  .swatch { width:22px; height:12px; border-radius:3px; }
+</style>
+</head>
+<body>
+<div class="window">
+  <aside class="sidebar">
+    <div class="traffic"><i></i><i></i><i></i></div>
+    <div class="brand"><span class="brand-mark"></span><span>deepseek</span><b>HARNESS</b></div>
+    <button class="new"><span class="plus">＋</span>新会话</button>
+    <div class="section">工作区</div>
+    <div class="nav">
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>搜索会话</div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3h14v18H5z"/><path d="M8 7h8M8 11h8"/></svg>设计插件 README 图标</div>
+      <div class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16M12 4v16"/></svg>番茄钟统计改进</div>
+    </div>
+    <div class="workspaces">
+      <div class="folder">▱ dsh-todo <small>⌄</small></div>
+      <div class="folder">▱ Downloads</div>
+      <div class="folder">▱ dsh-doc</div>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="header">
+      <div class="crumb"><strong>dsh-todo</strong><span class="chev">⌄</span><span class="chev">·</span><span>创造模式</span><span class="chev">⌄</span></div>
+      <div class="header-spacer"></div>
+      <div class="branch">main</div>
+      <div class="timer">
+        <span class="ring"><svg viewBox="0 0 24 24" aria-hidden="true"><circle class="track" cx="12" cy="12" r="10.8"/><circle class="progress" cx="12" cy="12" r="10.8"/></svg></span>
+        <span class="timer-copy"><span class="mode">专注</span><span class="time">12:18</span></span>
+        <span class="task">番茄钟统计改进</span>
+        <button class="round" aria-label="暂停专注"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M8 5v14M16 5v14"/></svg></button>
+        <button class="skip" aria-label="跳过本轮"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5v14l9-7zM18 5v14"/></svg></button>
+      </div>
+    </header>
+
+    <section class="stage">
+      <div class="todo-pom">
+        <div class="todo-pom-main">
+          <div class="todo-pom-modes">
+            <button class="todo-pom-mode is-active">专注 <span>25′</span></button>
+            <button class="todo-pom-mode">短休 <span>5′</span></button>
+            <button class="todo-pom-mode">长休 <span>15′</span></button>
+          </div>
+          <div class="todo-pom-presets">
+            <span class="todo-pom-presets-label">专注时长</span>
+            <button class="todo-pom-preset is-active">25′</button>
+            <button class="todo-pom-preset">45′</button>
+            <button class="todo-pom-preset">60′</button>
+            <input class="todo-pom-preset-input" value="25" aria-label="自定义分钟" />
+          </div>
+          <div class="todo-pom-clock">
+            <svg class="todo-pom-ring" viewBox="0 0 240 240"><circle class="track" cx="120" cy="120" r="105"/><circle class="fill" cx="120" cy="120" r="105"/></svg>
+            <div class="todo-pom-clock-inner">
+              <span class="todo-pom-time">12:42</span>
+              <span class="todo-pom-state">专注 · 暂停中</span>
+              <span class="todo-pom-cycle"><i class="on"></i><i class="on"></i><i></i><i></i></span>
+            </div>
+          </div>
+          <div class="todo-pom-actions">
+            <button class="todo-btn ghost"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 5v14l9-7zM18 5v14"/></svg>跳过</button>
+            <button class="todo-btn primary">暂停</button>
+            <button class="todo-btn ghost">放弃</button>
+          </div>
+          <label class="todo-pom-bind">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5.4 5.4h13.2v9.4l-4 4H5.4V5.4zM14.6 18.8v-4h4"/></svg>
+            <select><option>番茄钟统计改进</option><option>回复读者邮件</option><option>未绑定任务</option></select>
+          </label>
+          <p class="todo-pom-hint">暂停期间不计时；放弃时已专注 ≥5 分钟将计入今日专注分钟。</p>
+        </div>
+
+        <div class="todo-pom-side">
+          <div class="card stat-card">
+            <div class="seg" role="tablist" aria-label="统计范围">
+              <button class="is-active">7 天</button><button>30 天</button><button>全部</button>
+            </div>
+            <div class="todo-stat-grid">
+              <div class="todo-stat"><span class="todo-stat-label">今日番茄</span><span class="todo-stat-value">6</span><span class="todo-stat-sub">目标 8</span></div>
+              <div class="todo-stat"><span class="todo-stat-label">今日专注</span><span class="todo-stat-value">168</span><span class="todo-stat-sub">分钟 · 含中断 18</span></div>
+              <div class="todo-stat"><span class="todo-stat-label">连续天数</span><span class="todo-stat-value">9</span><span class="todo-stat-sub">天</span></div>
+            </div>
+            <div class="callout c1"><strong>口径与范围切换</strong><span>7 / 30 / 全部三段切换，仅影响图表与分布；今日三格恒为当天。中断的专注分钟计入时长，个数不进目标与柱状图。</span></div>
+          </div>
+
+          <div class="card chart-card">
+            <div class="chart-head">
+              <div class="chart-drill">
+                <h3 class="chart-title">近 7 天</h3>
+                <span class="day-detail"><b>11 月 25 日</b> · <b>6</b> 个 · <b>168</b> 分钟 · 中断 <b>18</b></span>
+              </div>
+              <span class="chart-total">共 41 个 · 19.2h</span>
+            </div>
+            <div class="bars">
+              <button class="bar" aria-label="11 月 19 日周三 4 个"><span class="bar-value">4</span><span class="bar-track"><span class="bar-fill" style="height:44%"></span></span><span class="bar-day">周三</span></button>
+              <button class="bar" aria-label="11 月 20 日周四 7 个"><span class="bar-value">7</span><span class="bar-track"><span class="bar-fill" style="height:78%"></span></span><span class="bar-day">周四</span></button>
+              <button class="bar" aria-label="11 月 21 日周五 5 个"><span class="bar-value">5</span><span class="bar-track"><span class="bar-fill" style="height:56%"></span></span><span class="bar-day">周五</span></button>
+              <button class="bar" aria-label="11 月 22 日周六 0 个"><span class="bar-value">0</span><span class="bar-track"><span class="bar-fill" style="height:0"></span></span><span class="bar-day">周六</span></button>
+              <button class="bar" aria-label="11 月 23 日周日 3 个"><span class="bar-value">3</span><span class="bar-track"><span class="bar-fill" style="height:33%"></span></span><span class="bar-day">周日</span></button>
+              <button class="bar" aria-label="11 月 24 日周一 6 个"><span class="bar-value">6</span><span class="bar-track"><span class="bar-fill" style="height:67%"></span></span><span class="bar-day">周一</span></button>
+              <button class="bar is-selected" aria-label="11 月 25 日周二 6 个，已选中，再次点击取消"><span class="bar-value">6</span><span class="bar-track"><span class="bar-fill" style="height:67%"></span><span class="bar-fill dim" style="height:8%"></span></span><span class="bar-day">周二</span></button>
+            </div>
+          </div>
+
+          <div class="card rank-card">
+            <h3 class="chart-title" style="margin:0">专注分布 · 11 月 25 日</h3>
+            <div class="rank-row">
+              <div class="rank-line"><span class="rank-name">番茄钟统计改进</span><span class="rank-mins">100 分钟</span></div>
+              <div class="rank-track"><span class="rank-fill" style="width:100%"></span></div>
+              <span class="rank-sub">工程 · 4 个番茄</span>
+            </div>
+            <div class="rank-row">
+              <div class="rank-line"><span class="rank-name">回复读者邮件</span><span class="rank-mins">43 分钟</span></div>
+              <div class="rank-track"><span class="rank-fill" style="width:43%"></span></div>
+              <span class="rank-sub">日常 · 1 个 · 中断 18</span>
+            </div>
+            <div class="rank-row">
+              <div class="rank-line"><span class="rank-name">阅读《卡片笔记》</span><span class="rank-mins">25 分钟</span></div>
+              <div class="rank-track"><span class="rank-fill" style="width:25%"></span></div>
+              <span class="rank-sub">阅读 · 1 个番茄</span>
+            </div>
+          </div>
+
+          <div class="card log-card">
+            <div class="log-head">
+              <h3 class="log-title">专注记录 · 11 月 25 日</h3>
+              <div class="log-tabs"><button class="is-active">今日</button><button>全部</button></div>
+            </div>
+            <p class="log-day">6 个 · 168 分钟 · 中断 18</p>
+            <ul class="log-list">
+              <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 8.4c-3.4 0-6.1 2.6-6.1 5.9S8.6 20 12 20s6.1-2.4 6.1-5.7-2.7-5.9-6.1-5.9M12 8.4c0-2 1.3-3.4 3-3.9"/></svg><span>25 分钟 · 16:02</span><span class="log-task">番茄钟统计改进</span></li>
+              <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 8.4c-3.4 0-6.1 2.6-6.1 5.9S8.6 20 12 20s6.1-2.4 6.1-5.7-2.7-5.9-6.1-5.9M12 8.4c0-2 1.3-3.4 3-3.9"/></svg><span>18 分钟 · 15:14</span><span class="tag-interrupted">中断</span><span class="log-task">回复读者邮件</span></li>
+              <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 8.4c-3.4 0-6.1 2.6-6.1 5.9S8.6 20 12 20s6.1-2.4 6.1-5.7-2.7-5.9-6.1-5.9M12 8.4c0-2 1.3-3.4 3-3.9"/></svg><span>25 分钟 · 14:36</span><span class="log-task">番茄钟统计改进</span></li>
+              <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 8.4c-3.4 0-6.1 2.6-6.1 5.9S8.6 20 12 20s6.1-2.4 6.1-5.7-2.7-5.9-6.1-5.9M12 8.4c0-2 1.3-3.4 3-3.9"/></svg><span>25 分钟 · 13:58</span><span class="log-task">阅读《卡片笔记》</span></li>
+            </ul>
+            <button class="log-more">显示更多（还有 3 条）</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout c2"><strong>记录列表升级</strong><span>「今日 / 全部」切换；全部模式按日分组、倒序，初始 8 条 + 展开更多。中断会话带 amber 标签并显示实际分钟。</span></div>
+      <div class="callout c3"><strong>柱状图口径与单日下钻</strong><span>7 天按日；30 天聚合为周、全部按月。点柱下钻（周→日、月→周→日），点日柱选中单日：头部显示当日汇总，分布与记录跟随，概览三格恒为今日。中断分钟以半透明段叠加在柱顶，不改变柱高。</span></div>
+      <div class="caption"><i></i><span>暂停中的专注：放弃时已专注 12 分 42 秒 ≥ 5 分钟，将记为 13 分钟中断会话</span></div>
+    </section>
+
+    <section class="hint-badges">
+      <div class="hint-col">
+        <h4>中断标记</h4>
+        <div class="badge-row"><span class="tag-interrupted">中断</span>放弃 / 跳过的专注收尾，分钟为实际值，个数不计</div>
+        <div class="badge-row"><span class="swatch" style="background:var(--tomato)"></span>完整专注（计入个数与分钟）</div>
+        <div class="badge-row"><span class="swatch" style="background:var(--tomato-dim)"></span>中断专注分钟（只计时长，柱内叠加段）</div>
+      </div>
+      <div class="hint-col">
+        <h4>30 天 / 全部 聚合与下钻</h4>
+        <div class="chart-drill" style="margin-bottom:6px"><span class="day-detail">11.16–11.22 · <b>24</b> 个</span><button class="back">‹ 返回 30 天</button></div>
+        <div class="bars" style="height:64px; max-width:420px">
+          <div class="bar"><span class="bar-value">3</span><span class="bar-track"><span class="bar-fill" style="height:43%"></span></span><span class="bar-day">周一</span></div>
+          <div class="bar"><span class="bar-value">5</span><span class="bar-track"><span class="bar-fill" style="height:71%"></span></span><span class="bar-day">周二</span></div>
+          <div class="bar is-selected"><span class="bar-value">4</span><span class="bar-track"><span class="bar-fill" style="height:57%"></span></span><span class="bar-day">周三</span></div>
+          <div class="bar"><span class="bar-value">6</span><span class="bar-track"><span class="bar-fill" style="height:86%"></span></span><span class="bar-day">周四</span></div>
+          <div class="bar"><span class="bar-value">2</span><span class="bar-track"><span class="bar-fill" style="height:29%"></span></span><span class="bar-day">周五</span></div>
+          <div class="bar"><span class="bar-value">4</span><span class="bar-track"><span class="bar-fill" style="height:57%"></span></span><span class="bar-day">周六</span></div>
+          <div class="bar"><span class="bar-value">0</span><span class="bar-track"><span class="bar-fill" style="height:0"></span></span><span class="bar-day">周日</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

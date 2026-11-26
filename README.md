@@ -4,7 +4,7 @@
 
 [![DSH Plugin Index](https://dsh.127.dev/assets/badge-en.svg)](https://dsh.127.dev/)
 
-A full-featured to-do list and Pomodoro timer plugin for DeepSeek Harness. Combines the core workflow of **Todoist** (Today, Upcoming, Inbox, Projects, Priorities, Natural-Language Quick Add) with the focused timeboxing of **TickTick** (Pomodoro timer bound to tasks, 25/5/15 cycles, and 7-day stats).
+A full-featured to-do list and Pomodoro timer plugin for DeepSeek Harness. Combines the core workflow of **Todoist** (Today, Upcoming, Inbox, Projects, Priorities, Natural-Language Quick Add) with the focused timeboxing of **TickTick** (Pomodoro timer bound to tasks, 25/5/15 cycles, and focus stats).
 
 Runs entirely local: tasks, projects, settings, and Pomodoro sessions are saved to `$DSH_HOME/storages/todo/state.json` via atomic file writes. DeepSeek Harness agents can read and write the exact same task database via the built-in `todo` tool.
 
@@ -42,8 +42,12 @@ An unstarted focus stays quiet; a short or long break shows as soon as it become
 
 ![Short break countdown on the sidebar](./preview/screenshots/sidebar-badge-wide-break.png)
 
-### Pomodoro Timer & 7-Day Stats
+### Pomodoro Timer & Focus Stats
 ![Pomodoro View](./preview/screenshots/pomodoro.png)
+
+![30-day range](./preview/screenshots/pomodoro-stats-30d.png)
+
+![A selected single day](./preview/screenshots/pomodoro-stats-day.png)
 
 ### Theme picker
 Use the top-right **Plugin settings → Appearance → Theme** control. It applies immediately, persists locally, supports keyboard navigation, and follows the host light or dark mode.
@@ -78,7 +82,8 @@ Use the top-right **Plugin settings → Appearance → Theme** control. It appli
 - **Persistent Countdown**: Timer state is preserved in browser storage (`localStorage`) with absolute timestamps, surviving page refreshes without drifting.
 - **Audio & Visual Alerts**: One Alerts setting, enabled by default for new users, covers both task completion and Pomodoro endings. Task completion uses a brief ascending two-note confirmation; Pomodoro keeps its three-note chime. Existing saved choices remain unchanged, and the Test button plays the Pomodoro chime immediately. With the notification center plugin (`@polunzh/dsh-task-notifier`) installed, Pomodoro endings are published there and it owns the system notification and chime; dsh-todo's own notification is the fallback when the notification center is absent.
 - **Plugin settings & themes**: One top-right Plugin settings panel contains Pomodoro timings, alerts, goals, and the single Appearance control for five locally persisted themes. Studio Vivid green is the default; the picker works with keyboard navigation, click-outside dismissal, and host light/dark mode.
-- **Statistics**: Today's Pomodoros vs daily goal, focus minutes, cumulative totals, current streak (in days), and a 7-day bar chart.
+- **Focus stats**: switch the right-hand panel between 7 days, 30 days and all time; the 30-day view aggregates by week and all time by month. Click a bar to drill down (month → week → day), and selecting a day makes the task breakdown and focus log follow it. A per-task/project breakdown and streak sit alongside.
+- **Trustworthy records**: only fully completed pomodoros count toward totals and the daily goal. Abandoning or skipping a focus records the actual minutes as an "interrupted" entry once you have focused for 5 minutes or more, and leaves nothing behind below that. Finishing a break no longer logs a focus session.
 
 ### Keyboard shortcuts
 

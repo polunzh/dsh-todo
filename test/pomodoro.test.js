@@ -295,6 +295,13 @@ test("normalizePomodoro 容忍损坏/缺失的 localStorage 数据", () => {
   );
   assert.equal(fixed.running, false);
   assert.equal(fixed.endsAt, null);
+
+  // 专注记账字段：非法值归零；休息模式不保留
+  assert.equal(normalizePomodoro({ mode: "focus", focusElapsedMs: -5, focusStartedAt: "x" }, DEFAULT_SETTINGS).focusElapsedMs, 0);
+  assert.equal(normalizePomodoro({ mode: "short", focusElapsedMs: 90000 }, DEFAULT_SETTINGS).focusElapsedMs, 0);
+  const paused = normalizePomodoro({ mode: "focus", focusElapsedMs: 300000, focusStartedAt: 5 }, DEFAULT_SETTINGS);
+  assert.equal(paused.focusElapsedMs, 300000);
+  assert.equal(paused.focusStartedAt, null);
 });
 
 test("pomodoroRemaining 计算当前剩余毫秒数", () => {
@@ -526,4 +533,112 @@ test("configure：设置未变化时保持同一状态且不广播（防止顶�
   engine.setSettings(settings);
   assert.equal(emits, 0, "运行态写入设置也不应唤醒订阅者");
   release();
+});
+
+/* ------------------------------------------------------------------ */
+/* 会话记账：休息不记、中断按实际分钟                                      */
+/* ------------------------------------------------------------------ */
+
+/** 在引擎作用域内替换 dataStore.recordSession，收集本段期间的所有会话写入。 */
+function withRecording(seed, options, fn) {
+  const realStore = preview.__internal.dataStore;
+  const calls = [];
+  const realRecord = realStore.recordSession;
+  const realToast = realStore.toast;
+  realStore.recordSession = (input) => {
+    calls.push(input);
+    return Promise.resolve({ ok: true });
+  };
+  realStore.toast = () => {};
+  try {
+    const { value } = withEngine({ seed, ...(options || {}) }, (ctx) => fn({ ...ctx, calls }));
+    return { calls, result: value };
+  } finally {
+    realStore.recordSession = realRecord;
+    realStore.toast = realToast;
+  }
+}
+
+test("休息到点不写会话记录", () => {
+  const { calls } = withRecording(
+    { mode: "short", running: true, endsAt: Date.now() - 1000, remainingMs: 0, taskId: null, cycle: 1 },
+    {},
+    ({ engine }) => {
+      engine.tick();
+      return engine.get();
+    },
+  );
+  assert.equal(calls.length, 0, "短休结束不应记成专注会话");
+});
+
+test("专注到点写一条完整会话", () => {
+  const { calls, result } = withRecording(
+    { mode: "focus", running: true, endsAt: Date.now() - 1000, remainingMs: 0, taskId: null, cycle: 0 },
+    {},
+    ({ engine }) => {
+      engine.tick();
+      return engine.get();
+    },
+  );
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].completed, true);
+  assert.equal(calls[0].minutes, DEFAULT_SETTINGS.focusMinutes);
+  assert.equal(calls[0].actualMinutes, undefined);
+  // 到点后切换到短休并清零记账
+  assert.equal(result.mode, "short");
+  assert.equal(result.focusElapsedMs, 0);
+});
+
+test("放弃专注按实际分钟记中断会话", () => {
+  const { calls } = withRecording(
+    { mode: "focus", running: false, remainingMs: 5 * 60000, focusElapsedMs: 12 * 60000, taskId: null, cycle: 0 },
+    {},
+    ({ engine }) => engine.dispatch({ type: "abandon" }),
+  );
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].completed, false);
+  assert.equal(calls[0].actualMinutes, 12);
+  assert.equal(calls[0].minutes >= calls[0].actualMinutes, true, "minutes 需容纳实际分钟");
+});
+
+test("不足 5 分钟的放弃与跳过不记会话", () => {
+  const { calls } = withRecording(
+    { mode: "focus", running: false, remainingMs: 20 * 60000, focusElapsedMs: 3 * 60000, taskId: null, cycle: 0 },
+    {},
+    ({ engine }) => {
+      engine.dispatch({ type: "abandon" });
+      engine.dispatch({ type: "start" });
+      engine.dispatch({ type: "skip" });
+    },
+  );
+  assert.equal(calls.length, 0);
+});
+
+test("跳过专注同样按实际分钟记中断会话", () => {
+  const { calls } = withRecording(
+    { mode: "focus", running: false, remainingMs: 0, focusElapsedMs: 9 * 60000, taskId: null, cycle: 0 },
+    {},
+    ({ engine }) => engine.dispatch({ type: "skip" }),
+  );
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].completed, false);
+  assert.equal(calls[0].actualMinutes, 9);
+});
+
+test("暂停期间不计时，恢复后接着累计", () => {
+  const { value } = withEngine({}, ({ engine }) => {
+    engine.dispatch({ type: "start", now: 0 });
+    let state = engine.get();
+    assert.equal(state.focusStartedAt, 0);
+    engine.dispatch({ type: "pause", now: 5 * 60000 });
+    state = engine.get();
+    assert.equal(state.focusElapsedMs, 5 * 60000, "暂停时应把已运行时长结账");
+    assert.equal(state.focusStartedAt, null);
+    engine.dispatch({ type: "resume", now: 10 * 60000 });
+    engine.dispatch({ type: "pause", now: 12 * 60000 });
+    state = engine.get();
+    assert.equal(state.focusElapsedMs, 7 * 60000, "两次运行段累加，暂停的 5 分钟不计入");
+    return state;
+  });
+  assert.equal(value.focusElapsedMs, 7 * 60000);
 });

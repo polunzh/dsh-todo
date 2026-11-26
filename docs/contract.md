@@ -51,7 +51,9 @@ PomodoroSession = {
   "kind": "focus",
   "startedAt": epoch-ms,
   "endedAt": epoch-ms,
-  "minutes": 25
+  "minutes": 25,              // 设定时长（完整番茄 = 实际专注时长）
+  "completed": true,          // false = 中断收尾（放弃 / 跳过）；老数据缺省视为 true
+  "actualMinutes": 18         // 仅 completed=false：实际专注分钟（0..minutes）
 }
 
 Settings = {
@@ -110,7 +112,7 @@ Settings = {
 | `POST /todo/api/projects/update` | `{ id, name?, color? }` | `{ ok, project }` |
 | `POST /todo/api/projects/delete` | `{ id, mode?: "tasks-to-inbox" \| "tasks-delete" }`，默认 inbox | `{ ok, deletedTasks }` |
 | `POST /todo/api/settings` | `{ focusMinutes?, ... }` | `{ ok, settings }` |
-| `POST /todo/api/sessions/record` | `{ taskId?, startedAt, endedAt, minutes }` | `{ ok, session, task? }` |
+| `POST /todo/api/sessions/record` | `{ taskId?, startedAt, endedAt, minutes, completed?, actualMinutes? }` | `{ ok, session, task? }` |
 
 `due` 请求格式：`{ "date": "YYYY-MM-DD", "time": "HH:mm" | null }` 或 `null`。`toggle` 的 `done` 省略时取反。
 

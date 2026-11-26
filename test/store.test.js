@@ -338,6 +338,101 @@ test("recordSession validates, increments task pomodoros, and feeds summary", ()
   assert.equal(stats.tasks.total, 1);
 });
 
+test("recordSession 的 completed=false 会话按 actualMinutes 计时长、不计个数", () => {
+  const task = createTask({ title: "写一半的任务" }, { dataDir: testDir });
+  const now = Date.parse("2026-11-09T10:00:00Z");
+  const opts = { dataDir: testDir, today: "2026-11-09", now };
+
+  const complete = recordSession(
+    { taskId: task.id, startedAt: now - 25 * 60 * 1000, endedAt: now, minutes: 25 },
+    opts,
+  );
+  assert.equal(complete.session.completed, undefined, "完整会话不写 completed:false");
+  assert.equal(complete.task.pomodoros, 1);
+
+  const interrupted = recordSession(
+    {
+      taskId: task.id,
+      startedAt: now - 18 * 60 * 1000,
+      endedAt: now,
+      minutes: 25,
+      completed: false,
+      actualMinutes: 18,
+    },
+    opts,
+  );
+  assert.equal(interrupted.session.completed, false);
+  assert.equal(interrupted.session.actualMinutes, 18);
+  // 中断不增加任务的番茄数
+  assert.equal(interrupted.task.pomodoros, 1);
+
+  const stats = summary(opts);
+  assert.equal(stats.pomodoro.todayFocus, 1, "个数只数完整会话");
+  assert.equal(stats.pomodoro.todayMinutes, 43, "分钟按 25 + 18 计入");
+  assert.equal(stats.pomodoro.todayInterruptedMinutes, 18);
+  assert.equal(stats.pomodoro.totalMinutes, 43);
+  assert.equal(readState({ dataDir: testDir }).tasks[0].pomodoros, 1);
+});
+
+test("recordSession 拒绝缺 actualMinutes 的中断会话与越界值", () => {
+  const now = Date.parse("2026-11-09T10:00:00Z");
+  const opts = { dataDir: testDir, today: "2026-11-09", now };
+  assert.throws(
+    () => recordSession({ startedAt: now - 60000, endedAt: now, minutes: 25, completed: false }, opts),
+    (error) => error.code === "invalid-session",
+  );
+  assert.throws(
+    () =>
+      recordSession(
+        { startedAt: now - 60000, endedAt: now, minutes: 25, completed: false, actualMinutes: 90 },
+        opts,
+      ),
+    (error) => error.code === "invalid-session",
+  );
+});
+
+test("summary 提供 byTask 分布与近 12 个月聚合", () => {
+  const now = Date.parse("2026-11-09T10:00:00Z");
+  const opts = { dataDir: testDir, today: "2026-11-09", now };
+  const a = createTask({ title: "任务 A" }, opts);
+  const b = createTask({ title: "任务 B" }, opts);
+
+  recordSession({ taskId: a.id, startedAt: now - 3600000, endedAt: now, minutes: 25 }, opts);
+  recordSession({ taskId: a.id, startedAt: now - 7200000, endedAt: now - 3600000, minutes: 25 }, opts);
+  recordSession({ taskId: b.id, startedAt: now - 10800000, endedAt: now - 7200000, minutes: 25 }, opts);
+  recordSession({ startedAt: now - 14400000, endedAt: now - 10800000, minutes: 25 }, opts);
+
+  const stats = summary(opts);
+  assert.equal(stats.pomodoro.byTask.length, 3);
+  assert.equal(stats.pomodoro.byTask[0].taskId, a.id);
+  assert.equal(stats.pomodoro.byTask[0].minutes, 50);
+  // 未绑定任务以 taskId: null 出现在分布里
+  assert.ok(stats.pomodoro.byTask.some((row) => row.taskId === null && row.minutes === 25));
+
+  assert.equal(stats.pomodoro.month.length, 12);
+  assert.equal(stats.pomodoro.month.at(-1).date, "2026-11");
+  assert.equal(stats.pomodoro.month.at(-1).count, 4);
+  assert.equal(stats.pomodoro.month.at(-1).minutes, 100);
+  assert.equal(stats.pomodoro.month[0].date, "2025-12");
+});
+
+test("老会话缺 completed/actualMinutes 时按完整会话解释", () => {
+  const now = Date.parse("2026-11-09T10:00:00Z");
+  const state = readState({ dataDir: testDir });
+  state.sessions = [
+    { id: "legacy-1", taskId: null, kind: "focus", startedAt: now - 60000, endedAt: now, minutes: 25 },
+  ];
+  writeState(state, { dataDir: testDir });
+  const opts = { dataDir: testDir, today: "2026-11-09", now };
+  const reloaded = readState({ dataDir: testDir });
+  assert.equal(reloaded.sessions[0].completed, true);
+  assert.equal(reloaded.sessions[0].actualMinutes, undefined);
+  const stats = summary(opts);
+  assert.equal(stats.pomodoro.todayFocus, 1);
+  assert.equal(stats.pomodoro.todayMinutes, 25);
+  assert.equal(stats.pomodoro.todayInterruptedMinutes, 0);
+});
+
 test("corrupt state file is quarantined and recovered to empty state", () => {
   const file = dataFile({ dataDir: testDir });
   writeState({ version: 1, tasks: [] }, { dataDir: testDir });

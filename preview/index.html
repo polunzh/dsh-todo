@@ -617,13 +617,59 @@
 
       /* 会话按「钉住的今天」锚定，保证截图统计稳定（与真实时钟无关） */
       const todayBase = new Date(todayDate + "T09:00:00").getTime();
-      const seedSessions = [
-        { id: "s-1", taskId: "t-01", kind: "focus", startedAt: todayBase - 3600000 * 3, endedAt: todayBase - 3600000 * 2.5, minutes: 25 },
-        { id: "s-2", taskId: "t-01", kind: "focus", startedAt: todayBase - 3600000 * 2, endedAt: todayBase - 3600000 * 1.5, minutes: 25 },
-        { id: "s-3", taskId: "t-08", kind: "focus", startedAt: todayBase - 3600000 * 1.3, endedAt: todayBase - 3600000 * 0.8, minutes: 25 },
-        { id: "s-4", taskId: "t-02", kind: "focus", startedAt: todayBase - 86400000 - 3600000 * 2, endedAt: todayBase - 86400000 - 3600000 * 1.5, minutes: 25 },
-        { id: "s-5", taskId: "t-03", kind: "focus", startedAt: todayBase - 86400000 * 2 - 3600000 * 3, endedAt: todayBase - 86400000 * 2 - 3600000 * 2.5, minutes: 25 },
+      /* 造数口径：个数只数完整会话；中断会话带 completed:false + actualMinutes。
+         历史摊到过去 5 周，让 7/30/全部三个范围都有可看的数据。 */
+      const MIN = 60000;
+      const seedSessions = [];
+      const seedPlan = [
+        // [天偏移, 小时偏移, taskId, minutes, completed, actualMinutes]
+        [0, -3, "t-01", 25, true],
+        [0, -2, "t-01", 25, true],
+        [0, -1.3, "t-08", 25, false, 18],
+        [0, -0.6, "t-02", 25, true],
+        [0, -0.3, "t-03", 25, true],
+        [0, -0.15, null, 25, true],
+        [0, -0.05, "t-01", 25, false, 12],
+        [-1, -2, "t-02", 25, true],
+        [-1, -1, "t-08", 25, true],
+        [-1, -0.5, "t-01", 25, true],
+        [-2, -3, "t-03", 25, true],
+        [-2, -1.5, null, 25, true],
+        [-3, -2, "t-02", 25, true],
+        [-4, -2.5, "t-01", 25, true],
+        [-4, -1, "t-03", 25, false, 9],
+        [-5, -2, "t-08", 25, true],
+        [-6, -1.5, "t-01", 25, true],
+        [-7, -2, "t-02", 25, true],
+        [-8, -3, "t-03", 25, true],
+        [-9, -1, null, 25, true],
+        [-10, -2, "t-01", 25, true],
+        [-11, -1.5, "t-08", 25, true],
+        [-12, -2, "t-02", 25, true],
+        [-14, -2, "t-03", 25, true],
+        [-15, -1.5, "t-01", 25, true],
+        [-17, -2, "t-08", 25, true],
+        [-19, -1.5, "t-02", 25, true],
+        [-21, -2, "t-03", 25, true],
+        [-24, -1.5, "t-01", 25, true],
+        [-27, -2, "t-08", 25, true],
+        [-31, -1.5, "t-02", 25, true],
+        [-35, -2, "t-03", 25, true],
+        [-42, -1.5, "t-01", 25, true],
+        [-49, -2, "t-08", 25, true],
+        [-56, -1.5, "t-02", 25, true],
       ];
+      seedPlan.forEach((row, index) => {
+        const [dayOffset, hourOffset, taskId, minutes, completed, actualMinutes] = row;
+        const start = todayBase + dayOffset * 86400000 + hourOffset * 3600000;
+        const session = { id: "s-" + (index + 1), taskId, kind: "focus", startedAt: start, endedAt: start + minutes * MIN, minutes };
+        if (!completed) {
+          session.completed = false;
+          session.actualMinutes = actualMinutes;
+          session.endedAt = start + actualMinutes * MIN;
+        }
+        seedSessions.push(session);
+      });
 
       const mockDb = {
         version: 1,
@@ -798,9 +844,15 @@
             endedAt: Number(body.endedAt) || Date.now(),
             minutes: Number(body.minutes) || 25,
           };
+          if (body.completed === false) {
+            session.completed = false;
+            session.actualMinutes = Number(body.actualMinutes) || session.minutes;
+          } else {
+            session.completed = true;
+          }
           mockDb.sessions.push(session);
           let targetTask = null;
-          if (session.taskId) {
+          if (session.taskId && session.completed !== false) {
             targetTask = mockDb.tasks.find((t) => t.id === session.taskId);
             if (targetTask) targetTask.pomodoros = (targetTask.pomodoros || 0) + 1;
           }

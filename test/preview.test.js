@@ -71,3 +71,24 @@ test("index.html handles theme and locale parameters and stubs /todo/api/state",
   assert.match(html, /todoTheme/, "预览应支持指定要展示的主题");
   assert.match(html, /: "studio-vivid"/, "预览默认主题应为 Studio Vivid");
 });
+
+test("preview seeds interrupted sessions and long-range history", () => {
+  const html = readFileSync(resolve(root, "preview", "index.html"), "utf8");
+  // 中断会话：completed=false + actualMinutes，供统计区与记录列表展示
+  assert.match(html, /session\.completed = false/, "种子应包含中断会话");
+  assert.match(html, /session\.actualMinutes = actualMinutes/);
+  // 历史摊到过去数周，7/30/全部三个范围都有数据
+  assert.match(html, /seedPlan\.forEach/, "种子会话应由计划表生成");
+  assert.match(html, /-56, -1\.5/, "种子历史应覆盖约两个月");
+  // mock 接口透传新字段，且中断不增加任务番茄数
+  assert.match(html, /if \(body\.completed === false\)/);
+  assert.match(html, /session\.completed !== false/);
+});
+
+test("screenshot script covers the new stats ranges", () => {
+  const script = readFileSync(resolve(root, "scripts", "screenshot.mjs"), "utf8");
+  assert.match(script, /name: "pomodoro-stats-30d"/);
+  assert.match(script, /name: "pomodoro-stats-day"/);
+  assert.match(script, /todo-stats-range-btn/);
+  assert.match(script, /todo-pom-bar/);
+});
