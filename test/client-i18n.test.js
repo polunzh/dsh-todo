@@ -257,6 +257,26 @@ test("任务行播放按钮复用直接启动专注路径且不切换视图", ()
   assert.match(SOURCE, /onFocus: handleStartFocus/, "任务行播放按钮必须复用直接启动处理器");
 });
 
+test("优先级渲染在行首左栏，右栏不再放优先级标签", () => {
+  assert.match(SOURCE, /function PriorityFlag\(props\)/, "需要 PriorityFlag 左栏组件");
+  assert.match(SOURCE, /h\(PriorityFlag, \{ priority \}\)/, "任务行首位渲染 PriorityFlag");
+  // 无优先级时保留空列占位，标题不左右跳动
+  assert.match(
+    SOURCE,
+    /return h\("span", \{ className: "todo-priority-col", "aria-hidden": "true" \}\)/,
+    "无优先级必须渲染空 todo-priority-col 占位",
+  );
+  // 旧的右侧标签与 2px 色条彻底移除
+  assert.equal(SOURCE.includes("todo-priority-bar"), false, "旧版 todo-priority-bar 必须删除");
+  const taskRowStart = SOURCE.indexOf("function TaskRow");
+  const taskRowBody = SOURCE.slice(taskRowStart, taskRowStart + 9000);
+  assert.equal(taskRowBody.includes("todo-priority-label"), false, "标题行内不应再渲染优先级标签");
+  // 左栏列与标签样式
+  assert.match(SOURCE, /\.todo-priority-col \{\s*\n\s*flex: none; width: 22px;/, "左栏固定 22px 列宽");
+  assert.match(SOURCE, /font-variant-numeric: tabular-nums;\s*\n\}/, "标签数字必须等宽");
+  assert.match(SOURCE, /padding: 0 4px; border-radius: 5px; line-height: 16px; font-size: 10\.5px;/, "P0 胶囊用 4px 内边距");
+});
+
 test("番茄钟模式按钮垂直居中，且没有无用的沉浸模式入口", () => {
   assert.match(SOURCE, /\.todo-pom-mode \{\s*display: inline-flex; align-items: center; justify-content: center;/, "模式按钮必须垂直居中");
   assert.match(SOURCE, /height: 32px; padding: 0 14px;/, "模式按钮需要稳定的点击高度与水平内边距");
