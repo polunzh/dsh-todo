@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DSH · 任务级专注时长设计稿</title>
+<style>
+  :root {
+    --canvas: #f8f9fb;
+    --surface: #ffffff;
+    --layer1: #ffffff;
+    --layer2: #f1f3f7;
+    --layer3: #e6e9ef;
+    --line: #e6e9ef;
+    --line-strong: #d9dee8;
+    --ink: #17191f;
+    --muted: #61666b;
+    --quiet: #8a9098;
+    --accent: #4f46e5;
+    --accent-soft: #eeedff;
+    --tomato: #e0523f;
+    --tomato-dim: rgba(224, 82, 63, .38);
+    --red: #d64541;
+    --shadow: 0 10px 26px rgba(20, 28, 45, .08), 0 2px 5px rgba(20, 28, 45, .05);
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--canvas); color: var(--ink); font-family: var(--font); }
+  body { font-size: 14px; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; }
+
+  /* ---- DSH 环境（与 pomodoro-stats.html 同一套） ---- */
+  .window { height: 100vh; min-height: 760px; display: grid; grid-template-columns: 232px 1fr; overflow: hidden; }
+  .sidebar { background: linear-gradient(180deg, #f1f3f7, #e9edf4); border-right: 1px solid #dfe4ed; padding: 20px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .traffic { display: flex; gap: 9px; padding: 4px 7px 18px; }
+  .traffic i { width: 12px; height: 12px; border-radius: 50%; display:block; }
+  .traffic i:nth-child(1){background:#fb5b57}.traffic i:nth-child(2){background:#f5bb42}.traffic i:nth-child(3){background:#42c552}
+  .brand { display: flex; align-items: center; gap: 9px; padding: 3px 6px 25px; font-weight: 720; font-size: 19px; letter-spacing: -.025em; }
+  .brand-mark { width: 27px; height: 22px; position: relative; }
+  .brand-mark:before, .brand-mark:after { content:""; position:absolute; border-radius: 14px 3px 14px 3px; background:#17191f; transform:rotate(34deg); }
+  .brand-mark:before { width:25px;height:13px;top:5px;left:0;}.brand-mark:after{width:12px;height:7px;top:0;right:0;transform:rotate(-10deg)}
+  .brand b { font-size: 11px; padding: 3px 5px; border-radius: 3px; background:#17191f;color:white;letter-spacing:.05em; }
+  .new { height: 46px; border: 1px solid #dde2eb; background: rgba(255,255,255,.78); border-radius: 11px; display:flex;align-items:center;justify-content:center;gap:9px; font-weight:650; font-size:15px; color: var(--ink); }
+  .new .plus { font-size:21px; font-weight:300; line-height:1; }
+  .section { padding: 12px 8px 4px; color: var(--quiet); font-size: 13px; }
+  .nav { display:flex; flex-direction:column; gap:2px; }
+  .nav div { height: 38px; display:flex;align-items:center; gap:10px; padding:0 10px; border-radius:8px; color:#282b32; }
+  .nav div.active { background:rgba(255,255,255,.72); box-shadow: 0 1px 2px rgba(18,25,38,.04); font-weight:650; }
+  .nav svg { width:18px; height:18px; color:#707783; }
+  .workspaces { margin-top:12px; border-top: 1px solid #dce1e9; padding-top:12px; }
+  .folder { color:#2d3037; font-size:14px; padding:9px 10px; display:flex;gap:8px;align-items:center; }
+  .folder small{margin-left:auto;color:#9197a1;font-size:12px}
+  .main { min-width: 0; display: flex; flex-direction:column; background: var(--surface); overflow: auto; }
+  .header { height: 70px; border-bottom: 1px solid var(--line); display:flex; align-items:center; padding: 0 28px 0 34px; gap: 18px; flex: none; }
+  .crumb { display:flex; align-items:center; gap:8px; color:var(--muted); min-width: 0; }
+  .crumb strong { color:var(--ink); font-size:15px; font-weight:650; white-space:nowrap; }
+  .crumb .chev { color:#a3a8b1; font-size:18px; }
+  .header-spacer { flex:1; }
+  .branch { display:flex; align-items:center; gap:7px; color:#61666b; font-size:13px; white-space:nowrap; }
+  .branch:before { content:"⌘"; font-size:17px; color:#818792; }
+  .timer { height: 42px; display:flex; align-items:center; gap:8px; padding: 4px 5px 4px 10px; border: 1px solid #dcdffc; border-radius: 12px; background: #fbfbff; box-shadow: 0 2px 6px rgba(20,28,45,.08); }
+  .ring { width:25px;height:25px;position:relative;flex:none; }
+  .ring svg{width:25px;height:25px;transform:rotate(-90deg);}.ring circle{fill:none;stroke-width:2.8}.ring .track{stroke:#deddf9}.ring .progress{stroke:var(--accent);stroke-linecap:round;stroke-dasharray:30 68}
+  .timer-copy { display:flex; align-items:baseline; gap:7px; white-space:nowrap; }
+  .mode { color:var(--muted); font-size:12px; font-weight:550; }.time { font-variant-numeric:tabular-nums; letter-spacing:.025em; font-size:15px; font-weight:720; }
+  .timer-task { max-width: 154px; overflow:hidden;text-overflow:ellipsis;white-space:nowrap; padding-left:9px; border-left:1px solid #e2e4ec; color:#4d5360; font-size:12px; }
+  .round { width:31px;height:31px;border:0;border-radius:8px;background:var(--accent);color:white;display:grid;place-items:center;box-shadow:0 2px 5px rgba(20,28,45,.16); }
+  .round svg { width:15px; height:15px; margin-left:1px; }
+  .stage { flex:1; display:grid; place-items:center; padding: 30px 0; position:relative; }
+
+  /* ---- 今天视图任务列表（复刻 .todo-item 体系） ---- */
+  .board { width: min(920px, 90%); }
+  .board-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px; }
+  .board-title { margin:0; font-size:22px; font-weight:720; letter-spacing:-.02em; }
+  .board-sub { color:var(--quiet); font-size:12.5px; }
+  .add-bar { height:48px; border:1px solid #e4e1fb; border-radius:11px; background:#fff; display:flex; align-items:center; padding:0 15px; color:#a0a0aa; font-size:13.5px; box-shadow:0 3px 14px rgba(31,22,90,.04); margin-bottom:18px; }
+  .add-bar b { color:var(--accent); font-size:19px; font-weight:400; margin-right:10px; }
+  .list { list-style:none; margin:0; padding:0; border-top:1px solid var(--line); }
+  .item { display:flex; align-items:center; gap:12px; padding:14px 13px; border-bottom:1px solid var(--line); background:var(--surface); border-radius:8px; }
+  .item.is-focused { background:var(--accent-soft); }
+  .check { width:23px;height:23px; border:1.6px solid #dadbe2; border-radius:7px; flex:none; }
+  .item-main { flex:1; min-width:0; }
+  .item-line { display:flex; align-items:center; gap:8px; }
+  .item-title { font-size:15px; font-weight:620; color:var(--ink); border:0; background:none; padding:0; text-align:left; cursor:pointer; }
+  .meta { display:flex; flex-wrap:wrap; gap:5px; margin-top:5px; align-items:center; }
+  .chip { display:inline-flex; align-items:center; gap:4px; height:22px; padding:0 8px; border-radius:999px; background:var(--layer2); border:1px solid var(--line); font-size:11.5px; color:var(--muted); }
+  .chip svg { width:11px; height:11px; }
+  .chip-due { color:var(--red); background:rgba(224,82,63,.06); border-color:rgba(224,82,63,.22); }
+  .chip-due svg { color:var(--red); }
+  .chip-sub { background:none; border-color:transparent; color:var(--quiet); padding:0 4px; }
+  .chip-sub svg { color:var(--quiet); }
+  .chip-pom { background:rgba(224,82,63,.08); border-color:rgba(224,82,63,.25); color:#b84534; }
+  .chip-pom svg { color:var(--tomato); }
+  .chip-min { background:var(--accent-soft); border-color:#d9d5fb; color:#4638c9; font-variant-numeric:tabular-nums; font-weight:600; }
+  .sub { margin:8px 0 0 0; padding:0; list-style:none; border-left:1.5px solid var(--line-strong); margin-left:6px; }
+  .sub li { display:flex; align-items:center; gap:9px; padding:5px 0 5px 14px; }
+  .sub .check { width:17px; height:17px; border-radius:5px; }
+  .sub span { font-size:13px; color:#4b4f58; }
+  .actions { display:flex; gap:3px; flex:none; }
+  .icon-btn { width:30px; height:30px; border:0; border-radius:8px; background:transparent; color:#818792; display:grid; place-items:center; cursor:pointer; position:relative; }
+  .icon-btn svg { width:13px; height:13px; }
+  .icon-btn:hover { background:var(--layer2); color:var(--muted); }
+  .icon-btn.play { background:var(--accent-soft); color:var(--accent); }
+  .tooltip { position:absolute; top:-38px; right:-6px; background:#262334; color:#fff; border-radius:8px; padding:6px 10px; font-size:11.5px; white-space:nowrap; box-shadow:0 8px 24px rgba(25,20,43,.28); }
+  .tooltip:after { content:""; position:absolute; bottom:-5px; right:14px; border:5px solid transparent; border-top-color:#262334; border-bottom:0; }
+
+  /* ---- 详情抽屉（复刻 .todo-drawer 体系 + 新「专注时长」字段） ---- */
+  .veil { position:fixed; inset:0; background:rgba(23,22,32,.18); backdrop-filter:blur(1.5px); }
+  .drawer { position:fixed; right:0; top:0; width:min(470px,100vw); height:100vh; display:flex; flex-direction:column; background:var(--surface); box-shadow:-14px 0 38px rgba(16,16,28,.14); }
+  .drawer-head { padding:16px 24px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px; }
+  .drawer-title { font-size:17px; font-weight:730; margin-right:auto; }
+  .save-btn { height:32px; border:0; border-radius:8px; padding:0 14px; color:#fff; background:var(--accent); box-shadow:0 2px 6px rgba(79,70,229,.28); font-size:12.5px; font-weight:680; cursor:pointer; }
+  .icon-close { width:32px; height:32px; border:0; border-radius:8px; background:transparent; color:#53545f; font-size:20px; line-height:1; cursor:pointer; }
+  .drawer-body { flex:1; overflow:hidden; padding:20px 24px 16px; }
+  .field { margin-bottom:16px; }
+  .field > label, .field-label { display:block; color:#70717b; font-weight:650; font-size:11.5px; margin-bottom:7px; }
+  .field-input { font:inherit; color:var(--ink); width:100%; border:1px solid #e7e7ec; border-radius:8px; background:#fff; padding:9px 12px; outline:none; font-size:14.5px; font-weight:600; height:40px; }
+  .textarea { height:84px; resize:none; font-size:13px; font-weight:400; color:#686973; line-height:1.55; }
+  .due-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .segment { display:inline-flex; gap:4px; }
+  .seg-btn { height:34px; min-width:52px; padding:0 12px; border:1px solid #e7e7ec; border-radius:8px; background:#fff; color:#464751; font-size:12.5px; cursor:pointer; }
+  .seg-btn.is-active { color:var(--accent); border-color:#c6beff; background:var(--accent-soft); font-weight:700; }
+  .focus-row { display:flex; gap:8px; align-items:center; }
+  .num-input { width:86px; height:34px; padding:0 10px; border:1px solid #e7e7ec; border-radius:8px; font:inherit; font-size:13px; color:var(--ink); }
+  .num-unit { color:var(--quiet); font-size:12px; }
+  .field-aside { color:var(--quiet); font-size:11px; font-weight:500; margin-left:auto; }
+  .pom-row { display:flex; align-items:center; justify-content:space-between; background:var(--layer2); border:1px solid var(--line); border-radius:10px; padding:11px 13px; margin-top:4px; }
+  .pom-row .left { display:flex; flex-direction:column; gap:1px; }
+  .pom-row .left strong { font-size:13px; }
+  .pom-row .left .field-aside { margin:0; }
+  .focus-start { height:32px; border:0; border-radius:8px; padding:0 13px; color:#fff; background:var(--accent); font-size:12.5px; font-weight:680; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 2px 6px rgba(79,70,229,.25); }
+  .focus-start svg { width:11px; height:11px; }
+  .drawer-foot { padding:14px 24px; border-top:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; color:#a0a1aa; font-size:11.5px; }
+  .delete-btn { border:1px solid #f1bebe; color:#c84242; background:#fff; border-radius:8px; height:32px; padding:0 12px; font-size:12.5px; cursor:pointer; }
+
+  /* ---- 顶栏计时器态（联动展示） ---- */
+  .pomo-strip { display:flex; gap:10px; align-items:center; width:min(920px,90%); margin:20px auto 0; }
+  .pomo-pill { display:flex; align-items:center; gap:8px; height:44px; padding:0 14px; border:1px solid #e0def9; border-radius:12px; background:#fbfbff; box-shadow:0 2px 8px rgba(20,28,45,.06); font-size:12px; color:var(--muted); }
+  .pomo-pill b { font-variant-numeric:tabular-nums; font-size:15px; color:var(--ink); letter-spacing:.02em; }
+  .pomo-pill .lbl { font-size:11px; color:var(--quiet); }
+  .pomo-pill .task-name { border-left:1px solid #e2e4ec; padding-left:9px; color:#4d5360; }
+  .pomo-pill .dur { color:#4638c9; font-weight:650; }
+
+  /* ---- 标注 ---- */
+  .callout { position:absolute; background:#fff; border:1px solid #dedffc; box-shadow:var(--shadow); border-radius:12px; padding:13px 15px; color:#343846; z-index:9; width:270px; }
+  .callout strong { display:block; font-size:13px; margin-bottom:5px; }
+  .callout span { font-size:12px; color:var(--muted); line-height:1.55; }
+  .c1 { top:54px; right:48px; }
+  .c2 { top:330px; right:490px; }
+  .c3 { bottom:150px; left:260px; }
+
+  @media (max-width:900px) { .window { grid-template-columns:1fr; } .sidebar { display:none; } .c2 { right:12px; } }
+</style>
+</head>
+<body>
+<div class="window">
+  <aside class="sidebar">
+    <div class="traffic"><i></i><i></i><i></i></div>
+    <div class="brand"><span class="brand-mark"></span><span>deepseek</span><b>HARNESS</b></div>
+    <button class="new"><span class="plus">＋</span>新会话</button>
+    <div class="section">工作区</div>
+    <div class="nav">
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>搜索会话</div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3h14v18H5z"/><path d="M8 7h8M8 11h8"/></svg>设计插件 README 图标</div>
+      <div class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16M12 4v16"/></svg>任务级专注时长</div>
+    </div>
+    <div class="workspaces">
+      <div class="folder">▱ dsh-todo <small>⌄</small></div>
+      <div class="folder">▱ Downloads</div>
+      <div class="folder">▱ dsh-doc</div>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="header">
+      <div class="crumb"><strong>dsh-todo</strong><span class="chev">⌄</span><span class="chev">·</span><span>创造模式</span><span class="chev">⌄</span></div>
+      <div class="header-spacer"></div>
+      <div class="branch">main</div>
+      <div class="timer">
+        <span class="ring"><svg viewBox="0 0 24 24" aria-hidden="true"><circle class="track" cx="12" cy="12" r="10.8"/><circle class="progress" cx="12" cy="12" r="10.8"/></svg></span>
+        <span class="timer-copy"><span class="mode">专注</span><span class="time">14:12</span></span>
+        <span class="timer-task">学习多邻国+背单词</span>
+        <button class="round" aria-label="暂停专注"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M8 5v14M16 5v14"/></svg></button>
+      </div>
+    </header>
+
+    <section class="stage">
+      <div class="board">
+        <div class="board-head">
+          <h1 class="board-title">今天</h1>
+          <span class="board-sub">11 月 26 日 · 周四 · 全局专注时长 25′</span>
+        </div>
+        <div class="add-bar"><b>＋</b>添加任务：明天 15:00 写周报 #工作 !p1</div>
+        <ul class="list">
+          <li class="item is-focused">
+            <span class="check"></span>
+            <div class="item-main">
+              <div class="item-line"><button class="item-title">学习多邻国+背单词</button></div>
+              <div class="meta">
+                <span class="chip chip-due"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/></svg>11 月 26 日</span>
+                <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5" stroke-linejoin="round"/></svg>每天</span>
+                <span class="chip chip-min">15′</span>
+                <span class="chip chip-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6" stroke-linecap="round"/></svg>子任务 0/2</span>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="icon-btn" aria-label="上移"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 15 6-6 6 6"/></svg></button>
+              <button class="icon-btn" aria-label="下移"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></button>
+              <button class="icon-btn play" aria-label="开始专注 · 15 分钟">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <span class="tooltip">开始专注 · 15 分钟</span>
+              </button>
+              <button class="icon-btn" aria-label="删除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+          </li>
+          <li class="item">
+            <span class="check"></span>
+            <div class="item-main">
+              <div class="item-line"><button class="item-title">LLM</button></div>
+              <div class="meta">
+                <span class="chip chip-due"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/></svg>11 月 22 日</span>
+                <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5" stroke-linejoin="round"/></svg>每天</span>
+                <span class="chip chip-min">45′</span>
+                <span class="chip chip-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6" stroke-linecap="round"/></svg>子任务 0/3</span>
+              </div>
+              <ul class="sub">
+                <li><span class="check"></span><span>Karpathy 视频</span></li>
+              </ul>
+            </div>
+            <div class="actions">
+              <button class="icon-btn" aria-label="上移"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 15 6-6 6 6"/></svg></button>
+              <button class="icon-btn" aria-label="下移"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></button>
+              <button class="icon-btn play" aria-label="开始专注 · 45 分钟"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+              <button class="icon-btn" aria-label="删除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+          </li>
+          <li class="item">
+            <span class="check"></span>
+            <div class="item-main">
+              <div class="item-line"><button class="item-title">读一些新出的文章或论文</button></div>
+              <div class="meta">
+                <span class="chip chip-due"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/></svg>11 月 27 日</span>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="icon-btn" aria-label="上移"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 15 6-6 6 6"/></svg></button>
+              <button class="icon-btn" aria-label="下移"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></button>
+              <button class="icon-btn play" aria-label="开始专注"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+              <button class="icon-btn" aria-label="删除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="pomo-strip">
+      <span class="pomo-pill"><span class="lbl">任务行启动后 · 顶栏计时器</span><b>14:12</b><span class="dur">/ 15′</span><span class="task-name">学习多邻国+背单词</span></span>
+      <span class="pomo-pill"><span class="lbl">下一个：LLM</span><b>45′</b><span class="lbl">专属时长</span></span>
+    </div>
+  </main>
+</div>
+
+<div class="veil"></div>
+<aside class="drawer" role="dialog" aria-label="任务详情">
+  <header class="drawer-head">
+    <strong class="drawer-title">任务详情</strong>
+    <button class="save-btn">保存</button>
+    <button class="icon-close" aria-label="关闭">×</button>
+  </header>
+  <div class="drawer-body">
+    <div class="field">
+      <label>标题</label>
+      <input class="field-input" value="学习多邻国+背单词" readonly />
+    </div>
+    <div class="field">
+      <label>备注</label>
+      <textarea class="field-input textarea" readonly>多邻国一节课 + 复习 20 个单词</textarea>
+    </div>
+    <div class="field">
+      <label>截止时间</label>
+      <div class="due-row"><input class="field-input" value="2026/11/26" readonly /><input class="field-input" value="--:--" readonly /></div>
+    </div>
+    <div class="field">
+      <label>优先级</label>
+      <div class="segment"><button class="seg-btn">无</button><button class="seg-btn">P0</button><button class="seg-btn">P1</button><button class="seg-btn is-active">P2</button><button class="seg-btn">P3</button><button class="seg-btn">P4</button></div>
+    </div>
+    <div class="field">
+      <div class="field-label"><span>专注时长</span><span class="field-aside">留空跟随全局设置</span></div>
+      <div class="focus-row">
+        <div class="segment">
+          <button class="seg-btn is-active">15′</button>
+          <button class="seg-btn">25′</button>
+          <button class="seg-btn">45′</button>
+          <button class="seg-btn">默认</button>
+        </div>
+        <input class="num-input" value="15" aria-label="自定义分钟数" />
+        <span class="num-unit">分钟</span>
+      </div>
+    </div>
+    <div class="pom-row">
+      <div class="left">
+        <strong>已累计 12 个番茄</strong>
+        <span class="field-aside">自动保存已开启</span>
+      </div>
+      <button class="focus-start"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>开始专注 · 15 分钟</button>
+    </div>
+  </div>
+  <footer class="drawer-foot">
+    <span>全局专注时长 25′ · 此任务覆盖为 15′</span>
+    <button class="delete-btn">⌫　删除任务</button>
+  </footer>
+</aside>
+
+<div class="callout c1"><strong>唯一的设置入口</strong><span>详情抽屉「专注时长」：15/25/45 快捷 + 自定义 + 默认（清除覆盖）。走现有脏值保存队列，与其它字段一条保存路径。</span></div>
+<div class="callout c2"><strong>任务行直接生效</strong><span>设置后任务行出现 15′ 徽标；点播放立即按 15 分钟开跑，无页面跳转。未设置的任务（第三行）无徽标，按全局 25′ 启动。</span></div>
+<div class="callout c3"><strong>顶栏与统计联动</strong><span>顶栏计时器满值即 15′；本任务完成的会话按实际 15 分钟入统计，无需换算。</span></div>
+</body>
+</html>
