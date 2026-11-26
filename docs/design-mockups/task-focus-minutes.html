@@ -25,7 +25,7 @@
     --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--canvas); color: var(--ink); font-family: var(--font); }
+  html, body { margin: 0; background: var(--canvas); color: var(--ink); font-family: var(--font); overflow-x: hidden; }
   body { font-size: 14px; -webkit-font-smoothing: antialiased; }
   button { font: inherit; }
 
@@ -120,7 +120,7 @@
   .segment { display:inline-flex; gap:4px; }
   .seg-btn { height:34px; min-width:52px; padding:0 12px; border:1px solid #e7e7ec; border-radius:8px; background:#fff; color:#464751; font-size:12.5px; cursor:pointer; }
   .seg-btn.is-active { color:var(--accent); border-color:#c6beff; background:var(--accent-soft); font-weight:700; }
-  .focus-row { display:flex; gap:8px; align-items:center; }
+  .focus-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
   .num-input { width:86px; height:34px; padding:0 10px; border:1px solid #e7e7ec; border-radius:8px; font:inherit; font-size:13px; color:var(--ink); }
   .num-unit { color:var(--quiet); font-size:12px; }
   .field-aside { color:var(--quiet); font-size:11px; font-weight:500; margin-left:auto; }
@@ -149,7 +149,18 @@
   .c2 { top:330px; right:490px; }
   .c3 { bottom:150px; left:260px; }
 
-  @media (max-width:900px) { .window { grid-template-columns:1fr; } .sidebar { display:none; } .c2 { right:12px; } }
+  @media (max-width:900px) {
+    .window { grid-template-columns:1fr; }
+    .sidebar { display:none; }
+    .callout { display:none; }
+    .drawer { width:100%; }
+    .drawer-body { padding:16px 14px 12px; }
+    .drawer-head, .drawer-foot { padding-left:14px; padding-right:14px; }
+    .seg-btn { min-width:40px; padding:0 8px; font-size:12px; }
+    .num-input { width:64px; }
+    .pom-row { flex-wrap:wrap; gap:8px; }
+    .focus-start { padding:0 10px; font-size:12px; }
+  }
 </style>
 </head>
 <body>
