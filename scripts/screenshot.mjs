@@ -204,6 +204,38 @@ const shots = [
     narrative: "English · Per-task focus length with the 15′ chip and drawer field",
   },
   {
+    name: "subtask-edit",
+    width: 1440,
+    height: 900,
+    url: "?view=today&theme=light&locale=zh",
+    afterReady: `new Promise((resolve) => {
+      const row = [...document.querySelectorAll(".todo-item")].find((item) => item.querySelector(".todo-chip-button"));
+      row?.querySelector(".todo-item-title")?.click();
+      setTimeout(() => {
+        const titles = document.querySelectorAll(".todo-drawer-subtask-title");
+        titles[titles.length - 1]?.click();
+        setTimeout(resolve, 260);
+      }, 320);
+    })`,
+    narrative: "子任务就地编辑：抽屉里点标题直接改名，Enter 提交、Esc 取消",
+  },
+  {
+    name: "subtask-edit-en",
+    width: 1440,
+    height: 900,
+    url: "?view=today&theme=light&locale=en",
+    afterReady: `new Promise((resolve) => {
+      const row = [...document.querySelectorAll(".todo-item")].find((item) => item.querySelector(".todo-chip-button"));
+      row?.querySelector(".todo-item-title")?.click();
+      setTimeout(() => {
+        const titles = document.querySelectorAll(".todo-drawer-subtask-title");
+        titles[titles.length - 1]?.click();
+        setTimeout(resolve, 260);
+      }, 320);
+    })`,
+    narrative: "English · Renaming a subtask in place from the drawer",
+  },
+  {
     name: "mobile",
     width: 390,
     height: 844,
@@ -315,6 +347,8 @@ async function captureShot(cdp, baseUrl, spec) {
 
   await cdp.send("Page.enable");
   await cdp.send("Runtime.enable");
+  // 无头浏览器默认认为页面没有焦点，:focus 样式不生效；截图需要真实的聚焦边框。
+  await cdp.send("Emulation.setFocusEmulationEnabled", { enabled: true });
 
   // Reset ready flag on current execution context if any
   try {

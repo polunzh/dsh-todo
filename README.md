@@ -61,6 +61,11 @@ Not every task deserves 25 minutes. Give a single todo its own focus length in t
 
 ![Per-task focus length](./preview/screenshots/task-focus-en.png)
 
+### Subtask editing
+Click a subtask title in the task drawer and it becomes an input right there. Enter or clicking away saves, Esc cancels, and the checkbox state stays put — no delete-and-retype.
+
+![Renaming a subtask in place](./preview/screenshots/subtask-edit-en.png)
+
 ### Theme picker
 Use the top-right **Plugin settings → Appearance → Theme** control. It applies immediately, persists locally, supports keyboard navigation, and follows the host light or dark mode.
 
@@ -80,7 +85,7 @@ Use the top-right **Plugin settings → Appearance → Theme** control. It appli
 ### Task Management
 - **Views**: Today (split into Overdue and Today), Upcoming (grouped by date), Inbox, Completed, Projects, Calendar, and Pomodoro.
 - **Natural-Language Quick Add**: Type `Tomorrow 3pm review roadmap #work !p1 ~weekly` to parse due dates, times, projects, priorities, and recurrence rules into structured fields automatically.
-- **Task Hierarchy**: One-level subtasks with progress tracking (`1/2 completed`), cascade completion, and cascade deletion with full undo support.
+- **Task Hierarchy**: One-level subtasks with progress tracking (`1/2 completed`), rename in place from the drawer, cascade completion, and cascade deletion with full undo support.
 - **Recurring Tasks**: Supports `daily`, `weekday` (skipping weekends), `weekly` (optionally on multiple weekdays such as Mon/Wed/Fri), `monthly` (same day, last day of month, or the Nth weekday), and `yearly`, with catch-up logic. Marking a recurring task complete archives the current occurrence and immediately spawns the next one with fresh subtasks.
 - **Priorities & Labels**: P0 (Critical, filled red), P1 (Urgent, red), P2 (High, orange), P3 (Medium, blue), P4 (Low, gray) shown in a dedicated column at the row start; quick add accepts `!p0`–`!p4`, plus arbitrary `#project` and `@tag` labels.
 - **Calendar Grid**: Interactive monthly grid displaying task count dots; clicking any date filters tasks for that specific day.
