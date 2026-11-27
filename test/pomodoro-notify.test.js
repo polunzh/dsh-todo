@@ -170,7 +170,7 @@ test("没装通知中心时回退到原来的 sendNotification + playChime", () 
     assert.equal(calls.notifications.length, 1, "应回退到浏览器通知");
     assert.equal(calls.notifications[0].title, preview.DICT.zh["pom.notifyTitleFocus"]);
     assert.equal(calls.notifications[0].body, preview.DICT.zh["pom.notifyBodyFocus"]);
-    assert.equal(calls.chimeNotes, 3, "三音提示音仍需完整播放");
+    assert.equal(calls.chimeNotes, 1, "完成提示音应只响一声「叮」");
     assert.equal(preview.__internal.dataStore.getToast().message, preview.DICT.zh["pom.finishedFocus"]);
   });
 });

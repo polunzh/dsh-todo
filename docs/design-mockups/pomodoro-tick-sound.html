@@ -146,7 +146,7 @@
     <div>
       <div class="eyebrow">dsh-todo · Pomodoro tick</div>
       <h1>番茄钟嘀嗒声</h1>
-      <p>专注计时运行时每秒一声轻嘀嗒（tick / tock 交替），默认开启，可在插件设置里关闭。结束三音、任务完成双音与通知中心的行为保持不变。</p>
+      <p>专注计时运行时每秒一声轻嘀嗒（tick / tock 交替），默认开启，可在插件设置里关闭。任务完成与番茄结束的单声「叮」、通知中心行为保持不变。</p>
     </div>
     <div class="stamp"><b>方案 B（推荐） / 方案 A（备选）</b>2026-11-27 · v0.2.20 设计稿</div>
   </header>
@@ -407,7 +407,7 @@
         <div class="step">
           <span class="n">4</span>
           <h4>到点</h4>
-          <p>嘀嗒停止，结束三音（或通知中心）接管；关闭开关即时生效。</p>
+          <p>嘀嗒停止，单声「叮」（或通知中心）接管；关闭开关即时生效。</p>
         </div>
       </div>
       <div class="spec">
@@ -416,7 +416,7 @@
           <dl>
             <dt>合成</dt><dd>噪声脉冲 + 带通滤波，无音频文件</dd>
             <dt>音色</dt><dd>tick 3.2kHz / tock 2.4kHz 交替</dd>
-            <dt>峰值</dt><dd>0.05（结束三音 0.14）</dd>
+            <dt>峰值</dt><dd>0.05（完成「叮」0.13）</dd>
             <dt>时长</dt><dd>约 50ms，衰减包络</dd>
           </dl>
           <div class="wave" aria-hidden="true">
