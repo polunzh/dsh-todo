@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>dsh-todo · 子任务就地编辑设计稿</title>
+<style>
+  :root {
+    --canvas: #f5f6f8;
+    --surface: #ffffff;
+    --ink: #1a1c20;
+    --sub: #5c626b;
+    --quiet: #8d949d;
+    --caption: #a2a8b0;
+    --line: #e7e9ed;
+    --line-2: #d7dbe1;
+    --line-3: #cdd2d9;
+    --hover: #f2f4f6;
+    --accent: #10a37f;
+    --accent-ink: #08745a;
+    --accent-tint: rgba(16, 163, 127, .13);
+    --danger: #d64541;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.005em;
+  }
+  .board { max-width: 1440px; margin: 0 auto; padding: 34px 56px 28px; }
+
+  /* ---------- 标题 ---------- */
+  .eyebrow { font-size: 11px; font-weight: 650; letter-spacing: .12em; color: var(--quiet); text-transform: uppercase; }
+  h1 { margin: 9px 0 0; font-size: 27px; font-weight: 720; letter-spacing: -.025em; }
+  .lede { margin: 9px 0 0; max-width: 720px; color: var(--sub); font-size: 13.5px; line-height: 1.6; }
+  .lede b { color: var(--ink); font-weight: 620; }
+  .meta { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  .tag { height: 22px; padding: 0 8px; display: inline-flex; align-items: center; border: 1px solid var(--line-2); border-radius: 6px; color: var(--sub); font-size: 11px; }
+
+  /* ---------- 栅格 ---------- */
+  .cols { display: grid; grid-template-columns: 400px 400px minmax(0, 1fr); gap: 34px; margin-top: 24px; align-items: start; }
+  .strip { margin-top: 18px; }
+  .c-split { display: grid; grid-template-columns: 400px minmax(0, 1fr); gap: 22px; align-items: start; }
+  .c-side { min-height: 177px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; }
+  .strip .col-head { width: 400px; }
+  .c-side .eyebrow-sm { font-size: 10.5px; font-weight: 600; letter-spacing: .08em; color: var(--quiet); }
+  .c-side .stack { display: flex; flex-direction: column; gap: 9px; }
+
+  .col-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .col-head .id { width: 19px; height: 19px; display: grid; place-items: center; border-radius: 5px; background: var(--ink); color: #fff; font-size: 11px; font-weight: 700; }
+  .col-head .name { font-size: 12.5px; font-weight: 650; }
+  .col-head .hint { margin-left: auto; color: var(--quiet); font-size: 11px; }
+  .col-head .hint-touch { display: none; }
+
+  /* ---------- 抽屉切片（真实尺寸 400px） ---------- */
+  .crop {
+    width: 400px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(22, 29, 38, .07), 0 1px 2px rgba(22, 29, 38, .04);
+    overflow: hidden;
+  }
+  .crop-head { display: flex; align-items: center; gap: 8px; padding: 13px 14px; border-bottom: 1px solid var(--line); }
+  .crop-head h2 { margin: 0; font-size: 14px; font-weight: 650; }
+  .save-state { font-size: 10.5px; color: var(--caption); }
+  .crop-actions { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; }
+  .save { height: 26px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--hover); color: var(--caption); font-size: 12px; font-weight: 650; }
+  .save.is-ready { background: var(--accent-tint); border-color: rgba(16, 163, 127, .42); color: var(--accent-ink); }
+  .close { width: 24px; height: 24px; display: grid; place-items: center; border: 0; background: transparent; color: var(--quiet); }
+  .crop-body { padding: 14px; display: flex; flex-direction: column; gap: 13px; }
+
+  .field-head { display: flex; align-items: baseline; justify-content: space-between; }
+  .field-label { font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--quiet); }
+  .field-aside { font-size: 10.5px; color: var(--caption); font-variant-numeric: tabular-nums; }
+
+  .subs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .sub { position: relative; display: flex; align-items: center; gap: 7px; min-height: 22px; padding: 3px 2px; border-radius: 6px; }
+  .sub.is-hover { background: var(--hover); }
+  .cb { flex: none; width: 15px; height: 15px; border-radius: 50%; border: 1.6px solid var(--line-3); background: var(--surface); display: grid; place-items: center; }
+  .cb.is-checked { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .ttl { flex: 1; min-width: 0; font-size: 12.5px; color: var(--sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sub.is-done .ttl { color: var(--caption); text-decoration: line-through; }
+  .sub.is-hover .ttl { cursor: text; }
+  .del { flex: none; width: 20px; height: 20px; display: grid; place-items: center; border: 0; border-radius: 5px; background: transparent; color: var(--caption); }
+  .sub.is-hover .del { color: var(--quiet); }
+
+  /* 编辑态输入框：高 26px / 12.5px */
+  .sub-input {
+    flex: 1; min-width: 0; height: 24px; display: flex; align-items: center; gap: 1px;
+    padding: 0 6px; border: 1px solid var(--accent); border-radius: 6px;
+    background: var(--surface); box-shadow: 0 0 0 3px rgba(16, 163, 127, .16);
+  }
+  .sub-input .val { font-size: 12.5px; color: var(--ink); white-space: nowrap; overflow: hidden; }
+  .caret { flex: none; width: 1.5px; height: 14px; background: var(--accent); border-radius: 1px; }
+
+  .add { display: flex; gap: 6px; align-items: center; }
+  .add input {
+    flex: 1; min-width: 0; height: 30px; padding: 0 8px; font: inherit; font-size: 12.5px;
+    border: 1px solid var(--line-2); border-radius: 8px; background: var(--surface); color: var(--ink);
+  }
+  .add input::placeholder { color: var(--caption); }
+  .add button { flex: none; height: 30px; padding: 0 10px; display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--surface); color: var(--sub); font-size: 12.5px; font-weight: 550; }
+  .add button i { font-style: normal; color: var(--quiet); font-size: 13px; }
+
+  /* 悬停 tooltip */
+  .tip {
+    position: absolute; right: 26px; top: -30px; z-index: 3;
+    padding: 4px 8px; border-radius: 6px; background: #23262d; color: #fff;
+    font-size: 11.5px; white-space: nowrap; box-shadow: 0 6px 16px rgba(20, 26, 34, .22);
+  }
+  .tip:after { content: ""; position: absolute; left: 18px; bottom: -4px; width: 8px; height: 8px; background: #23262d; transform: rotate(45deg); border-radius: 1px; }
+
+  /* 失败提示条：真实形态浮在面板底部、抽屉遮罩之上 */
+  .toast-frame { padding: 13px 14px; border: 1px solid var(--line); border-radius: 10px; background: #e9ebef; display: flex; justify-content: center; }
+  .toast { display: inline-flex; align-items: center; gap: 9px; max-width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: #eef0f3; box-shadow: 0 2px 6px rgba(22, 29, 38, .07); }
+  .toast .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--danger); flex: none; }
+  .toast .msg { font-size: 12.5px; color: var(--danger); white-space: nowrap; }
+  .c-caption { margin-top: 8px; color: var(--quiet); font-size: 11px; line-height: 1.5; }
+
+  /* ---------- 说明列 ---------- */
+  .notes { display: flex; flex-direction: column; gap: 22px; }
+  .note-block h3 { margin: 0 0 9px; font-size: 12.5px; font-weight: 680; letter-spacing: .01em; }
+  .note-block ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .note-block li { position: relative; padding-left: 15px; color: var(--sub); font-size: 12.5px; line-height: 1.55; }
+  .note-block li:before { content: ""; position: absolute; left: 3px; top: 8px; width: 4px; height: 4px; border-radius: 50%; background: var(--line-3); }
+  .note-block li b { color: var(--ink); font-weight: 620; }
+  .note-card { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 13px 14px; box-shadow: 0 1px 2px rgba(22, 29, 38, .03); }
+  .note-card h4 { margin: 0 0 6px; font-size: 12px; font-weight: 680; }
+  .note-card p { margin: 0; color: var(--sub); font-size: 12px; line-height: 1.6; }
+  .note-card p + p { margin-top: 7px; }
+  .kbd { display: inline-block; min-width: 18px; padding: 1px 5px; border: 1px solid var(--line-2); border-bottom-width: 2px; border-radius: 4px; background: #fbfbfc; color: var(--sub); font-size: 10.5px; font-weight: 600; text-align: center; }
+
+  .strip-note { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 16px 18px; }
+  .strip-note h3 { margin: 0 0 8px; font-size: 12.5px; font-weight: 680; }
+  .strip-note p { margin: 0; color: var(--sub); font-size: 12.5px; line-height: 1.65; }
+  .strip-note p + p { margin-top: 8px; }
+  .strip-note .quote { color: var(--quiet); }
+
+  .foot { margin-top: 26px; color: var(--caption); font-size: 11px; display: flex; justify-content: space-between; }
+
+  @media (max-width: 1180px) {
+    .cols { grid-template-columns: 400px minmax(0, 1fr); }
+    .cols .col-a { display: none; }
+  }
+  @media (max-width: 760px) {
+    .board { padding: 20px 16px 24px; }
+    h1 { font-size: 21px; }
+    .lede { font-size: 12.5px; }
+    .cols, .strip { grid-template-columns: minmax(0, 1fr); gap: 22px; margin-top: 20px; }
+    .crop { width: 100%; }
+    .col-a, .strip, .foot, .col-notes .is-why { display: none; }
+    .col-notes { gap: 14px; }
+    .hint-key { display: none; }
+    .col-head .hint-touch { display: inline; }
+    .col-head .hint { font-size: 10.5px; }
+    .crop-body { padding: 12px; }
+    .lede { margin-top: 8px; }
+    .meta { margin-top: 12px; }
+    .cols { margin-top: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="board">
+  <div class="eyebrow">dsh-todo · 详情抽屉</div>
+  <h1>子任务就地编辑</h1>
+  <p class="lede">子任务行一直只能勾选和删除。这次把<b>标题本身变成编辑入口</b>：点一下就地变成输入框，<b>Enter</b> 提交、<b>Esc</b> 取消，失焦也算提交。控件数量不变，保存路径仍是 <code>tasks/update</code>。</p>
+  <div class="meta">
+    <span class="tag">Studio Vivid</span>
+    <span class="tag">抽屉 400px</span>
+    <span class="tag">行高 22px</span>
+    <span class="tag">输入 24px / 12.5px</span>
+    <span class="tag">v0.2.23</span>
+  </div>
+
+  <div class="cols">
+    <!-- A · 默认与悬停 -->
+    <section class="col-a">
+      <div class="col-head"><span class="id">A</span><span class="name">默认 / 悬停</span><span class="hint">指针悬停第 4 行</span></div>
+      <div class="crop">
+        <div class="crop-head">
+          <h2>任务详情</h2>
+          <span class="save-state">已保存</span>
+          <div class="crop-actions">
+            <button class="save">保存</button>
+            <button class="close" aria-label="关闭">×</button>
+          </div>
+        </div>
+        <div class="crop-body">
+          <div>
+            <div class="field-head"><span class="field-label">子任务</span><span class="field-aside">0/6</span></div>
+            <ul class="subs" style="margin-top:6px">
+              <li class="sub"><span class="cb"></span><span class="ttl">展腹跳</span><span class="del">×</span></li>
+              <li class="sub"><span class="cb"></span><span class="ttl">收腹跳</span><span class="del">×</span></li>
+              <li class="sub"><span class="cb"></span><span class="ttl">快速转身 X 2</span><span class="del">×</span></li>
+              <li class="sub is-hover">
+                <span class="tip">点击标题即可修改</span>
+                <span class="cb"></span><span class="ttl">转髋跳 20 X 2</span><span class="del">×</span>
+              </li>
+              <li class="sub"><span class="cb"></span><span class="ttl">确认步 15 X 2</span><span class="del">×</span></li>
+              <li class="sub"><span class="cb"></span><span class="ttl">整体 15 X 2</span><span class="del">×</span></li>
+            </ul>
+          </div>
+          <div class="add">
+            <input placeholder="添加子任务…" />
+            <button><i>＋</i>添加子任务</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- B · 编辑中 -->
+    <section class="col-b">
+      <div class="col-head"><span class="id">B</span><span class="name">编辑中</span><span class="hint hint-key"><span class="kbd">Enter</span> 提交 · <span class="kbd">Esc</span> 取消</span><span class="hint hint-touch">点标题直接进入编辑</span></div>
+      <div class="crop">
+        <div class="crop-head">
+          <h2>任务详情</h2>
+          <span class="save-state">已保存</span>
+          <div class="crop-actions">
+            <button class="save">保存</button>
+            <button class="close" aria-label="关闭">×</button>
+          </div>
+        </div>
+        <div class="crop-body">
+          <div>
+            <div class="field-head"><span class="field-label">子任务</span><span class="field-aside">1/6</span></div>
+            <ul class="subs" style="margin-top:6px">
+              <li class="sub"><span class="cb"></span><span class="ttl">展腹跳</span><span class="del">×</span></li>
+              <li class="sub"><span class="cb"></span><span class="ttl">收腹跳</span><span class="del">×</span></li>
+              <li class="sub"><span class="cb"></span><span class="ttl">快速转身 X 2</span><span class="del">×</span></li>
+              <li class="sub">
+                <span class="cb"></span>
+                <span class="sub-input"><span class="val">转髋跳 20 X 3</span><i class="caret"></i></span>
+                <span class="del">×</span>
+              </li>
+              <li class="sub"><span class="cb"></span><span class="ttl">确认步 15 X 2</span><span class="del">×</span></li>
+              <li class="sub is-done">
+                <span class="cb is-checked"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.4 9.4 16.8 19 7.2"/></svg></span>
+                <span class="ttl">整体 15 X 2</span><span class="del">×</span>
+              </li>
+            </ul>
+          </div>
+          <div class="add">
+            <input placeholder="添加子任务…" />
+            <button><i>＋</i>添加子任务</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 说明 -->
+    <aside class="col-notes notes">
+      <div class="note-block">
+        <h3>状态与边界</h3>
+        <ul>
+          <li>清空到只剩空格：<b>恢复原标题</b>，不发请求。</li>
+          <li>标题没改动：直接退出，不发请求。</li>
+          <li>Esc：放弃本次修改，文字回到原样。</li>
+          <li>点另一行标题：先提交当前行，再进入新的一行。</li>
+          <li>保存失败：<b>保留输入</b>并重新聚焦，面板底部弹真实错误文案。</li>
+          <li>已完成子任务同样可编辑；编辑中该行不显示删除线。</li>
+        </ul>
+      </div>
+      <div class="note-card is-why">
+        <h4>标题自己就是入口</h4>
+        <p>抽屉里一列只有勾选框、标题、删除三个落点。行内再插一个铅笔图标会压窄 12.5px 的文本列，也和列表里「点标题打开详情」的手感冲突。</p>
+      </div>
+      <div class="note-card is-why">
+        <h4>为什么立即保存</h4>
+        <p>新增、勾选、删除都即时落盘。子任务改名走同一条 <code>tasks/update</code>，不进抽屉顶部的脏值队列——否则「保存」按钮会因为改了个子任务而亮起，语义变糊。</p>
+      </div>
+    </aside>
+  </div>
+
+  <div class="strip">
+    <div class="col-head"><span class="id">C</span><span class="name">保存失败</span><span class="hint">输入保留 · Enter 重试 · Esc 放弃</span></div>
+    <div class="c-split">
+      <div class="crop">
+        <div class="crop-head">
+          <h2>任务详情</h2>
+          <span class="save-state">已保存</span>
+          <div class="crop-actions">
+            <button class="save">保存</button>
+            <button class="close" aria-label="关闭">×</button>
+          </div>
+        </div>
+        <div class="crop-body" style="gap:9px">
+          <div class="field-head"><span class="field-label">子任务</span><span class="field-aside">0/3</span></div>
+          <ul class="subs">
+            <li class="sub"><span class="cb"></span><span class="ttl">展腹跳</span><span class="del">×</span></li>
+            <li class="sub">
+              <span class="cb"></span>
+              <span class="sub-input"><span class="val">快速转身 X 3</span><i class="caret"></i></span>
+              <span class="del">×</span>
+            </li>
+            <li class="sub"><span class="cb"></span><span class="ttl">转髋跳 20 X 2</span><span class="del">×</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="c-side">
+        <div class="eyebrow-sm">面板底部 · 提示条</div>
+        <div class="stack">
+          <div class="toast-frame"><div class="toast"><span class="dot"></span><span class="msg">网络请求失败</span></div></div>
+          <p class="c-caption">提示条浮在抽屉遮罩之上，错误文案直接来自 store；抽屉里的输入框保留原文并重新聚焦，可再 Enter 重试或 Esc 放弃。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>dsh-todo · 详情抽屉「子任务」区 · 真实尺寸 400px 切片</span>
+    <span>1440 × 900 · @2x</span>
+  </div>
+</div>
+</body>
+</html>
