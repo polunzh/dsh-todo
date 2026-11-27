@@ -84,6 +84,22 @@ const shots = [
     narrative: "窄屏番茄钟：计时盘在上，统计区在下依次堆叠",
   },
   {
+    name: "settings-sound",
+    width: 1440,
+    height: 900,
+    url: "?view=pomodoro&theme=light&locale=zh",
+    afterReady: `new Promise((resolve) => { document.querySelector(".todo-open-settings")?.click(); setTimeout(resolve, 120); })`,
+    narrative: "中文 · 插件设置：提示音与嘀嗒声两个开关，默认开启",
+  },
+  {
+    name: "settings-sound-en",
+    width: 1440,
+    height: 900,
+    url: "?view=pomodoro&theme=light&locale=en",
+    afterReady: `new Promise((resolve) => { document.querySelector(".todo-open-settings")?.click(); setTimeout(resolve, 120); })`,
+    narrative: "English · Plugin settings with the Alerts and Ticking switches, both on",
+  },
+  {
     name: "theme-switcher",
     width: 1440,
     height: 900,

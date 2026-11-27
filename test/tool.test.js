@@ -385,12 +385,13 @@ test("action=add accepts structured recurrence params", async () => {
 
 test("action=settings updates pomodoro settings", async () => {
   const result = await executeTodoAction(
-    { action: "settings", focusMinutes: 50, shortBreakMinutes: 8, theme: "navy-blue" },
+    { action: "settings", focusMinutes: 50, shortBreakMinutes: 8, tickSound: false, theme: "navy-blue" },
     opts,
   );
   assert.equal(result.ok, true);
   assert.equal(result.settings.focusMinutes, 50);
   assert.equal(result.settings.shortBreakMinutes, 8);
+  assert.equal(result.settings.tickSound, false);
   assert.equal(result.settings.theme, "navy-blue");
   assert.match(result.summary, /番茄设置/);
   assert.equal(readState(opts).settings.focusMinutes, 50);

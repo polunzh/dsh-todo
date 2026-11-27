@@ -704,6 +704,15 @@ test("主题调色板覆盖五个主题、深浅宿主模式与宿主入口令�
   assert.match(SOURCE, /--todo-on-accent/, "强调按钮必须有显式对比色");
 });
 
+test("设置里的嘀嗒声开关与试听共用合成函数", () => {
+  assert.match(SOURCE, /t\("settings\.tickSound"\)/, "设置行需要嘀嗒声文案");
+  assert.match(SOURCE, /t\("settings\.tickSoundHint"\)/, "设置行需要说明文案");
+  assert.match(SOURCE, /settings\.tickSound === true/, "开关应回显持久化的 tickSound");
+  assert.match(SOURCE, /ui\.onSettings\(\{ tickSound: event\.target\.checked \}\)/, "开关改动应立刻保存");
+  assert.match(SOURCE, /onClick: playTickPreview/, "试听按钮与真实嘀嗒共用合成函数");
+  assert.match(SOURCE, /settingsSnapshot\(\)\.tickSound && state\.mode === "focus"/, "只在专注模式读实时开关");
+});
+
 test("完成与保存反馈包含专属结构、撤销与共享提示音", () => {
   assert.match(SOURCE, /kind: "completed"/, "完成提示需要专属 kind");
   assert.match(SOURCE, /actionLabel: t\("toast\.undo"\)/, "完成提示需要撤销动作");

@@ -49,6 +49,13 @@ An unstarted focus stays quiet; a short or long break shows as soon as it become
 
 ![A selected single day](./preview/screenshots/pomodoro-stats-day.png)
 
+### Alerts and ticking
+In Plugin settings, Alerts covers task completion and Pomodoro endings, while Ticking covers the focus countdown only. Each switch has its own Test button and both default to on.
+
+![Plugin settings: Alerts and Ticking](./preview/screenshots/settings-sound.png)
+
+![English: Alerts and Ticking](./preview/screenshots/settings-sound-en.png)
+
 ### Per-task focus length
 Not every task deserves 25 minutes. Give a single todo its own focus length in the task drawer — 15 / 25 / 45 or any value from 1 to 180 minutes — and its play button starts exactly that session. Tasks without one keep following the global setting. The chip on the task row shows the assigned length, and the finished session is recorded with those minutes.
 
@@ -87,7 +94,8 @@ Use the top-right **Plugin settings → Appearance → Theme** control. It appli
 - **Conversation-header timer**: A compact timer sits at the top right of every session — idle shows the configured focus length, running shows the countdown with the bound task and pause/skip controls. The sidebar icon mirrors the countdown as mm:ss, labelled with the mode while on a break.
 - **Persistent Countdown**: Timer state is preserved in browser storage (`localStorage`) with absolute timestamps, surviving page refreshes without drifting.
 - **Audio & Visual Alerts**: One Alerts setting, enabled by default for new users, covers both task completion and Pomodoro endings. Task completion uses a brief ascending two-note confirmation; Pomodoro keeps its three-note chime. Existing saved choices remain unchanged, and the Test button plays the Pomodoro chime immediately. With the notification center plugin (`@polunzh/dsh-task-notifier`) installed, Pomodoro endings are published there and it owns the system notification and chime; dsh-todo's own notification is the fallback when the notification center is absent.
-- **Plugin settings & themes**: One top-right Plugin settings panel contains Pomodoro timings, alerts, goals, and the single Appearance control for five locally persisted themes. Studio Vivid green is the default; the picker works with keyboard navigation, click-outside dismissal, and host light/dark mode.
+- **Focus ticking**: While a focus session runs, a soft tick plays once a second, alternating tick and tock. Pausing, breaks, skipping, abandoning, and the final second stay silent — the ending alert takes over. A separate Ticking switch ships on and defaults to on, so you can silence the countdown while keeping the end alerts; its Test button plays three ticks.
+- **Plugin settings & themes**: One top-right Plugin settings panel contains Pomodoro timings, alerts, ticking, goals, and the single Appearance control for five locally persisted themes. Studio Vivid green is the default; the picker works with keyboard navigation, click-outside dismissal, and host light/dark mode.
 - **Focus stats**: switch the right-hand panel between 7 days, 30 days and all time; the 30-day view aggregates by week and all time by month. Click a bar to drill down (month → week → day), and selecting a day makes the task breakdown and focus log follow it. A per-task/project breakdown and streak sit alongside.
 - **Trustworthy records**: only fully completed pomodoros count toward totals and the daily goal. Abandoning or skipping a focus records the actual minutes as an "interrupted" entry once you have focused for 5 minutes or more, and leaves nothing behind below that. Finishing a break no longer logs a focus session.
 
@@ -118,7 +126,7 @@ Supported actions:
 - `delete`: Remove tasks and their child subtasks.
 - `stats`: Retrieve today's completed task count, focus minutes, and Pomodoro counts.
 - `project`: Create a new project.
-- `settings`: Adjust Pomodoro focus/short/long lengths, long-break interval, auto-start, sound, daily goal, and the theme (`studio-vivid`, `deep-teal`, `warm-orange`, `navy-blue`, or `rose-warm-gray`).
+- `settings`: Adjust Pomodoro focus/short/long lengths, long-break interval, auto-start, sound, ticking, daily goal, and the theme (`studio-vivid`, `deep-teal`, `warm-orange`, `navy-blue`, or `rose-warm-gray`).
 
 ---
 
