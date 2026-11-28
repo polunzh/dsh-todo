@@ -12,7 +12,7 @@
 - [x] `docs/contract.md`、`docs/design.md`、`docs/design-completion-ding.md`、`docs/design-pomodoro-tick-sound.md`、`docs/design-task-completion-feedback.md` 与双语 README 同步文案与行为。
 - [x] `test/`：覆盖默认值、迁移、工具参数、设置行结构，以及 `test/complete-sound.test.js` 里勾选发声 / 关闭静音 / 取消完成不发声三条真实路径。
 - [x] 跑 `npm test`、`node --check lib/client.js`、截图脚本；确认亮 / 深 / 中英 / 390px 设置面板与设计稿一致。
-- [ ] 版本从 `0.2.23` 递增到 `0.2.24`，提交并 push；npm staged publishing 需用户在 npmjs.com Approve。
+- [x] 版本从 `0.2.23` 递增到 `0.2.24`，提交并 push；npm staged publishing 需用户在 npmjs.com Approve。
 
 ## 实施要点
 

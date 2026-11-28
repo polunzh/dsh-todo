@@ -63,7 +63,8 @@ Settings = {
   "longBreakMinutes": 15,    // 1..120
   "longBreakEvery": 4,       // 2..12
   "autoStartNext": false,
-  "sound": true,             // 任务完成与番茄结束提示音
+  "sound": true,             // 番茄结束提示音
+  "completeSound": true,     // 任务完成音效；默认开启，旧数据迁移为 true
   "tickSound": true,         // 专注倒计时每秒嘀嗒；默认开启，旧数据迁移为 true
   "dailyGoal": 8             // 1..40，每天番茄目标
 }
@@ -162,6 +163,7 @@ Settings = {
     "dailyGoal": { "type": "integer", "minimum": 1, "maximum": 40 },
     "autoStartNext": { "type": "boolean" },
     "sound": { "type": "boolean" },
+    "completeSound": { "type": "boolean" },
     "tickSound": { "type": "boolean" },
     "view": { "type": "string", "enum": ["today", "upcoming", "inbox", "completed", "all"] },
     "query": { "type": "string" },
@@ -176,7 +178,7 @@ Settings = {
 
 `output.schema`：`{ "type": "object", "properties": { "summary": {"type":"string"}, "tasks": {"type":"array"} } }`；`render` 返回 `[{ type: "text", text: summary + 任务行 }]`。
 
-行为：调用同一份 store 函数（与路由完全一致），返回文本摘要，例如 `今天 3 个任务（逾期 1）` 后跟每行 `- [ ] 写周报 · P1 · 今天 15:00 · #工作`。`action: "settings"` 改番茄设置（专注/短休/长休时长、长休间隔、自动开始、提示音、嘀嗒声、每日目标），走 `updateSettings` 校验。
+行为：调用同一份 store 函数（与路由完全一致），返回文本摘要，例如 `今天 3 个任务（逾期 1）` 后跟每行 `- [ ] 写周报 · P1 · 今天 15:00 · #工作`。`action: "settings"` 改番茄设置（专注/短休/长休时长、长休间隔、自动开始、完成音效、结束提示音、嘀嗒声、每日目标），走 `updateSettings` 校验。
 
 `focusMinutes` 有两种语义：在 `add` / `update` 下写入任务级专注时长（`null` 或 `""` 清除覆盖，回到跟随全局）；在 `settings` 下改全局默认专注时长。任务带覆盖时，`list` / `add` / `update` 的摘要行追加 `⏱15 分钟`。
 

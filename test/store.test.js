@@ -623,6 +623,8 @@ test("新用户默认开启提示音，已有状态保留显式选择", () => {
   assert.equal(DEFAULT_SETTINGS.sound, true);
   assert.equal(fresh.settings.tickSound, true);
   assert.equal(DEFAULT_SETTINGS.tickSound, true);
+  assert.equal(fresh.settings.completeSound, true);
+  assert.equal(DEFAULT_SETTINGS.completeSound, true);
 
   mkdirSync(testDir, { recursive: true });
   writeFileSync(
@@ -640,6 +642,7 @@ test("新用户默认开启提示音，已有状态保留显式选择", () => {
   assert.equal(migrated.settings.sound, false, "旧文件的关闭选择必须保留");
   assert.equal(migrated.settings.dailyGoal, 12, "其他设置不受迁移影响");
   assert.equal(migrated.settings.tickSound, true, "旧文件没有 tickSound 时迁移为默认开启");
+  assert.equal(migrated.settings.completeSound, true, "旧文件没有 completeSound 时迁移为默认开启");
   assert.equal(migrated.version, 2);
 });
 
@@ -647,6 +650,15 @@ test("用户在面板里修改提示音后保持选择", () => {
   updateSettings({ sound: false }, { dataDir: testDir });
   const state = readState({ dataDir: testDir });
   assert.equal(state.settings.sound, false);
+});
+
+test("完成音效开关独立保存，显式关闭后保持关闭", () => {
+  updateSettings({ completeSound: false }, { dataDir: testDir });
+  assert.equal(readState({ dataDir: testDir }).settings.completeSound, false);
+  assert.equal(readState({ dataDir: testDir }).settings.sound, true, "关掉完成音效不能连带关掉结束提示音");
+  updateSettings({ completeSound: true }, { dataDir: testDir });
+  assert.equal(readState({ dataDir: testDir }).settings.completeSound, true);
+  assert.throws(() => updateSettings({ completeSound: "on" }, { dataDir: testDir }), (err) => err.code === "invalid-settings");
 });
 
 test("嘀嗒声开关可保存，显式关闭后保持关闭", () => {

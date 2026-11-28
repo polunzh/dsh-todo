@@ -713,6 +713,17 @@ test("设置里的嘀嗒声开关与试听共用合成函数", () => {
   assert.match(SOURCE, /settingsSnapshot\(\)\.tickSound && state\.mode === "focus"/, "只在专注模式读实时开关");
 });
 
+test("完成音效开关与结束提示音分开", () => {
+  assert.match(SOURCE, /t\("settings\.completeSound"\)/, "设置行需要完成音效文案");
+  assert.match(SOURCE, /t\("settings\.completeSoundHint"\)/, "设置行需要完成音效说明");
+  assert.match(SOURCE, /settings\.completeSound === true/, "开关应回显持久化的 completeSound");
+  assert.match(SOURCE, /ui\.onSettings\(\{ completeSound: event\.target\.checked \}\)/, "开关改动应立刻保存");
+  assert.match(SOURCE, /onClick: playCompletionChime/, "完成音效的试听与真实完成音共用同一函数");
+  assert.match(SOURCE, /state\.settings\.completeSound\) playCompletionChime\(\)/, "完成任务只受 completeSound 控制");
+  assert.match(SOURCE, /onClick: playChime/, "结束提示音的试听仍播结束音");
+  assert.match(SOURCE, /t\("settings\.soundHint"\)/, "结束提示音需要独立说明");
+});
+
 test("完成与保存反馈包含专属结构、撤销与共享提示音", () => {
   assert.match(SOURCE, /kind: "completed"/, "完成提示需要专属 kind");
   assert.match(SOURCE, /actionLabel: t\("toast\.undo"\)/, "完成提示需要撤销动作");
